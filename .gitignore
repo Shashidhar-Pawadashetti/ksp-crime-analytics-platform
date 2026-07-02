@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Local configuration and private keys
+.env
+.env.local
+*.env.json
+.app-config.json
+
+# Catalyst CLI logs and temporary build outputs
+.catalyst/
+catalyst-debug.log
+build/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+resources/
+data_pipeline/data/
+data_pipeline/node_modules/

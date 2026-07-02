@@ -1,0 +1,9 @@
+{
+  "functions": {
+    "targets": [
+      "test"
+    ],
+    "ignore": [],
+    "source": "functions"
+  }
+}
