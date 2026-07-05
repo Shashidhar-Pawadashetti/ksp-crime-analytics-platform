@@ -116,6 +116,7 @@ async function callQuickML(prompt, options = {}) {
 		messages: [{ role: 'user', content: prompt }],
 		temperature: options.temperature ?? 0.1,
 		max_tokens: options.max_tokens ?? 500,
+		chat_template_kwargs: { enable_thinking: false },
 	});
 
 	const urlObj = new URL(QUICKML_URL);

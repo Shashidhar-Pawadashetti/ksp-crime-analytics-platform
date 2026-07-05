@@ -7,6 +7,8 @@ const QUICKML_URL = process.env.QUICKML_URL || 'https://api.catalyst.zoho.in/qui
 const QUICKML_MODEL = process.env.QUICKML_MODEL || 'crm-di-glm47b_30b_it';
 const CATALYST_ORG = process.env.CATALYST_ORG || '60073929329';
 
+const STRUCTURED_PATTERNS = /\b(how many|count|total|list\s+\w+|show\s+(me|all|the|FIR)|find\s+\w+|get\s+(me|all|the)|cases?\s+(in|registered|filed|reported)|FIR\s+details?|accused\s+details?|victim\s+details?|officer\s+|section\s+\w+|IPC|CrPC|charge\s+sheet)\b/i;
+const NARRATIVE_PATTERNS = /\b(describe|what\s+happened|tell\s+me\s+about|modus\s+operandi|summary\s+of|overview\s+of|details?\s+about\s+case|brief\s+facts|incident\s+details?|sequence\s+of\s+events)\b/i;
 const NETWORK_PATTERNS = /\b(associates?|linked\s+to|connected|co-accused|network|relationships?)\b/i;
 const RISK_PATTERNS = /\b(risk\s+score|high-risk|repeat\s+offender|risk\s+level|dangerous|threat\s+level)\b/i;
 const FORECAST_PATTERNS = /\b(predict|forecast|next\s+month|hotspot|trend|pattern|seasonal)\b/i;
@@ -60,8 +62,14 @@ function classifyByKeyword(query) {
 	if (RISK_PATTERNS.test(query)) {
 		return { intent: 'risk', confidence: 0.95 };
 	}
+	if (NARRATIVE_PATTERNS.test(query)) {
+		return { intent: 'narrative', confidence: 0.85 };
+	}
 	if (FORECAST_PATTERNS.test(query)) {
 		return { intent: 'analytical', confidence: 0.95 };
+	}
+	if (STRUCTURED_PATTERNS.test(query)) {
+		return { intent: 'structured', confidence: 0.85 };
 	}
 	return null;
 }
@@ -77,6 +85,7 @@ async function callQuickML(prompt, options) {
 		messages: [{ role: 'user', content: prompt }],
 		temperature: options.temperature ?? 0.1,
 		max_tokens: options.max_tokens ?? 200,
+		chat_template_kwargs: { enable_thinking: false },
 	});
 
 	const urlObj = new URL(QUICKML_URL);
@@ -129,14 +138,10 @@ function extractGLMContent(response) {
 }
 
 async function classifyWithLLM(query) {
-	const prompt = 'Classify this crime database query into exactly one of these intents:\n\n' +
-		'- structured: asking for specific data, counts, lists, FIR details, statistics (e.g. "how many theft cases", "show FIRs in Bengaluru", "list accused", "cases registered in 2025")\n' +
-		'- narrative: asking for descriptions, summaries, what happened in a case (e.g. "what happened in case 2024-00412", "describe the incident", "tell me about", "modus operandi")\n' +
-		'- network: asking about relationships between people, associates, connections, co-accused (e.g. "show associates of Ravi", "who else was accused with", "linked to")\n' +
-		'- risk: asking about risk scores, dangerous offenders, threat assessment (e.g. "risk score of Kumar", "high-risk offenders", "repeat offender list")\n' +
-		'- analytical: asking for predictions, trends, forecasts, patterns, hotspots (e.g. "predict crime hotspots next month", "crime trend 2026", "seasonal patterns")\n\n' +
-		'Query: "' + query + '"\n\n' +
-		'Respond ONLY with a JSON object: {"intent": "...", "confidence": 0.0-1.0}';
+	const prompt = 'Classify this query into exactly one intent. Respond ONLY with valid JSON, no other text.\n' +
+		'{\n  "intent": "structured",\n  "confidence": 0.95\n}\n\n' +
+		'Intents: structured (counts, lists, stats), narrative (descriptions, summaries), network (associates, connections), risk (risk scores, repeat offenders), analytical (predictions, trends).\n' +
+		'Query: ' + query;
 
 	try {
 		const response = await callQuickML(prompt, { temperature: 0.1, max_tokens: 100 });

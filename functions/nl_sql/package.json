@@ -1,9 +1,7 @@
 {
 	"name": "nl_sql",
 	"version": "1.0.0",
+	"description": "Natural Language to ZCQL translation function",
 	"main": "index.js",
-	"author": "shashipshetti@gmail.com",
-	"dependencies": {
-		"zcatalyst-sdk-node": "latest"
-	}
+	"dependencies": {}
 }

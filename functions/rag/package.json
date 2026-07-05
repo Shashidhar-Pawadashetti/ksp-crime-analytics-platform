@@ -1,9 +1,9 @@
 {
 	"name": "rag",
 	"version": "1.0.0",
+	"description": "RAG function for BriefFacts search",
 	"main": "index.js",
-	"author": "shashipshetti@gmail.com",
 	"dependencies": {
-		"zcatalyst-sdk-node": "latest"
+		"zcatalyst-sdk-node": "^3.4.0"
 	}
 }
