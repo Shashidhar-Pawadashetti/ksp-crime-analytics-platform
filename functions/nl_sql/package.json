@@ -1,0 +1,9 @@
+{
+	"name": "nl_sql",
+	"version": "1.0.0",
+	"main": "index.js",
+	"author": "shashipshetti@gmail.com",
+	"dependencies": {
+		"zcatalyst-sdk-node": "latest"
+	}
+}
