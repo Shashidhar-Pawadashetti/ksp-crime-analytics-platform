@@ -21,3 +21,7 @@ Thumbs.db
 resources/
 data_pipeline/data/
 data_pipeline/node_modules/
+
+# Large generated artifacts
+.build/
+functions/entity-matching-engine/output/candidate_matches.json
