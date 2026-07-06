@@ -65,8 +65,7 @@ const tables = {
     file: loadCSV('ChargesheetDetails'),
     checks: [
       { col: 'CaseMasterID', set: validCM, label: 'CaseMasterID' },
-      { col: 'FilingOfficerID', set: validEmployee, label: 'FilingOfficerID' },
-      { col: 'CourtID', set: validCourt, label: 'CourtID' },
+      { col: 'PolicePersonID', set: validEmployee, label: 'PolicePersonID' },
     ]
   },
 };
@@ -95,11 +94,14 @@ for (const [tname, tinfo] of Object.entries(tables)) {
   }
 
   if (tname === 'ChargesheetDetails') {
+    const csColIdx = ci['csdate'] !== undefined ? ci['csdate'] : -1;
+    const cmIdIdx = ci['CaseMasterID'] !== undefined ? ci['CaseMasterID'] : -1;
     let dateErr = 0;
     for (let i = 1; i < lines.length; i++) {
       const c = parseLine(lines[i]);
-      const csDate = new Date(c[3]);
-      const caseId = c[1];
+      const csDate = csColIdx >= 0 && c[csColIdx] ? new Date(c[csColIdx]) : null;
+      const caseId = cmIdIdx >= 0 ? c[cmIdIdx] : null;
+      if (!csDate || !caseId) { dateErr++; continue; }
       for (let j = 1; j < caseMasterCSV.length; j++) {
         const cm = parseLine(caseMasterCSV[j]);
         if (cm[cmI.CaseMasterID] === caseId) {
