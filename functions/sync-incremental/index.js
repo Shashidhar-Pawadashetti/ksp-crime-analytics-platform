@@ -1,24 +1,54 @@
 'use strict';
 
-const { IncomingMessage, ServerResponse } = require("http");
+var signalHandler = require('./signalHandler');
 
-/**
- * 
- * @param {IncomingMessage} req 
- * @param {ServerResponse} res 
- */
-module.exports = (req, res) => {
-	var url = req.url;
+async function handler(req, res) {
+  try {
+    var body = await parseBody(req);
 
-	switch (url) {
-		case '/':
-			res.writeHead(200, { 'Content-Type': 'text/html' });
-			res.write('<h1>Hello from index.js<h1>');
-			break;
-		default:
-			res.writeHead(404);
-			res.write('You might find the page you are looking for at "/" path');
-			break;
-	}
-	res.end();
-};
+    if (!body.event || !body.record) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'event and record are required' }));
+      return;
+    }
+
+    var result = await signalHandler.processSignal(body.event, body.record);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      status: 'success',
+      matched: result.matched,
+      person_id: result.personId,
+      person_name: result.personName,
+      source_records: result.sourceRecords,
+      total_edges: result.totalEdges,
+      elapsed: result.elapsed
+    }, null, 2));
+  } catch (err) {
+    console.error('Sync handler error:', err);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: err.message }));
+  }
+}
+
+function parseBody(req) {
+  return new Promise(function(resolve, reject) {
+    var body = '';
+    req.on('data', function(chunk) { body += chunk; });
+    req.on('end', function() {
+      try {
+        resolve(JSON.parse(body));
+      } catch (e) {
+        reject(new Error('Invalid JSON body'));
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
+if (require.main === module) {
+  console.log('Usage: node simulate-signal.js [mode]');
+  console.log('  or:    node index.js (as Catalyst AdvancedIO function)');
+}
+
+module.exports = handler;
