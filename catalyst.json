@@ -1,7 +1,13 @@
 {
   "functions": {
     "targets": [
-      "test"
+      "test",
+      "entity-matching-engine",
+      "personmaster-writer",
+      "sync-incremental",
+      "sync-full",
+      "graph-traversal",
+      "personmaster-api"
     ],
     "ignore": [],
     "source": "functions"
