@@ -209,25 +209,36 @@ ${SCHEMA_DESCRIPTION}
 
 Rules:
 1. Return ONLY valid JSON: {"sql": "SELECT ...", "explanation": "brief description of what this query does"}
-2. Use ZCQL dialect (Catalyst Data Store SQL)
-3. SELECT only — never DDL or DML
-4. Always JOIN through correct FK chains
-5. Never use SELECT * — name columns explicitly
-6. Limit results to 50 rows unless the query is an aggregation (COUNT, SUM, AVG, etc.)
+2. Use ZCQL V2 syntax
+3. SELECT only — never DDL or DML (no INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, EXEC)
+4. Always use INNER JOIN ... ON through FK chains via ROWID (max 4 JOINs, 1 condition per JOIN)
+5. Never use SELECT * — always name columns explicitly (max 20 columns per query)
+6. Limit results to 50 rows unless aggregating (COUNT, SUM, AVG, MIN, MAX)
 7. Always qualify column names with table aliases
-8. For text search on names, use LIKE with wildcards
-9. For date filtering, use proper date format YYYY-MM-DD
+8. For text search use LIKE with * wildcard (NOT % — ZCQL uses * not %)
+9. For date filtering use format YYYY-MM-DD in single quotes
 10. GenderID: 1=Male, 2=Female, 3=Other
+11. Never use COUNT(*) — use COUNT(alias.ColumnName) instead
+12. GROUP BY and ORDER BY are supported — use after WHERE, before LIMIT
+13. ORDER BY supports ASC/DESC per column
+14. ZCQL functions: COUNT(), SUM(), AVG(), MIN(), MAX(), DISTINCT
+15. Enclose all string values in single quotes
+16. Subqueries are supported in WHERE clause
+17. HAVING clause supported with GROUP BY
+18. Operator IS works like =, use IS NULL / IS NOT NULL for null checks
 
 Examples:
 Query: "show FIRs for theft in Bengaluru last month"
-SQL: SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, cs.CrimeHeadName, d.DistrictName FROM CaseMaster cm, CrimeSubHead cs, CrimeHead ch, Unit u, District d WHERE cm.CrimeMinorHeadID = cs.ROWID AND cs.CrimeHeadID = ch.ROWID AND cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID AND ch.CrimeGroupName LIKE '%theft%' AND d.DistrictName = 'Bengaluru' AND cm.CrimeRegisteredDate >= '2025-06-01' AND cm.CrimeRegisteredDate < '2025-07-01' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
+SQL: SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, cs.CrimeHeadName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.ROWID INNER JOIN CrimeHead ch ON cs.CrimeHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName = 'Bengaluru' AND cm.CrimeRegisteredDate >= '2025-06-01' AND cm.CrimeRegisteredDate < '2025-07-01' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
 
-Query: "how many murder cases in 2025"
-SQL: SELECT COUNT(*) AS case_count FROM CaseMaster cm, CrimeSubHead cs, CrimeHead ch WHERE cm.CrimeMinorHeadID = cs.ROWID AND cs.CrimeHeadID = ch.ROWID AND ch.CrimeGroupName LIKE '%murder%' AND cm.CrimeRegisteredDate >= '2025-01-01' AND cm.CrimeRegisteredDate < '2026-01-01'
+Query: "count of cases in Bengaluru Urban"
+SQL: SELECT COUNT(cm.CaseMasterID) AS case_count FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE d.DistrictName = 'Bengaluru Urban'
 
 Query: "list accused in case 2024-00412"
-SQL: SELECT a.AccusedMasterID, a.AccusedName, a.AgeYear, a.GenderID FROM Accused a, CaseMaster cm WHERE a.CaseMasterID = cm.ROWID AND cm.CrimeNo = '2024-00412'
+SQL: SELECT a.AccusedMasterID, a.AccusedName, a.AgeYear, a.GenderID FROM Accused a INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID WHERE cm.CrimeNo = '2024-00412'
+
+Query: "top 5 crime types by count"
+SQL: SELECT ch.CrimeGroupName, COUNT(cm.CaseMasterID) AS crime_count FROM CaseMaster cm INNER JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.ROWID INNER JOIN CrimeHead ch ON cs.CrimeHeadID = ch.ROWID GROUP BY ch.CrimeGroupName ORDER BY crime_count DESC LIMIT 5
 
 Query: "${query}"
 
@@ -288,8 +299,9 @@ module.exports = async (req, res) => {
 		return;
 	}
 
+	let result;
 	try {
-		const result = await translateToSQL(query);
+		result = await translateToSQL(query);
 		const rows = await app.zcql().executeZCQLQuery(result.sql);
 		const columnMeta = extractColumnMeta(result.sql);
 		const sourceRefs = extractSourceRefs(rows);
@@ -305,6 +317,7 @@ module.exports = async (req, res) => {
 		});
 	} catch (err) {
 		const errCode = err.message.startsWith('UNSAFE_SQL') ? 'UNSAFE_SQL' : 'TRANSLATION_FAILED';
-		sendError(res, 400, errCode, err.message);
+		const debugSql = result ? result.sql : 'N/A';
+		sendError(res, 400, errCode, err.message + ' | SQL: ' + debugSql);
 	}
 };

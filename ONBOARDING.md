@@ -72,7 +72,7 @@ Catalyst Functions **do not read `.env`**. You must set environment variables in
 2. Click **Environment Variables** → **Add**
 3. Key: `QUICKML_TOKEN` → Value: your token
 4. Click **Save**
-5. Repeat for **nl_sql** and **rag** once those functions are built
+5. Repeat for **nl_sql**, **rag**, and **pipeline** — all 4 functions need this token to call the GLM LLM.
 
 > **Production**: Use a Server-based Application OAuth flow and set the token via CI/CD secrets pipeline. Never use Self Client tokens in production — they expire every hour with no auto-refresh.
 
@@ -102,22 +102,28 @@ ksp-crime-analytics-platform/
 ├── .env.example               # Template for .env (committed)
 ├── .gitignore
 ├── functions/
-│   ├── session/               # WBS 3.4 — Session manager (deployed)
+│   ├── session/               # WBS 3.4 — Session manager (deployed, working)
 │   │   ├── index.js
 │   │   ├── catalyst-config.json
 │   │   └── package.json
-│   ├── classifier/            # WBS 3.3 — Intent classifier (deployed)
+│   ├── classifier/            # WBS 3.3 — Intent classifier (deployed, working)
 │   │   ├── index.js
 │   │   ├── catalyst-config.json
 │   │   └── package.json
-│   ├── query_exec/            # WBS 3.1 — Query executor (written, not deployed)
+│   ├── nl_sql/                # WBS 3.2 — NL-to-SQL translator (deployed, working)
+│   │   ├── index.js           #   Generates SQL + executes via ZCQL, returns rows
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   ├── rag/                   # WBS 3.5 — RAG dispatcher (deployed, working)
+│   │   ├── index.js           #   BriefFacts LIKE search + GLM narrative answer
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   ├── pipeline/              # WBS 7.0 — Orchestrator (deployed, working)
+│   │   ├── index.js           #   Classify → route → execute → format → session
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   ├── query_exec/            # WBS 3.1 — Query executor (deployed)
 │   │   ├── index.js
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── nl_sql/                # WBS 3.2 — NL-to-SQL translator (stub)
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── rag/                   # WBS 3.5 — RAG dispatcher (stub)
 │   │   ├── catalyst-config.json
 │   │   └── package.json
 │   └── test/                  # Health check endpoint
@@ -134,38 +140,46 @@ ksp-crime-analytics-platform/
 
 ```bash
 # Build all function deps first
-foreach ($fn in @("session","classifier","query_exec","nl_sql","rag")) {
+foreach ($fn in @("classifier","nl_sql","rag","session","query_exec","pipeline")) {
   Push-Location "functions/$fn"
   npm install
   Pop-Location
 }
 
+# Deploy specific functions
+catalyst deploy --only "functions:classifier,functions:nl_sql,functions:rag"
+
 # Deploy all targets
 catalyst deploy
 
 # Deploy a single function
-catalyst deploy --functions classifier
+catalyst deploy --only "functions:pipeline"
+
+# IMPORTANT: After every deploy, re-add QUICKML_TOKEN env var via Console
 ```
 
-### Smoke test (after deploy)
+### Smoke test (after deploy + env vars set)
 
 ```bash
-# Session — create a new session
-curl -X POST https://datathon2026-60073929329.development.catalystserverless.in/server/session/create \
-  -H "Content-Type: application/json" \
-  -d '{"employee_id": 1}'
+# Pipeline — aggregation query
+Invoke-RestMethod -Method POST -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/pipeline/query" -ContentType "application/json" -Body '{"query":"count of cases in Bengaluru Urban","employee_id":1}'
+# → {"status":"ok","data":{"intent":"structured","answer":"Result: 929",...}}
 
-# Classifier — network query (keyword match, no LLM needed)
-curl -X POST https://datathon2026-60073929329.development.catalystserverless.in/server/classifier/classify \
-  -H "Content-Type: application/json" \
-  -d '{"query":"show associates of Ravi"}'
-# → {"intent":"network","confidence":0.95}
+# Pipeline — structured data query
+Invoke-RestMethod -Method POST -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/pipeline/query" -ContentType "application/json" -Body '{"query":"list FIRs for theft in Bengaluru Urban","employee_id":1}'
+# → {"status":"ok","data":{"intent":"structured","answer":"Found 43 record(s).",...}}
 
-# Classifier — structured query (needs QUICKML_TOKEN for LLM, else falls back)
-curl -X POST https://datathon2026-60073929329.development.catalystserverless.in/server/classifier/classify \
-  -H "Content-Type: application/json" \
-  -d '{"query":"how many theft cases in 2025?"}'
-# → {"intent":"structured","confidence":0.5,"fallback":true}
+# Pipeline — narrative query
+Invoke-RestMethod -Method POST -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/pipeline/query" -ContentType "application/json" -Body '{"query":"describe what happened in HSR Layout theft cases","employee_id":1}'
+# → {"status":"ok","data":{"intent":"narrative","answer":"...CaseMasterID citations...",...}}
+
+# Pipeline — analytical query
+Invoke-RestMethod -Method POST -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/pipeline/query" -ContentType "application/json" -Body '{"query":"show crime trends in Bengaluru","employee_id":1}'
+# → {"status":"ok","data":{"intent":"analytical","trends":{...}}}
+
+# RAG — narrative query
+Invoke-RestMethod -Method POST -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/rag/query" -ContentType "application/json" -Body '{"query":"tell me about theft in Bengaluru"}'
+# → {"status":"ok","data":{"answer":"...BriefFacts summary with citations..."}}
 ```
 
 ---
@@ -183,11 +197,11 @@ classifier.classifyIntent(query, session_history)
   │  keyword match → returns instantly
   │  ambiguous     → QuickML LLM fallback
   ▼
-          ┌ structured → nl_sql.translate() → query_exec.execute() → ZCQL result
-          ├ narrative  → rag.dispatchRAG()  → BriefFacts search + LLM answer
-          ├ network    → network_traversal() → PersonMaster graph
-          ├ risk       → risk_score()       → PersonMaster risk flag
-          └ analytical → forecast()         → AutoML prediction
+  ┌ structured → pipeline: GLM SQL gen → ZCQL execution → rows
+  ├ narrative  → pipeline: rag.searchBriefFacts() → GLM answer
+  ├ network    → pipeline: inline handler → graph (nodes + edges)
+  ├ risk       → pipeline: inline handler → risk score
+  └ analytical → pipeline: inline handler → aggregation trends
 ```
 
 ---

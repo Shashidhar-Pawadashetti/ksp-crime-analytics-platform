@@ -39,11 +39,11 @@ classifier.classifyIntent(query)
   │  keyword match → returns instantly
   │  ambiguous     → GLM LLM fallback (enable_thinking: false)
   ▼
-  ┌─ structured → nl_sql.translate() → query_exec.execute() → ZCQL result
-  ├─ narrative  → rag.searchBriefFacts() → GLM answer generation
-  ├─ network    → pipeline network handler → structured graph data
-  ├─ risk       → pipeline risk handler    → recidivism-based score
-  └─ analytical → pipeline analytical handler → aggregation trends
+  ┌─ structured → pipeline: GLM SQL gen → ZCQL execution → formatted result
+  ├─ narrative  → pipeline: rag.searchBriefFacts() → GLM answer generation
+  ├─ network    → pipeline: inline handler → Accused/Victim/Complainant graph
+  ├─ risk       → pipeline: inline handler → recidivism-based score
+  └─ analytical → pipeline: inline handler → aggregation trends
   │
   ▼
 pipeline formats response + appends turns to session (Cache, 1hr TTL)
@@ -73,12 +73,12 @@ ksp-crime-analytics-platform/
 │   │   ├── index.js             #   2-stage: keyword heuristic + GLM fallback
 │   │   ├── catalyst-config.json
 │   │   └── package.json
-│   ├── nl_sql/                  #   NL-to-ZCQL translator (deployed, partial)
-│   │   ├── index.js             #   Generates SQL from natural language
+│   ├── nl_sql/                  #   NL-to-ZCQL translator (deployed, working)
+│   │   ├── index.js             #   Generates SQL + executes via ZCQL, returns rows
 │   │   ├── catalyst-config.json
 │   │   └── package.json
-│   ├── rag/                     #   RAG dispatcher (deployed)
-│   │   ├── index.js             #   BriefFacts LIKE search + GLM answer
+│   ├── rag/                     #   RAG dispatcher (deployed, working)
+│   │   ├── index.js             #   BriefFacts LIKE search + GLM narrative answer
 │   │   ├── catalyst-config.json
 │   │   └── package.json
 │   ├── session/                 #   Session manager (deployed, working)
@@ -124,11 +124,11 @@ ksp-crime-analytics-platform/
 | Function | WBS | Role | Status | Endpoint |
 |----------|-----|------|--------|----------|
 | **classifier** | 3.3 | Intent routing (keyword + GLM) | ✅ Deployed, working | `POST /classifier/classify` |
-| **nl_sql** | 3.2 | NL → ZCQL translation | ✅ Deployed, needs execute step | `POST /nl_sql/translate` |
-| **rag** | 3.5 | BriefFacts search + narrative answers | ✅ Deployed, no data yet | `POST /rag/query` |
+| **nl_sql** | 3.2 | NL → ZCQL translation + execution | ✅ Deployed, working | `POST /nl_sql/query` |
+| **rag** | 3.5 | BriefFacts search + narrative answers | ✅ Deployed, working | `POST /rag/query` |
 | **session** | 3.4 | Conversation memory (Cache, 1hr TTL) | ✅ Deployed, working | `GET /session/`, `POST /session/create` |
 | **query_exec** | 3.1 | ZCQL execution + RBAC scope | ✅ Deployed | `POST /query_exec/` |
-| **pipeline** | 7.0 | Full orchestrator (classify → route → execute → format) | ✅ Deployed, 3 stubs remain | `POST /pipeline/query` |
+| **pipeline** | 7.0 | Full orchestrator (classify → route → execute → format) | ✅ Deployed, all 5 intents working | `POST /pipeline/query` |
 | **test** | — | Health check | ✅ Deployed | `GET /test/` |
 
 ---
@@ -137,8 +137,8 @@ ksp-crime-analytics-platform/
 
 | Intent | Matched by | Routes to | Status |
 |--------|------------|-----------|--------|
-| `structured` | keyword: how many, count, list, show, FIR details | nl_sql → query_exec | ✅ Complete |
-| `narrative` | keyword: describe, what happened, tell me about, modus operandi | rag (BriefFacts + GLM) | ✅ Complete (no data) |
+| `structured` | keyword: how many, count, list, show, FIR details | pipeline: GLM SQL → ZCQL | ✅ Complete, with auto-retry |
+| `narrative` | keyword: describe, what happened, tell me about, modus operandi | pipeline: rag search → GLM answer | ✅ Complete, working |
 | `network` | keyword: associates, linked to, co-accused, network | pipeline inline handler | ✅ Complete |
 | `risk` | keyword: risk score, high-risk, repeat offender | pipeline inline handler | ✅ Complete |
 | `analytical` | keyword: predict, forecast, hotspot, trend | pipeline inline handler | ✅ Complete |

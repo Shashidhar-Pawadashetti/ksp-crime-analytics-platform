@@ -242,23 +242,36 @@ Respond ONLY with JSON: {"intent": "...", "confidence": 0.0-1.0}`;
 }
 
 async function translateToSQL(query) {
-	const prompt = `You are a ZCQL generator for the KSP crime database.
+	const prompt = `You are a ZCQL V2 generator for the KSP crime database.
 
 ${SCHEMA_DESCRIPTION}
 
 Rules:
 1. Return ONLY JSON: {"sql": "SELECT ...", "explanation": "..."}
-2. SELECT only, never DDL/DML
-3. Join through correct FK chains
-4. Never use SELECT *, name columns explicitly
-5. Limit results to 50 unless aggregation (COUNT, SUM, AVG)
-6. GenderID: 1=Male, 2=Female, 3=Other
+2. SELECT only — never DDL/DML
+3. INNER JOIN ... ON through FK chains via ROWID (every table used MUST be joined)
+4. Never SELECT * — name columns explicitly (max 20)
+5. Always qualify columns with table alias
+6. Text search: LIKE '*text*' — dates: 'YYYY-MM-DD'
+7. GenderID: 1=Male, 2=Female, 3=Other
+8. COUNT(alias.Col) not COUNT(*); GROUP BY/ORDER BY/HAVING supported
+9. String values in single quotes; IS for null checks
+10. Use ONLY columns listed in the schema above. NEVER invent column names.
+11. Every table alias (cm, cs, ch, u, d, a, v, etc.) MUST appear in a JOIN clause before being used in WHERE/SELECT
+
+Template:
+Query: "list FIRs for theft in Bengaluru Urban"
+SQL: SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.ROWID INNER JOIN CrimeHead ch ON cs.CrimeHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName = 'Bengaluru Urban' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
 
 Query: "${query}"
 
-Respond ONLY with the JSON object.`;
+Respond ONLY with JSON.
 
-	const response = await callQuickML(prompt, { temperature: 0.1, max_tokens: 500 });
+Query: "${query}"
+
+Respond ONLY with JSON.`;
+
+	const response = await callQuickML(prompt, { temperature: 0.1, max_tokens: 300 });
 	const content = extractGLMContent(response);
 	if (!content) throw new Error('Empty response from GLM');
 	const cleaned = content.replace(/```sql\s*/gi, '').replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
@@ -292,18 +305,28 @@ async function searchBriefFacts(app, query) {
 	const keywords = extractKeywords(query);
 	if (keywords.length === 0) return [];
 
-	const conditions = keywords.map(k => `cm.BriefFacts LIKE '%${k}%'`);
+	const conditions = keywords.map(k => `cm.BriefFacts LIKE '*${k}*'`);
 	const sql = `SELECT cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, d.DistrictName 
-FROM CaseMaster cm, Unit u, District d
-WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID
-AND (${conditions.join(' OR ')}) 
+FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID
+WHERE (${conditions.join(' OR ')}) 
 AND cm.BriefFacts IS NOT NULL 
 ORDER BY cm.IncidentFromDate DESC 
 LIMIT 3`;
 
 	try {
 		const rows = await app.zcql().executeZCQLQuery(sql);
-		return rows.map(r => Object.values(r)[0]).filter(Boolean);
+		return rows.map(r => {
+			const flat = {};
+			for (const key of Object.keys(r)) {
+				const val = r[key];
+				if (val && typeof val === 'object' && !Array.isArray(val)) {
+					Object.assign(flat, val);
+				} else {
+					flat[key] = val;
+				}
+			}
+			return flat;
+		}).filter(Boolean);
 	} catch {
 		return [];
 	}
@@ -330,8 +353,20 @@ Answer based ONLY on the excerpts. Cite CaseMasterIDs. Be concise.`;
 	return extractGLMContent(response) || 'I was unable to generate an answer.';
 }
 
-function formatSQLResult(intent, result) {
+function formatSQLResult(intent, result, sql) {
 	const rows = result.rows || result;
+	const isAgg = sql && /\b(COUNT|SUM|AVG|MIN|MAX)\s*\(/i.test(sql);
+	if (isAgg && rows.length === 1) {
+		const flat = zcqlRows(rows);
+		const values = Object.values(flat[0]);
+		const aggValue = values[0];
+		return {
+			intent,
+			answer: `Result: ${aggValue}`,
+			data: flat,
+			source_refs: []
+		};
+	}
 	const count = rows.length;
 	return {
 		intent,
@@ -431,18 +466,15 @@ async function handleNetwork(app, query) {
 	const [accusedAll, victimAll, complainantAll] = await Promise.all([
 		app.zcql().executeZCQLQuery(
 			`SELECT a.ROWID, a.AccusedName, a.CaseMasterID, cm.CrimeNo, cm.IncidentFromDate
-FROM Accused a, CaseMaster cm
-WHERE a.CaseMasterID = cm.ROWID AND LOWER(a.AccusedName) LIKE '%${name.toLowerCase()}%' LIMIT 50`
+FROM Accused a INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID WHERE LOWER(a.AccusedName) LIKE '*${name.toLowerCase()}*' LIMIT 50`
 		).catch(() => []),
 		app.zcql().executeZCQLQuery(
 			`SELECT v.ROWID, v.VictimName, v.CaseMasterID, cm.CrimeNo
-FROM Victim v, CaseMaster cm
-WHERE v.CaseMasterID = cm.ROWID AND LOWER(v.VictimName) LIKE '%${name.toLowerCase()}%' LIMIT 50`
+FROM Victim v INNER JOIN CaseMaster cm ON v.CaseMasterID = cm.ROWID WHERE LOWER(v.VictimName) LIKE '*${name.toLowerCase()}*' LIMIT 50`
 		).catch(() => []),
 		app.zcql().executeZCQLQuery(
 			`SELECT c.ComplainantID, c.ComplainantName, c.CaseMasterID, cm.CrimeNo
-FROM ComplainantDetails c, CaseMaster cm
-WHERE c.CaseMasterID = cm.ROWID AND LOWER(c.ComplainantName) LIKE '%${name.toLowerCase()}%' LIMIT 50`
+FROM ComplainantDetails c INNER JOIN CaseMaster cm ON c.CaseMasterID = cm.ROWID WHERE LOWER(c.ComplainantName) LIKE '*${name.toLowerCase()}*' LIMIT 50`
 		).catch(() => [])
 	]);
 
@@ -525,9 +557,8 @@ async function handleRisk(app, query) {
 
 	const accusedRows = zcqlRows(await app.zcql().executeZCQLQuery(
 		`SELECT a.ROWID, a.AccusedName, a.CaseMasterID, cm.CrimeRegisteredDate, ch.CrimeGroupName
-FROM Accused a, CaseMaster cm, CrimeHead ch
-WHERE a.CaseMasterID = cm.ROWID AND cm.CrimeMajorHeadID = ch.ROWID
-AND LOWER(a.AccusedName) LIKE '%${name.toLowerCase()}%' LIMIT 100`
+FROM Accused a INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID
+WHERE LOWER(a.AccusedName) LIKE '*${name.toLowerCase()}*' LIMIT 100`
 	).catch(() => []));
 
 	if (accusedRows.length === 0) {
@@ -561,7 +592,7 @@ async function handleAnalytical(app, query) {
 
 	const whereClauses = [];
 	if (location) {
-		whereClauses.push(`LOWER(d.DistrictName) LIKE '%${location.toLowerCase()}%'`);
+		whereClauses.push(`LOWER(d.DistrictName) LIKE '*${location.toLowerCase()}*'`);
 	}
 	if (period) {
 		whereClauses.push(`cm.CrimeRegisteredDate >= '${period.since}'`);
@@ -572,22 +603,20 @@ async function handleAnalytical(app, query) {
 	const [crimeTypeRows, monthlyRows, locationRows] = await Promise.all([
 		app.zcql().executeZCQLQuery(
 			`SELECT ch.CrimeGroupName, COUNT(cm.CaseMasterID) AS cnt
-FROM CaseMaster cm, CrimeHead ch, Unit u, District d
-WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID AND cm.CrimeMajorHeadID = ch.ROWID
-${whereSQL ? 'AND ' + whereClauses.join(' AND ') : ''}
+FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID
+${whereSQL}
 GROUP BY ch.CrimeGroupName ORDER BY cnt DESC LIMIT 10`
 		).catch(() => []),
 		app.zcql().executeZCQLQuery(
-			`SELECT SUBSTRING(cm.CrimeRegisteredDate, 1, 7) AS yr_month, COUNT(cm.CaseMasterID) AS cnt
-FROM CaseMaster cm, Unit u, District d
-WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID
-${whereSQL ? 'AND ' + whereClauses.join(' AND ') : ''}
-GROUP BY yr_month ORDER BY yr_month DESC LIMIT 12`
+			`SELECT cm.CrimeRegisteredDate, COUNT(cm.CaseMasterID) AS cnt
+FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID
+${whereSQL}
+GROUP BY cm.CrimeRegisteredDate ORDER BY cm.CrimeRegisteredDate DESC LIMIT 12`
 		).catch(() => []),
 		app.zcql().executeZCQLQuery(
 			`SELECT d.DistrictName, COUNT(cm.CaseMasterID) AS cnt
-FROM CaseMaster cm, Unit u, District d
-WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID
+FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID
+${whereSQL}
 GROUP BY d.DistrictName ORDER BY cnt DESC LIMIT 10`
 		).catch(() => [])
 	]);
@@ -772,8 +801,27 @@ module.exports = async (req, res) => {
 		switch (kwResult.intent) {
 			case 'structured': {
 				const translation = await translateToSQL(query);
-				const rows = await executeSQL(app, translation.sql);
-				result = formatSQLResult('structured', rows);
+				let rows;
+				let lastError;
+				for (let attempt = 0; attempt < 2; attempt++) {
+					try {
+						rows = await executeSQL(app, translation.sql);
+						break;
+					} catch (err) {
+						lastError = err.message;
+						if (attempt === 0) {
+							const fixPrompt = `The following ZCQL query failed with error: "${lastError}". Fix it and return ONLY the corrected JSON: {"sql": "SELECT ...", "explanation": "..."}. Use ONLY columns from the schema. Every table alias MUST be joined.\n\nFailing query: ${translation.sql}\n\nOriginal request: ${query}`;
+							const response = await callQuickML(fixPrompt, { temperature: 0, max_tokens: 200 });
+							const content = extractGLMContent(response);
+							if (content) {
+								const cleaned = content.replace(/```sql\s*/gi, '').replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+								translation.sql = JSON.parse(cleaned).sql;
+							}
+						}
+					}
+				}
+				if (!rows) throw new Error(lastError || 'SQL execution failed');
+				result = formatSQLResult('structured', rows, translation.sql);
 				result.explanation = translation.explanation;
 				break;
 			}

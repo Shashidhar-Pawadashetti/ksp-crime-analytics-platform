@@ -69,7 +69,7 @@ async function callQuickML(prompt, options = {}) {
 				'CATALYST-ORG': CATALYST_ORG,
 				'Content-Length': Buffer.byteLength(body),
 			},
-			timeout: 20000,
+			timeout: 25000,
 		};
 
 		const req = https.request(opts, (res) => {
@@ -118,11 +118,10 @@ async function searchBriefFacts(app, query) {
 		return [];
 	}
 
-	const conditions = keywords.map(k => `cm.BriefFacts LIKE '%${k}%'`);
+	const conditions = keywords.map(k => `cm.BriefFacts LIKE '*${k}*'`);
 	const sql = `SELECT cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, d.DistrictName 
-FROM CaseMaster cm, Unit u, District d
-WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID
-AND (${conditions.join(' OR ')}) 
+FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID
+WHERE (${conditions.join(' OR ')}) 
 AND cm.BriefFacts IS NOT NULL 
 ORDER BY cm.IncidentFromDate DESC 
 LIMIT ${MAX_EXCERPTS}`;
@@ -130,8 +129,16 @@ LIMIT ${MAX_EXCERPTS}`;
 	try {
 		const rows = await app.zcql().executeZCQLQuery(sql);
 		return rows.map(r => {
-			const entry = Object.values(r)[0];
-			return entry;
+			const flat = {};
+			for (const key of Object.keys(r)) {
+				const val = r[key];
+				if (val && typeof val === 'object' && !Array.isArray(val)) {
+					Object.assign(flat, val);
+				} else {
+					flat[key] = val;
+				}
+			}
+			return flat;
 		}).filter(Boolean);
 	} catch {
 		return [];
