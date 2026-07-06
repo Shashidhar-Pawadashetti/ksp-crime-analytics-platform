@@ -16,13 +16,41 @@ The system follows a 7-tier layered architecture:
 |---|---|
 | Edge | Catalyst Authentication, API Gateway |
 | Frontend | Slate / Web Client Hosting (chat UI, network graph, dashboards) |
-| Orchestration | Catalyst Functions (routing, tool-calling), Circuits (multi-step pipeline) |
-| AI/ML | QuickML (RAG/LLM), Zia AutoML (tabular models), Zia Services (voice/translation) |
-| Data | Data Store (relational schema), NoSQL (PersonMaster), Cache (session state) |
-| Response Assembly | Circuits explanation step |
+| Orchestration | Catalyst Functions (routing, tool-calling), pipeline function |
+| AI/ML | QuickML (GLM chat LLM), Zia AutoML (tabular models), Zia Services |
+| Data | Data Store (relational), NoSQL (PersonMaster), Cache (session state) |
+| Response Assembly | pipeline formatting (evidence trail, citations) |
 | Supporting | Stratus, SmartBrowz, Cron, Signals, Mail/Push |
 
 **Governing principle:** *The language model narrates, it never computes.* Every statistic, risk score, or prediction originates from a deterministic query or trained model — the LLM only translates questions and narrates answers with citations.
+
+---
+
+## Data Flow
+
+```
+User Query
+  │
+  ▼
+session.createSession(employee_id) → resolves rank/unit/district hierarchy
+  │
+  ▼
+classifier.classifyIntent(query)
+  │  keyword match → returns instantly
+  │  ambiguous     → GLM LLM fallback (enable_thinking: false)
+  ▼
+  ┌─ structured → nl_sql.translate() → query_exec.execute() → ZCQL result
+  ├─ narrative  → rag.searchBriefFacts() → GLM answer generation
+  ├─ network    → pipeline network handler → structured graph data
+  ├─ risk       → pipeline risk handler    → recidivism-based score
+  └─ analytical → pipeline analytical handler → aggregation trends
+  │
+  ▼
+pipeline formats response + appends turns to session (Cache, 1hr TTL)
+  │
+  ▼
+Response to user (JSON with intent, answer, data, source_refs, confidence)
+```
 
 ---
 
@@ -30,82 +58,90 @@ The system follows a 7-tier layered architecture:
 
 ```
 ksp-crime-analytics-platform/
-├── .catalystrc                  # Catalyst project config (project ID, environment)
-├── catalyst.json                # Functions deployment config
-├── package.json                 # Root dependencies (zcatalyst-sdk-node)
+├── .catalystrc                  # Catalyst project config
+├── catalyst.json                # Functions deployment targets (7 functions)
+├── AGENTS.md                    # AI agent context file
+├── CHANGELOG.md                 # Version history
+├── ONBOARDING.md                # Team onboarding guide
+├── TODO.md                      # Task tracker
+├── README.md                    # This file
+├── .env                         # Local secrets (gitignored)
+├── .env.example                 # Template for .env (committed)
 │
-├── functions/                   # Catalyst Functions (runtime application)
-│   ├── test/                    #   Placeholder function (node24, advancedio)
-│   │   ├── index.js
-│   │   ├── package.json
-│   │   └── catalyst-config.json
-│   ├── query_exec/              # [WIP] Query executor (WBS 3.1)
-│   ├── classifier/              # [WIP] Intent classifier (WBS 3.3)
-│   ├── nl_sql/                  # [WIP] NL-to-SQL translator (WBS 3.2)
-│   ├── session/                 # [WIP] Session manager (WBS 3.4)
-│   └── rag/                     # [WIP] RAG dispatcher (WBS 3.5)
+├── functions/                   # 7 Catalyst Functions (Node.js 24, AdvancedIO)
+│   ├── classifier/              #   Intent classifier (deployed, working)
+│   │   ├── index.js             #   2-stage: keyword heuristic + GLM fallback
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   ├── nl_sql/                  #   NL-to-ZCQL translator (deployed, partial)
+│   │   ├── index.js             #   Generates SQL from natural language
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   ├── rag/                     #   RAG dispatcher (deployed)
+│   │   ├── index.js             #   BriefFacts LIKE search + GLM answer
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   ├── session/                 #   Session manager (deployed, working)
+│   │   ├── index.js             #   Cache-backed CRUD + RBAC hierarchy resolution
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   ├── query_exec/              #   Query executor (deployed)
+│   │   ├── index.js             #   ZCQL validation + execution + RBAC scope injection
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   ├── pipeline/                #   Orchestrator (deployed, partial)
+│   │   ├── index.js             #   Classify → route → execute → format → session
+│   │   ├── catalyst-config.json
+│   │   └── package.json
+│   └── test/                    #   Health check placeholder (deployed)
+│       ├── index.js
+│       ├── catalyst-config.json
+│       └── package.json
 │
 ├── data_pipeline/               # Synthetic data generation & import
 │   ├── src/
 │   │   ├── index.js             #   Phase 1: 16 lookup table generators
-│   │   ├── generators/          #   Individual table generators (state, district, crimeHead, etc.)
+│   │   ├── generators/          #   Individual table generators (16 files)
 │   │   └── helpers/csv.js       #   CSV writer utility
-│   ├── mappings/                #   ROWID mappings (Catalyst internal IDs)
-│   ├── generate_phase2b.cjs     #   Unit + Court generator
-│   ├── generate_phase4.cjs      #   CaseMaster generator (3,000 FIR records)
-│   ├── generate_phase5.cjs      #   Complainant, Victim, Accused, Chargesheet generator
-│   ├── generate_phase6.cjs      #   ArrestSurrender generator
-│   ├── generate_rowid_mappings.js # ROWID mapping fetcher
+│   ├── mappings/                #   ROWID mappings (business ID ↔ Catalyst ROWID)
+│   ├── generate_*.cjs           #   Phase 2-6 generators
 │   ├── run_phase.js             #   Catalyst import orchestrator
-│   ├── validate_mappings.cjs    #   FK validation script
-│   ├── validate_phase5.cjs      #   Phase 5 output validator
-│   ├── generate_data.cjs        #   Legacy all-in-one generator
-│   └── package.json
+│   └── validate_*.cjs           #   Validation scripts
 │
-└── README.md
+├── docs/                        # Documentation
+│   └── production-auth.md       #   OAuth migration guide (Self Client → Server App)
+│
+├── ../KSP_Datathon_FRD.md       # Functional Requirements Document
+├── ../KSP_Datathon_HLD.md       # High-Level Design / Architecture
+├── ../KSP_Datathon_LLD.md       # Low-Level Design (module specs, pseudocode)
+└── ../KSP_Datathon_WBS.md       # Work Breakdown Structure
 ```
 
 ---
 
-## Data Flow
+## Functions — Roles & Status
 
-```
-Data Store (relational SQL, system of record)
-    ↑ CSV import via data_pipeline/
-    ↓ read by Functions (query_exec, nl_sql, rag)
-
-Entity Resolution Engine (WBS 4.0)
-    ↓ reads Accused/Victim/Complainant from Data Store
-    ↓ writes PersonMaster documents to NoSQL
-
-PersonMaster (NoSQL derived store)
-    ↓ read by network traversal & risk scoring
-    ↓ adjacency lists for graph traversal
-
-QuickML Vector Store
-    ↓ indexed from CaseMaster.BriefFacts
-    ↓ read by RAG dispatcher for narrative queries
-
-Zia AutoML Models
-    ↓ trained on schedule (Cron) using Data Store + NoSQL features
-    ↓ risk scores written back to PersonMaster
-```
+| Function | WBS | Role | Status | Endpoint |
+|----------|-----|------|--------|----------|
+| **classifier** | 3.3 | Intent routing (keyword + GLM) | ✅ Deployed, working | `POST /classifier/classify` |
+| **nl_sql** | 3.2 | NL → ZCQL translation | ✅ Deployed, needs execute step | `POST /nl_sql/translate` |
+| **rag** | 3.5 | BriefFacts search + narrative answers | ✅ Deployed, no data yet | `POST /rag/query` |
+| **session** | 3.4 | Conversation memory (Cache, 1hr TTL) | ✅ Deployed, working | `GET /session/`, `POST /session/create` |
+| **query_exec** | 3.1 | ZCQL execution + RBAC scope | ✅ Deployed | `POST /query_exec/` |
+| **pipeline** | 7.0 | Full orchestrator (classify → route → execute → format) | ✅ Deployed, 3 stubs remain | `POST /pipeline/query` |
+| **test** | — | Health check | ✅ Deployed | `GET /test/` |
 
 ---
 
-## Database Schema (27 tables)
+## Pipeline — Intent Routing
 
-### Lookup / Master Tables (16)
-State, District, CaseCategory, GravityOffence, CrimeHead, CrimeSubHead, Act, Section, CrimeHeadActSection, ReligionMaster, CasteMaster, OccupationMaster, CaseStatusMaster, UnitType, Rank, Designation
-
-### Reference Tables (4)
-Unit (122 police units with hierarchy), Court (50 courts), Employee (~1,000), PersonMaster (NoSQL)
-
-### Core Tables (2)
-CaseMaster (3,000 FIR records with lat/lng, BriefFacts text)
-
-### Case-Dependent Tables (5)
-ComplainantDetails, Victim, Accused, ActSectionAssociation, ArrestSurrender, ChargesheetDetails
+| Intent | Matched by | Routes to | Status |
+|--------|------------|-----------|--------|
+| `structured` | keyword: how many, count, list, show, FIR details | nl_sql → query_exec | ✅ Complete |
+| `narrative` | keyword: describe, what happened, tell me about, modus operandi | rag (BriefFacts + GLM) | ✅ Complete (no data) |
+| `network` | keyword: associates, linked to, co-accused, network | pipeline inline handler | ✅ Complete |
+| `risk` | keyword: risk score, high-risk, repeat offender | pipeline inline handler | ✅ Complete |
+| `analytical` | keyword: predict, forecast, hotspot, trend | pipeline inline handler | ✅ Complete |
 
 ---
 
@@ -115,16 +151,25 @@ ComplainantDetails, Victim, Accused, ActSectionAssociation, ArrestSurrender, Cha
 |---|---|
 | Platform | Zoho Catalyst |
 | Functions Runtime | Node.js 24 (AdvancedIO) |
-| Functions SDK | zcatalyst-sdk-node |
-| Relational DB | Catalyst Data Store |
+| Functions SDK | zcatalyst-sdk-node (v3.4.0) |
+| Relational DB | Catalyst Data Store (ZCQL) |
 | Document Store | Catalyst NoSQL |
-| Cache | Catalyst Cache |
-| LLM / RAG | Catalyst QuickML |
+| Cache | Catalyst Cache (TTL in hours) |
+| LLM | Catalyst QuickML — model: `crm-di-glm47b_30b_it` |
 | Tabular ML | Catalyst Zia AutoML |
-| Blob Storage | Catalyst Stratus |
-| PDF Rendering | Catalyst SmartBrowz |
-| CLI | zcatalyst-cli |
+| CLI | zcatalyst-cli (v1.26.2) |
 | Data Pipeline | Node.js, @faker-js/faker, csv-writer |
+
+---
+
+## Environment Variables (Catalyst Console)
+
+Set per-function via Catalyst Console → Functions → {name} → Environment Variables:
+
+| Variable | Required For | Notes |
+|----------|--------------|-------|
+| `QUICKML_TOKEN` | classifier, nl_sql, rag, pipeline | Self Client OAuth (1hr expiry) |
+| `CATALYST_ORG` | All QuickML callers | Reserved keyword — set via Console only, NOT in catalyst-config.json. Default: `60073929329` |
 
 ---
 
@@ -133,50 +178,26 @@ ComplainantDetails, Victim, Accused, ActSectionAssociation, ArrestSurrender, Cha
 ### Prerequisites
 
 - Node.js 24+
-- [zcatalyst-cli](https://www.npmjs.com/package/zcatalyst-cli) installed globally
-- Catalyst project credentials (`.catalystrc` + `CATALYST_PROJECT_KEY` env var)
+- zcatalyst-cli installed globally: `npm i -g zoho-catalyst-cli`
+- Catalyst project credentials
 
-### Install Dependencies
-
-```bash
-# Root (Functions SDK)
-npm install
-
-# Data pipeline
-cd data_pipeline && npm install
-```
-
-### Generate & Load Synthetic Data
+### Quick Start
 
 ```bash
-# Phase 1: Generate lookup tables and import to Data Store
-cd data_pipeline
-node run_phase.js phase1
+# 1. Install function dependencies
+foreach ($fn in @("classifier","nl_sql","rag","session","query_exec","pipeline")) {
+  Push-Location "functions/$fn"
+  npm install
+  Pop-Location
+}
 
-# Generate remaining tables
-node generate_phase2b.cjs
-node generate_phase4.cjs
-node generate_phase5.cjs
-node generate_phase6.cjs
-```
-
-### Deploy Functions
-
-```bash
+# 2. Deploy all functions
 catalyst deploy
+
+# 3. Set QUICKML_TOKEN in Catalyst Console for each function that needs it
 ```
 
----
-
-## WBS 3.0 — Core Conversational Platform (In Progress)
-
-| Module | Function | Status | Dependencies |
-|---|---|---|---|
-| 3.1 Query Executor | `query_exec` | Planned | Data Store |
-| 3.2 NL-to-SQL | `nl_sql` | Planned | QuickML, query_exec |
-| 3.3 Intent Classifier | `classifier` | Planned | QuickML |
-| 3.4 Session Manager | `session` | Planned | Cache |
-| 3.5 RAG Dispatcher | `rag` | Planned | QuickML, Data Store |
+See `ONBOARDING.md` for detailed setup steps.
 
 ---
 

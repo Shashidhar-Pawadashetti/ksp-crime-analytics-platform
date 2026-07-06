@@ -9,27 +9,80 @@ const CATALYST_ORG = process.env.CATALYST_ORG || '60073929329';
 const CACHE_SEGMENT = 'session';
 const SESSION_TTL_HOURS = 1;
 
+const STRUCTURED_PATTERNS = /\b(how many|count|total|list\s+\w+|show\s+(me|all|the|FIR)|find\s+\w+|get\s+(me|all|the)|cases?\s+(in|registered|filed|reported)|FIR\s+details?|accused\s+details?|victim\s+details?|officer\s+|section\s+\w+|IPC|CrPC|charge\s+sheet)\b/i;
+const NARRATIVE_PATTERNS = /\b(describe|what\s+happened|tell\s+me\s+about|modus\s+operandi|summary\s+of|overview\s+of|details?\s+about\s+case|brief\s+facts|incident\s+details?|sequence\s+of\s+events)\b/i;
 const NETWORK_PATTERNS = /\b(associates?|linked\s+to|connected|co-accused|network|relationships?)\b/i;
 const RISK_PATTERNS = /\b(risk\s+score|high-risk|repeat\s+offender|risk\s+level|dangerous|threat\s+level)\b/i;
-const FORECAST_PATTERNS = /\b(predict|forecast|next\s+month|hotspot|trend|pattern|seasonal)\b/i;
+const FORECAST_PATTERNS = /\b(predict|forecast|next\s+month|hotspot|trend(?:s|ing)?|pattern(?:s)?|seasonal|analysis|analytics|statistics?|breakdown|compare|most\s+common|crime\s+(?:trends?|analysis|statistics?|pattern|data|overview))\b/i;
 const FORBIDDEN_KEYWORDS = ['DROP', 'DELETE', 'INSERT', 'UPDATE', 'TRUNCATE', 'ALTER', 'CREATE', 'EXEC', 'EXECUTE'];
 
 const SCHEMA_DESCRIPTION = `
 Tables:
-- CaseMaster (CaseMasterID, CrimeNo, CrimeRegisteredDate, PoliceStationID, CrimeMajorHeadID, CrimeMinorHeadID, CaseStatusID, latitude, longitude, IncidentFromDate, IncidentToDate, BriefFacts)
-- Accused (AccusedMasterID, CaseMasterID, AccusedName, AgeYear, GenderID)
-- Victim (VictimMasterID, CaseMasterID, VictimName, AgeYear, GenderID)
+- CaseMaster (CaseMasterID, CrimeNo, CaseNo, CrimeRegisteredDate, PolicePersonID, PoliceStationID, CaseCategoryID, GravityOffenceID, CrimeMajorHeadID, CrimeMinorHeadID, CaseStatusID, CourtID, IncidentFromDate, IncidentToDate, InfoReceivedPSDate, Latitude, Longitude, BriefFacts)
+- Accused (AccusedMasterID, CaseMasterID, AccusedName, AgeYear, GenderID, PersonID)
+- Victim (VictimMasterID, CaseMasterID, VictimName, AgeYear, GenderID, VictimPolice)
 - ComplainantDetails (ComplainantID, CaseMasterID, ComplainantName, AgeYear, OccupationID, ReligionID, CasteID, GenderID)
-- CrimeHead (CrimeHeadID, CrimeGroupName)
-- CrimeSubHead (CrimeSubHeadID, CrimeHeadID, CrimeHeadName)
-- Act (ActID, ActName)
-- Section (SectionID, ActID, SectionName)
-- CaseStatusMaster (CaseStatusID, StatusName)
-- Unit (UnitID, UnitName, DistrictID, TypeID)
-- District (DistrictID, DistrictName, StateID)
-- Employee (EmployeeID, EmployeeName, RankID, UnitID, DistrictID)
-- ArrestSurrender (ArrestID, CaseMasterID, AccusedMasterID, ArrestDate, ArrestType)
-- ChargesheetDetails (ChargesheetID, CaseMasterID, FiledDate)
+- CrimeHead (CrimeHeadID, CrimeGroupName, Active)
+- CrimeSubHead (CrimeSubHeadID, CrimeHeadID, CrimeHeadName, SeqID)
+- ActSectionAssociation (CaseMasterID, ActID, SectionID, ActOrderID, SectionOrderID)
+- CrimeHeadActSection (CrimeHeadID, ActCode, SectionCode)
+- Act (ActCode, ActDescription, ShortName, Active)
+- Section (ActCode, SectionCode, SectionDescription, Active)
+- CaseCategory (CaseCategoryID, LookupValue)
+- CaseStatusMaster (CaseStatusID, CaseStatusName)
+- GravityOffence (GravityOffenceID, LookupValue)
+- Court (CourtID, CourtName, DistrictID, StateID, Active)
+- Unit (UnitID, UnitName, TypeID, ParentUnit, NationalityID, StateID, DistrictID, Active)
+- District (DistrictID, DistrictName, StateID, Active)
+- State (StateID, StateName, NationalityID, Active)
+- UnitType (UnitTypeID, UnitTypeName, CityDistState, Hierarchy, Active)
+- Rank (RankID, RankName, Hierarchy, Active)
+- Designation (DesignationID, DesignationName, Active, SortOrder)
+- Employee (EmployeeID, FirstName, KGID, RankID, DesignationID, UnitID, DistrictID, EmployeeDOB, GenderID, BloodGroupID, PhysicallyChallenged, AppointmentDate)
+- ReligionMaster (ReligionID, ReligionName)
+- CasteMaster (caste_master_id, caste_master_name)
+- OccupationMaster (OccupationID, OccupationName)
+- ChargesheetDetails (CSID, CaseMasterID, csdate, cstype, PolicePersonID)
+- ArrestSurrender (ArrestSurrenderID, CaseMasterID, ArrestSurrenderTypeID, ArrestSurrenderDate, ArrestSurrenderStateId, ArrestSurrenderDistrictId, PoliceStationID, IOID, CourtID, AccusedMasterID, IsAccused, IsComplainantAccused)
+
+IMPORTANT: All FK columns store the target table's Catalyst ROWID (a long alphanumeric string). JOIN using ROWID pseudo-column:
+- CaseMaster.PoliceStationID = Unit.ROWID
+- Unit.DistrictID = District.ROWID
+- District.StateID = State.ROWID
+- Unit.TypeID = UnitType.ROWID
+- CaseMaster.PolicePersonID = Employee.ROWID
+- CaseMaster.CrimeMajorHeadID = CrimeHead.ROWID
+- CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
+- CaseMaster.CaseStatusID = CaseStatusMaster.ROWID
+- CaseMaster.CaseCategoryID = CaseCategory.ROWID
+- CaseMaster.GravityOffenceID = GravityOffence.ROWID
+- CaseMaster.CourtID = Court.ROWID
+- ComplainantDetails.CaseMasterID = CaseMaster.ROWID
+- ComplainantDetails.OccupationID = OccupationMaster.ROWID
+- ComplainantDetails.ReligionID = ReligionMaster.ROWID
+- ComplainantDetails.CasteID = CasteMaster.ROWID
+- Accused.CaseMasterID = CaseMaster.ROWID
+- Victim.CaseMasterID = CaseMaster.ROWID
+- ActSectionAssociation.CaseMasterID = CaseMaster.ROWID
+- ActSectionAssociation.ActID = Act.ROWID
+- ActSectionAssociation.SectionID = Section.ROWID
+- ChargesheetDetails.CaseMasterID = CaseMaster.ROWID
+- ChargesheetDetails.PolicePersonID = Employee.ROWID
+- ArrestSurrender.CaseMasterID = CaseMaster.ROWID
+- ArrestSurrender.PoliceStationID = Unit.ROWID
+- ArrestSurrender.IOID = Employee.ROWID
+- ArrestSurrender.CourtID = Court.ROWID
+- ArrestSurrender.AccusedMasterID = Accused.ROWID
+- ArrestSurrender.ArrestSurrenderStateId = State.ROWID
+- ArrestSurrender.ArrestSurrenderDistrictId = District.ROWID
+- CrimeSubHead.CrimeHeadID = CrimeHead.ROWID
+- CrimeHeadActSection.CrimeHeadID = CrimeHead.ROWID
+- Court.DistrictID = District.ROWID
+- Court.StateID = State.ROWID
+- Employee.RankID = Rank.ROWID
+- Employee.UnitID = Unit.ROWID
+- Employee.DistrictID = District.ROWID
+- Employee.DesignationID = Designation.ROWID
 `;
 
 function sendJson(res, status, data) {
@@ -81,6 +134,21 @@ function uuid() {
 	});
 }
 
+async function queryFirst(app, sql) {
+	try {
+		const rows = await app.zcql().executeZCQLQuery(sql);
+		return rows && rows.length > 0 ? rows[0] : null;
+	} catch {
+		return null;
+	}
+}
+
+function extractRow(row) {
+	if (!row) return null;
+	const key = Object.keys(row)[0];
+	return row[key] || null;
+}
+
 function callQuickML(prompt, options = {}) {
 	return new Promise((resolve, reject) => {
 		const token = process.env.QUICKML_TOKEN;
@@ -94,6 +162,7 @@ function callQuickML(prompt, options = {}) {
 			messages: [{ role: 'user', content: prompt }],
 			temperature: options.temperature ?? 0.1,
 			max_tokens: options.max_tokens ?? 500,
+			chat_template_kwargs: { enable_thinking: false },
 		});
 
 		const urlObj = new URL(QUICKML_URL);
@@ -142,7 +211,9 @@ function extractGLMContent(response) {
 function classifyByKeyword(query) {
 	if (NETWORK_PATTERNS.test(query)) return { intent: 'network', confidence: 0.95 };
 	if (RISK_PATTERNS.test(query)) return { intent: 'risk', confidence: 0.95 };
+	if (NARRATIVE_PATTERNS.test(query)) return { intent: 'narrative', confidence: 0.85 };
 	if (FORECAST_PATTERNS.test(query)) return { intent: 'analytical', confidence: 0.95 };
+	if (STRUCTURED_PATTERNS.test(query)) return { intent: 'structured', confidence: 0.85 };
 	return null;
 }
 
@@ -223,10 +294,9 @@ async function searchBriefFacts(app, query) {
 
 	const conditions = keywords.map(k => `cm.BriefFacts LIKE '%${k}%'`);
 	const sql = `SELECT cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, d.DistrictName 
-FROM CaseMaster cm 
-JOIN Unit u ON cm.PoliceStationID = u.UnitID 
-JOIN District d ON u.DistrictID = d.DistrictID 
-WHERE ${conditions.join(' OR ')} 
+FROM CaseMaster cm, Unit u, District d
+WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID
+AND (${conditions.join(' OR ')}) 
 AND cm.BriefFacts IS NOT NULL 
 ORDER BY cm.IncidentFromDate DESC 
 LIMIT 3`;
@@ -279,10 +349,276 @@ function formatNarrativeResult(intent, answer, excerpts) {
 	};
 }
 
-function formatIntentResult(intent) {
+function formatIntentResult(intent, message) {
 	return {
 		intent,
-		answer: null,
+		answer: message || null,
+		source_refs: []
+	};
+}
+
+function extractPersonName(query) {
+	const nameStopWords = new Set(['show','me','the','find','get','list','what','how','who','which','all','any','describe','tell','about','for','of','with','and','network','associates','connections','linked','connected','risk','score','trend','pattern','crime','cases','case','in','at','on','by','to','from','is','was','are','were','has','have','been','being','do','does','did','will','would','could','should','can','may','might','shall','not','no','nor','but','or','if','then','else','than','that','this','these','those','his','her','its','their','your','our','my','mine','yours','theirs','itself','himself','herself','myself']);
+	const patterns = [
+		/(?:associates?|connected|linked|co-accused|network|find|search|about)\s+(?:of\s+)?(\w+)/i,
+		/(?:risk\s+)?score\s+(?:of\s+|for\s+)?(\w+)/i,
+		/(\w+)(?:'s)?\s+(?:associates?|network|connections?|links?|relations?|risk\s+score)/i,
+	];
+	for (const p of patterns) {
+		const m = query.match(p);
+		if (m && m[1].length > 1 && !nameStopWords.has(m[1].toLowerCase())) return m[1];
+	}
+	const words = query.split(/\s+/);
+	for (const w of words) {
+		const cleaned = w.replace(/[^a-zA-Z]/g, '');
+		if (cleaned && cleaned.length > 2 && /^[A-Z]/.test(cleaned) && !nameStopWords.has(cleaned.toLowerCase())) {
+			return cleaned;
+		}
+	}
+	return null;
+}
+
+function extractLocation(query) {
+	const locMatch = query.match(/\b(in|of|at|for)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/);
+	if (locMatch) return locMatch[2];
+	const knownDistricts = ['Bengaluru','Bangalore','Mysuru','Mysore','Hubli','Dharwad','Belagavi','Belgaum','Mangaluru','Mangalore','Shivamogga','Shimoga','Tumakuru','Tumkur','Kalaburagi','Gulbarga','Ballari','Bellary','Vijayapura','Bijapur','Davanagere','Udupi','Hassan','Chitradurga','Raichur','Kolar','Bidar','Haveri','Mandya','Kodagu','Chikkamagaluru','Chikmagalur','Ramanagara','Chikkaballapur','Yadgir','Gadag'];
+	for (const d of knownDistricts) {
+		if (query.toLowerCase().includes(d.toLowerCase())) return d;
+	}
+	return null;
+}
+
+function extractTimePeriod(query) {
+	const ql = query.toLowerCase();
+	const now = new Date();
+	const y = now.getFullYear();
+	const m = String(now.getMonth() + 1).padStart(2, '0');
+	if (/\bthis\s+month\b/i.test(ql)) return { label: `This month (${now.toLocaleString('en-US', { month: 'long' })})`, since: `${y}-${m}-01` };
+	if (/\blast\s+month\b/i.test(ql)) {
+		const d = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+		const lm = String(d.getMonth() + 1).padStart(2, '0');
+		return { label: `Last month (${d.toLocaleString('en-US', { month: 'long' })})`, since: `${d.getFullYear()}-${lm}-01` };
+	}
+	if (/\bthis\s+year\b/i.test(ql)) return { label: `This year (${y})`, since: `${y}-01-01` };
+	if (/\blast\s+year\b/i.test(ql)) return { label: `Last year (${y - 1})`, since: `${y - 1}-01-01` };
+	const yearMatch = ql.match(/\b(20\d{2})\b/);
+	if (yearMatch) return { label: yearMatch[1], since: `${yearMatch[1]}-01-01` };
+	return null;
+}
+
+function zcqlRows(rows) {
+	if (!rows || rows.length === 0) return [];
+	return rows.map(r => {
+		const flat = {};
+		for (const key of Object.keys(r)) {
+			const val = r[key];
+			if (val && typeof val === 'object' && !Array.isArray(val)) {
+				Object.assign(flat, val);
+			} else {
+				flat[key] = val;
+			}
+		}
+		return flat;
+	});
+}
+
+async function handleNetwork(app, query) {
+	const name = extractPersonName(query);
+	if (!name) {
+		return { intent: 'network', answer: 'Please specify a person name (e.g. "show associates of Ravi").', nodes: [], edges: [], source_refs: [] };
+	}
+
+	const [accusedAll, victimAll, complainantAll] = await Promise.all([
+		app.zcql().executeZCQLQuery(
+			`SELECT a.ROWID, a.AccusedName, a.CaseMasterID, cm.CrimeNo, cm.IncidentFromDate
+FROM Accused a, CaseMaster cm
+WHERE a.CaseMasterID = cm.ROWID AND LOWER(a.AccusedName) LIKE '%${name.toLowerCase()}%' LIMIT 50`
+		).catch(() => []),
+		app.zcql().executeZCQLQuery(
+			`SELECT v.ROWID, v.VictimName, v.CaseMasterID, cm.CrimeNo
+FROM Victim v, CaseMaster cm
+WHERE v.CaseMasterID = cm.ROWID AND LOWER(v.VictimName) LIKE '%${name.toLowerCase()}%' LIMIT 50`
+		).catch(() => []),
+		app.zcql().executeZCQLQuery(
+			`SELECT c.ComplainantID, c.ComplainantName, c.CaseMasterID, cm.CrimeNo
+FROM ComplainantDetails c, CaseMaster cm
+WHERE c.CaseMasterID = cm.ROWID AND LOWER(c.ComplainantName) LIKE '%${name.toLowerCase()}%' LIMIT 50`
+		).catch(() => [])
+	]);
+
+	const accused = zcqlRows(accusedAll);
+	const victims = zcqlRows(victimAll);
+	const complainants = zcqlRows(complainantAll);
+	const allMatches = [...accused, ...victims, ...complainants];
+
+	if (allMatches.length === 0) {
+		return { intent: 'network', answer: `No records found for "${name}" in the database.`, nodes: [], edges: [], source_refs: [] };
+	}
+
+	const caseIds = [...new Set(allMatches.map(r => r.CaseMasterID).filter(Boolean))];
+	const nodes = [];
+	const edges = [];
+	const seenNodes = new Set();
+	const sourceRefs = [];
+
+	for (const a of accused) {
+		const nid = `accused:${a.ROWID}`;
+		if (!seenNodes.has(nid)) {
+			seenNodes.add(nid);
+			nodes.push({ id: nid, name: a.AccusedName || name, type: 'person', role: 'accused' });
+			sourceRefs.push(`Accused:${a.AccusedName || name}`);
+		}
+		if (a.CaseMasterID) {
+			const cid = `case:${a.CaseMasterID}`;
+			if (!seenNodes.has(cid)) {
+				seenNodes.add(cid);
+				nodes.push({ id: cid, name: a.CrimeNo || `Case ${a.CaseMasterID}`, type: 'case' });
+			}
+			edges.push({ from: nid, to: cid, label: 'accused_in' });
+		}
+	}
+	for (const v of victims) {
+		const nid = `victim:${v.ROWID}`;
+		if (!seenNodes.has(nid)) {
+			seenNodes.add(nid);
+			nodes.push({ id: nid, name: v.VictimName || name, type: 'person', role: 'victim' });
+			sourceRefs.push(`Victim:${v.VictimName || name}`);
+		}
+		if (v.CaseMasterID) {
+			const cid = `case:${v.CaseMasterID}`;
+			if (!seenNodes.has(cid)) {
+				seenNodes.add(cid);
+				nodes.push({ id: cid, name: v.CrimeNo || `Case ${v.CaseMasterID}`, type: 'case' });
+			}
+			edges.push({ from: nid, to: cid, label: 'victim_in' });
+		}
+	}
+	for (const c of complainants) {
+		const nid = `complainant:${c.ComplainantID}`;
+		if (!seenNodes.has(nid)) {
+			seenNodes.add(nid);
+			nodes.push({ id: nid, name: c.ComplainantName || name, type: 'person', role: 'complainant' });
+			sourceRefs.push(`Complainant:${c.ComplainantName || name}`);
+		}
+		if (c.CaseMasterID) {
+			const cid = `case:${c.CaseMasterID}`;
+			if (!seenNodes.has(cid)) {
+				seenNodes.add(cid);
+				nodes.push({ id: cid, name: c.CrimeNo || `Case ${c.CaseMasterID}`, type: 'case' });
+			}
+			edges.push({ from: nid, to: cid, label: 'filed' });
+		}
+	}
+
+	const personNodeCount = nodes.filter(n => n.type === 'person').length;
+	const caseNodeCount = nodes.filter(n => n.type === 'case').length;
+	const answer = `Found a network with ${personNodeCount} person(s) connected across ${caseNodeCount} case(s).`;
+
+	return { intent: 'network', answer, nodes, edges, source_refs: [...new Set(sourceRefs)] };
+}
+
+async function handleRisk(app, query) {
+	const name = extractPersonName(query);
+	if (!name) {
+		return { intent: 'risk', answer: 'Please specify a person name (e.g. "risk score of Ravi").', risk_score: null, factors: [], source_refs: [] };
+	}
+
+	const accusedRows = zcqlRows(await app.zcql().executeZCQLQuery(
+		`SELECT a.ROWID, a.AccusedName, a.CaseMasterID, cm.CrimeRegisteredDate, ch.CrimeGroupName
+FROM Accused a, CaseMaster cm, CrimeHead ch
+WHERE a.CaseMasterID = cm.ROWID AND cm.CrimeMajorHeadID = ch.ROWID
+AND LOWER(a.AccusedName) LIKE '%${name.toLowerCase()}%' LIMIT 100`
+	).catch(() => []));
+
+	if (accusedRows.length === 0) {
+		return { intent: 'risk', answer: `No criminal history found for "${name}".`, risk_score: 0, factors: ['No prior cases'], source_refs: [] };
+	}
+
+	const uniqueCaseCount = new Set(accusedRows.map(r => r.CaseMasterID)).size;
+	const uniqueCrimeTypes = new Set(accusedRows.map(r => r.CrimeGroupName).filter(Boolean));
+	const recidivism = uniqueCaseCount > 1;
+
+	const score = Math.min(10, Math.round((uniqueCaseCount * 2.5 + (recidivism ? 2 : 0) + Math.min(uniqueCrimeTypes.size, 3)) * 10) / 10);
+	const factors = [
+		`${uniqueCaseCount} case(s) as accused`,
+		...(recidivism ? ['Repeat offender'] : ['First-time offender']),
+		...(uniqueCrimeTypes.size > 0 ? [`${uniqueCrimeTypes.size} distinct crime type(s): ${[...uniqueCrimeTypes].slice(0, 3).join(', ')}`] : [])
+	];
+	const severity = score >= 7 ? 'High' : score >= 4 ? 'Medium' : 'Low';
+	const answer = `${name} has a risk score of ${score}/10 (${severity}). ${factors.join('. ')}.`;
+
+	return { intent: 'risk', answer, risk_score: score, factors, severity, source_refs: [] };
+}
+
+async function handleAnalytical(app, query) {
+	const location = extractLocation(query);
+	const period = extractTimePeriod(query);
+	const parts = [];
+
+	if (location) parts.push(`in ${location}`);
+	if (period) parts.push(period.label);
+	const contextLabel = parts.length > 0 ? parts.join(' ') : 'overall';
+
+	const whereClauses = [];
+	if (location) {
+		whereClauses.push(`LOWER(d.DistrictName) LIKE '%${location.toLowerCase()}%'`);
+	}
+	if (period) {
+		whereClauses.push(`cm.CrimeRegisteredDate >= '${period.since}'`);
+	}
+
+	const whereSQL = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+	const [crimeTypeRows, monthlyRows, locationRows] = await Promise.all([
+		app.zcql().executeZCQLQuery(
+			`SELECT ch.CrimeGroupName, COUNT(cm.CaseMasterID) AS cnt
+FROM CaseMaster cm, CrimeHead ch, Unit u, District d
+WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID AND cm.CrimeMajorHeadID = ch.ROWID
+${whereSQL ? 'AND ' + whereClauses.join(' AND ') : ''}
+GROUP BY ch.CrimeGroupName ORDER BY cnt DESC LIMIT 10`
+		).catch(() => []),
+		app.zcql().executeZCQLQuery(
+			`SELECT SUBSTRING(cm.CrimeRegisteredDate, 1, 7) AS yr_month, COUNT(cm.CaseMasterID) AS cnt
+FROM CaseMaster cm, Unit u, District d
+WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID
+${whereSQL ? 'AND ' + whereClauses.join(' AND ') : ''}
+GROUP BY yr_month ORDER BY yr_month DESC LIMIT 12`
+		).catch(() => []),
+		app.zcql().executeZCQLQuery(
+			`SELECT d.DistrictName, COUNT(cm.CaseMasterID) AS cnt
+FROM CaseMaster cm, Unit u, District d
+WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID
+GROUP BY d.DistrictName ORDER BY cnt DESC LIMIT 10`
+		).catch(() => [])
+	]);
+
+	const crimeTypes = zcqlRows(crimeTypeRows);
+	const monthly = zcqlRows(monthlyRows);
+	const byLocation = zcqlRows(locationRows);
+
+	const total = crimeTypes.reduce((s, r) => s + Number(r.cnt || 0), 0);
+	const topCrime = crimeTypes.length > 0 ? crimeTypes[0].CrimeGroupName : 'N/A';
+	const topCrimeCount = crimeTypes.length > 0 ? crimeTypes[0].cnt : 0;
+	const topLocation = byLocation.length > 0 ? byLocation[0].DistrictName : 'N/A';
+	const trend = monthly.length >= 2
+		? (Number(monthly[0].cnt || 0) > Number(monthly[monthly.length - 1].cnt || 0) ? 'increasing' : 'decreasing')
+		: 'stable';
+
+	const answer = `Crime analysis ${contextLabel}: ${total} total case(s). Top crime type: ${topCrime} (${topCrimeCount} case(s)). Highest crime district: ${topLocation}. Trend: ${trend}.`;
+
+	return {
+		intent: 'analytical',
+		answer,
+		trends: {
+			total_cases: total,
+			top_crime_type: topCrime,
+			top_crime_count: topCrimeCount,
+			top_district: topLocation,
+			direction: trend,
+			crime_type_breakdown: crimeTypes.slice(0, 5),
+			monthly_trend: monthly,
+			location_breakdown: byLocation.slice(0, 5)
+		},
 		source_refs: []
 	};
 }
@@ -310,6 +646,51 @@ async function getOrCreateSession(app, employeeId, sessionId) {
 		district_id: null,
 		turns: []
 	};
+
+	try {
+		const empRow = extractRow(await queryFirst(app,
+			`SELECT EmployeeID, RankID, UnitID, DistrictID FROM Employee WHERE EmployeeID = ${Number(employeeId)}`
+		));
+
+		if (empRow) {
+			if (empRow.RankID) {
+				const rankRow = extractRow(await queryFirst(app,
+					`SELECT Hierarchy FROM Rank WHERE ROWID = ${String(empRow.RankID)}`
+				));
+				if (rankRow) {
+					session.rank_hierarchy = rankRow.Hierarchy ? Number(rankRow.Hierarchy) : null;
+				}
+			}
+
+			if (empRow.UnitID) {
+				const unitRow = extractRow(await queryFirst(app,
+					`SELECT UnitID, TypeID FROM Unit WHERE ROWID = ${String(empRow.UnitID)}`
+				));
+				if (unitRow) {
+					session.unit_id = unitRow.UnitID ? Number(unitRow.UnitID) : session.unit_id;
+
+					if (unitRow.TypeID) {
+						const utRow = extractRow(await queryFirst(app,
+							`SELECT UnitTypeID FROM UnitType WHERE ROWID = ${String(unitRow.TypeID)}`
+						));
+						if (utRow) {
+							session.unit_hierarchy = utRow.UnitTypeID ? Number(utRow.UnitTypeID) : null;
+						}
+					}
+				}
+			}
+
+			if (empRow.DistrictID) {
+				const distRow = extractRow(await queryFirst(app,
+					`SELECT DistrictID FROM District WHERE ROWID = ${String(empRow.DistrictID)}`
+				));
+				if (distRow) {
+					session.district_id = distRow.DistrictID ? Number(distRow.DistrictID) : session.district_id;
+				}
+			}
+		}
+	} catch {
+	}
 
 	await seg.put(cacheKey, JSON.stringify(session), SESSION_TTL_HOURS);
 	return session;
@@ -403,10 +784,13 @@ module.exports = async (req, res) => {
 				break;
 			}
 			case 'network':
+				result = await handleNetwork(app, query);
+				break;
 			case 'risk':
+				result = await handleRisk(app, query);
+				break;
 			case 'analytical':
-				result = formatIntentResult(kwResult.intent);
-				result.message = `The query was classified as "${kwResult.intent}". This handler is not yet implemented.`;
+				result = await handleAnalytical(app, query);
 				break;
 			default:
 				result = formatIntentResult('structured');

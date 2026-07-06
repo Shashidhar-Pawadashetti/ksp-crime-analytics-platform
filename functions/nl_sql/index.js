@@ -1,6 +1,7 @@
 'use strict';
 
 const https = require('https');
+const catalyst = require('zcatalyst-sdk-node');
 
 const QUICKML_URL = process.env.QUICKML_URL || 'https://api.catalyst.zoho.in/quickml/v1/project/47995000000013046/glm/chat';
 const QUICKML_MODEL = process.env.QUICKML_MODEL || 'crm-di-glm47b_30b_it';
@@ -10,52 +11,71 @@ const FORBIDDEN_KEYWORDS = ['DROP', 'DELETE', 'INSERT', 'UPDATE', 'TRUNCATE', 'A
 
 const SCHEMA_DESCRIPTION = `
 Tables:
-- CaseMaster (CaseMasterID, CrimeNo, CrimeRegisteredDate, PoliceStationID, CrimeMajorHeadID, CrimeMinorHeadID, CaseStatusID, latitude, longitude, IncidentFromDate, IncidentToDate, BriefFacts)
-- Accused (AccusedMasterID, CaseMasterID, AccusedName, AgeYear, GenderID)
-- Victim (VictimMasterID, CaseMasterID, VictimName, AgeYear, GenderID)
+- CaseMaster (CaseMasterID, CrimeNo, CaseNo, CrimeRegisteredDate, PolicePersonID, PoliceStationID, CaseCategoryID, GravityOffenceID, CrimeMajorHeadID, CrimeMinorHeadID, CaseStatusID, CourtID, IncidentFromDate, IncidentToDate, InfoReceivedPSDate, Latitude, Longitude, BriefFacts)
+- Accused (AccusedMasterID, CaseMasterID, AccusedName, AgeYear, GenderID, PersonID)
+- Victim (VictimMasterID, CaseMasterID, VictimName, AgeYear, GenderID, VictimPolice)
 - ComplainantDetails (ComplainantID, CaseMasterID, ComplainantName, AgeYear, OccupationID, ReligionID, CasteID, GenderID)
-- CrimeHead (CrimeHeadID, CrimeGroupName)
-- CrimeSubHead (CrimeSubHeadID, CrimeHeadID, CrimeHeadName)
-- CrimeHeadActSection (CrimeHeadID, ActID, SectionID)
-- Act (ActID, ActName)
-- Section (SectionID, ActID, SectionName)
-- CaseStatusMaster (CaseStatusID, StatusName)
-- GravityOffence (GravityOffenceID, GravityName)
-- Unit (UnitID, UnitName, DistrictID, TypeID)
-- District (DistrictID, DistrictName, StateID)
-- State (StateID, StateName)
-- UnitType (UnitTypeID, TypeName)
-- Rank (RankID, RankName, Hierarchy)
-- Designation (DesignationID, DesignationName)
-- Employee (EmployeeID, EmployeeName, RankID, UnitID, DistrictID)
+- CrimeHead (CrimeHeadID, CrimeGroupName, Active)
+- CrimeSubHead (CrimeSubHeadID, CrimeHeadID, CrimeHeadName, SeqID)
+- ActSectionAssociation (CaseMasterID, ActID, SectionID, ActOrderID, SectionOrderID)
+- CrimeHeadActSection (CrimeHeadID, ActCode, SectionCode)
+- Act (ActCode, ActDescription, ShortName, Active)
+- Section (ActCode, SectionCode, SectionDescription, Active)
+- CaseCategory (CaseCategoryID, LookupValue)
+- CaseStatusMaster (CaseStatusID, CaseStatusName)
+- GravityOffence (GravityOffenceID, LookupValue)
+- Court (CourtID, CourtName, DistrictID, StateID, Active)
+- Unit (UnitID, UnitName, TypeID, ParentUnit, NationalityID, StateID, DistrictID, Active)
+- District (DistrictID, DistrictName, StateID, Active)
+- State (StateID, StateName, NationalityID, Active)
+- UnitType (UnitTypeID, UnitTypeName, CityDistState, Hierarchy, Active)
+- Rank (RankID, RankName, Hierarchy, Active)
+- Designation (DesignationID, DesignationName, Active, SortOrder)
+- Employee (EmployeeID, FirstName, KGID, RankID, DesignationID, UnitID, DistrictID, EmployeeDOB, GenderID, BloodGroupID, PhysicallyChallenged, AppointmentDate)
 - ReligionMaster (ReligionID, ReligionName)
-- CasteMaster (CasteID, CasteName)
+- CasteMaster (caste_master_id, caste_master_name)
 - OccupationMaster (OccupationID, OccupationName)
-- ArrestSurrender (ArrestID, CaseMasterID, AccusedMasterID, ArrestDate, ArrestType)
-- ChargesheetDetails (ChargesheetID, CaseMasterID, FiledDate)
-- PersonMaster (PersonID, CanonicalName, RolesSummary, RiskScore)
+- ChargesheetDetails (CSID, CaseMasterID, csdate, cstype, PolicePersonID)
+- ArrestSurrender (ArrestSurrenderID, CaseMasterID, ArrestSurrenderTypeID, ArrestSurrenderDate, ArrestSurrenderStateId, ArrestSurrenderDistrictId, PoliceStationID, IOID, CourtID, AccusedMasterID, IsAccused, IsComplainantAccused)
 
-Key JOIN paths:
-- CaseMaster.PoliceStationID → Unit.UnitID
-- Unit.DistrictID → District.DistrictID
-- District.StateID → State.StateID
-- Unit.TypeID → UnitType.UnitTypeID
-- CaseMaster.CrimeMajorHeadID → CrimeHead.CrimeHeadID
-- CaseMaster.CrimeMinorHeadID → CrimeSubHead.CrimeSubHeadID
-- CaseMaster.CaseStatusID → CaseStatusMaster.CaseStatusID
-- CrimeSubHead.CrimeHeadID → CrimeHead.CrimeHeadID
-- CrimeHeadActSection.CrimeHeadID → CrimeHead.CrimeHeadID
-- CrimeHeadActSection.ActID → Act.ActID
-- CrimeHeadActSection.SectionID → Section.SectionID
-- Accused.CaseMasterID → CaseMaster.CaseMasterID
-- Victim.CaseMasterID → CaseMaster.CaseMasterID
-- ComplainantDetails.CaseMasterID → CaseMaster.CaseMasterID
-- ArrestSurrender.CaseMasterID → CaseMaster.CaseMasterID
-- ArrestSurrender.AccusedMasterID → Accused.AccusedMasterID
-- ChargesheetDetails.CaseMasterID → CaseMaster.CaseMasterID
-- Employee.RankID → Rank.RankID (via ROWID)
-- Employee.UnitID → Unit.UnitID (via ROWID)
-- Employee.DistrictID → District.DistrictID (via ROWID)
+IMPORTANT: All FK columns store the target table's Catalyst ROWID (a long alphanumeric string). JOIN using ROWID pseudo-column:
+- CaseMaster.PoliceStationID = Unit.ROWID
+- Unit.DistrictID = District.ROWID
+- District.StateID = State.ROWID
+- Unit.TypeID = UnitType.ROWID
+- CaseMaster.PolicePersonID = Employee.ROWID
+- CaseMaster.CrimeMajorHeadID = CrimeHead.ROWID
+- CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
+- CaseMaster.CaseStatusID = CaseStatusMaster.ROWID
+- CaseMaster.CaseCategoryID = CaseCategory.ROWID
+- CaseMaster.GravityOffenceID = GravityOffence.ROWID
+- CaseMaster.CourtID = Court.ROWID
+- ComplainantDetails.CaseMasterID = CaseMaster.ROWID
+- ComplainantDetails.OccupationID = OccupationMaster.ROWID
+- ComplainantDetails.ReligionID = ReligionMaster.ROWID
+- ComplainantDetails.CasteID = CasteMaster.ROWID
+- Accused.CaseMasterID = CaseMaster.ROWID
+- Victim.CaseMasterID = CaseMaster.ROWID
+- ActSectionAssociation.CaseMasterID = CaseMaster.ROWID
+- ActSectionAssociation.ActID = Act.ROWID
+- ActSectionAssociation.SectionID = Section.ROWID
+- ChargesheetDetails.CaseMasterID = CaseMaster.ROWID
+- ChargesheetDetails.PolicePersonID = Employee.ROWID
+- ArrestSurrender.CaseMasterID = CaseMaster.ROWID
+- ArrestSurrender.PoliceStationID = Unit.ROWID
+- ArrestSurrender.IOID = Employee.ROWID
+- ArrestSurrender.CourtID = Court.ROWID
+- ArrestSurrender.AccusedMasterID = Accused.ROWID
+- ArrestSurrender.ArrestSurrenderStateId = State.ROWID
+- ArrestSurrender.ArrestSurrenderDistrictId = District.ROWID
+- CrimeSubHead.CrimeHeadID = CrimeHead.ROWID
+- CrimeHeadActSection.CrimeHeadID = CrimeHead.ROWID
+- Court.DistrictID = District.ROWID
+- Court.StateID = State.ROWID
+- Employee.RankID = Rank.ROWID
+- Employee.UnitID = Unit.ROWID
+- Employee.DistrictID = District.ROWID
+- Employee.DesignationID = Designation.ROWID
 `;
 
 function sendJson(res, status, data) {
@@ -201,13 +221,13 @@ Rules:
 
 Examples:
 Query: "show FIRs for theft in Bengaluru last month"
-SQL: SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, cs.CrimeHeadName, d.DistrictName FROM CaseMaster cm JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.CrimeSubHeadID JOIN CrimeHead ch ON cs.CrimeHeadID = ch.CrimeHeadID JOIN Unit u ON cm.PoliceStationID = u.UnitID JOIN District d ON u.DistrictID = d.DistrictID WHERE ch.CrimeGroupName LIKE '%theft%' AND d.DistrictName = 'Bengaluru' AND cm.CrimeRegisteredDate >= '2025-06-01' AND cm.CrimeRegisteredDate < '2025-07-01' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
+SQL: SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, cs.CrimeHeadName, d.DistrictName FROM CaseMaster cm, CrimeSubHead cs, CrimeHead ch, Unit u, District d WHERE cm.CrimeMinorHeadID = cs.ROWID AND cs.CrimeHeadID = ch.ROWID AND cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID AND ch.CrimeGroupName LIKE '%theft%' AND d.DistrictName = 'Bengaluru' AND cm.CrimeRegisteredDate >= '2025-06-01' AND cm.CrimeRegisteredDate < '2025-07-01' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
 
 Query: "how many murder cases in 2025"
-SQL: SELECT COUNT(*) AS case_count FROM CaseMaster cm JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.CrimeSubHeadID JOIN CrimeHead ch ON cs.CrimeHeadID = ch.CrimeHeadID WHERE ch.CrimeGroupName LIKE '%murder%' AND cm.CrimeRegisteredDate >= '2025-01-01' AND cm.CrimeRegisteredDate < '2026-01-01'
+SQL: SELECT COUNT(*) AS case_count FROM CaseMaster cm, CrimeSubHead cs, CrimeHead ch WHERE cm.CrimeMinorHeadID = cs.ROWID AND cs.CrimeHeadID = ch.ROWID AND ch.CrimeGroupName LIKE '%murder%' AND cm.CrimeRegisteredDate >= '2025-01-01' AND cm.CrimeRegisteredDate < '2026-01-01'
 
 Query: "list accused in case 2024-00412"
-SQL: SELECT a.AccusedMasterID, a.AccusedName, a.AgeYear, a.GenderID FROM Accused a JOIN CaseMaster cm ON a.CaseMasterID = cm.CaseMasterID WHERE cm.CrimeNo = '2024-00412'
+SQL: SELECT a.AccusedMasterID, a.AccusedName, a.AgeYear, a.GenderID FROM Accused a, CaseMaster cm WHERE a.CaseMasterID = cm.ROWID AND cm.CrimeNo = '2024-00412'
 
 Query: "${query}"
 
@@ -219,6 +239,23 @@ Respond ONLY with the JSON object, no other text.`;
 		throw new Error('Empty response from GLM');
 	}
 	return parseSQLResponse(content);
+}
+
+function extractColumnMeta(sql) {
+	const match = sql.match(/SELECT\s+(.*?)\s+FROM/i);
+	if (!match) return [];
+	return match[1].split(',').map((c) => c.trim().replace(/\s+AS\s+/i, ' ').split(' ').pop());
+}
+
+function extractSourceRefs(rows) {
+	const refs = [];
+	for (const row of rows) {
+		const entry = Object.values(row)[0];
+		if (entry && entry.CaseMasterID) {
+			refs.push(`CaseMasterID:${entry.CaseMasterID}`);
+		}
+	}
+	return refs;
 }
 
 module.exports = async (req, res) => {
@@ -243,9 +280,29 @@ module.exports = async (req, res) => {
 		return;
 	}
 
+	let app;
+	try {
+		app = catalyst.initialize(req);
+	} catch {
+		sendError(res, 500, 'INIT_FAILED', 'Failed to initialize Catalyst SDK');
+		return;
+	}
+
 	try {
 		const result = await translateToSQL(query);
-		sendJson(res, 200, { status: 'ok', data: result });
+		const rows = await app.zcql().executeZCQLQuery(result.sql);
+		const columnMeta = extractColumnMeta(result.sql);
+		const sourceRefs = extractSourceRefs(rows);
+		sendJson(res, 200, {
+			status: 'ok',
+			data: {
+				sql: result.sql,
+				explanation: result.explanation,
+				rows,
+				column_meta: columnMeta,
+				source_refs: sourceRefs
+			}
+		});
 	} catch (err) {
 		const errCode = err.message.startsWith('UNSAFE_SQL') ? 'UNSAFE_SQL' : 'TRANSLATION_FAILED';
 		sendError(res, 400, errCode, err.message);

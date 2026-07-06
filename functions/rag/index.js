@@ -120,10 +120,9 @@ async function searchBriefFacts(app, query) {
 
 	const conditions = keywords.map(k => `cm.BriefFacts LIKE '%${k}%'`);
 	const sql = `SELECT cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, d.DistrictName 
-FROM CaseMaster cm 
-JOIN Unit u ON cm.PoliceStationID = u.UnitID 
-JOIN District d ON u.DistrictID = d.DistrictID 
-WHERE ${conditions.join(' OR ')} 
+FROM CaseMaster cm, Unit u, District d
+WHERE cm.PoliceStationID = u.ROWID AND u.DistrictID = d.ROWID
+AND (${conditions.join(' OR ')}) 
 AND cm.BriefFacts IS NOT NULL 
 ORDER BY cm.IncidentFromDate DESC 
 LIMIT ${MAX_EXCERPTS}`;
