@@ -95,12 +95,14 @@ const empMap = maps.employee;
 
 const unitNames = {};
 const empLines = fs.readFileSync(path.join(BASE, 'data', 'Employee.csv'), 'utf-8').trim().split('\n');
+const empH = parseLine(empLines[0]);
+const empI = {}; empH.forEach((n, i) => empI[n] = i);
 const empByUnit = {};
 for (let i = 1; i < empLines.length; i++) {
-  const cols = empLines[i].split(',');
-  const empRowID = empMap[cols[0]];
+  const cols = parseLine(empLines[i]);
+  const empRowID = empMap[cols[empI.EmployeeID]];
   if (empRowID) {
-    const unitRowID = cols[2];
+    const unitRowID = cols[empI.UnitID];
     if (!empByUnit[unitRowID]) empByUnit[unitRowID] = [];
     empByUnit[unitRowID].push(empRowID);
   }

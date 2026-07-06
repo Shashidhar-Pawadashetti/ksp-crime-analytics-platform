@@ -1,7 +1,13 @@
 {
   "functions": {
     "targets": [
-      "test"
+      "test",
+      "session",
+      "classifier",
+      "nl_sql",
+      "rag",
+      "query_exec",
+      "pipeline"
     ],
     "ignore": [],
     "source": "functions"

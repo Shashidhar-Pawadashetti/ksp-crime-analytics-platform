@@ -21,3 +21,7 @@ Thumbs.db
 resources/
 data_pipeline/data/
 data_pipeline/node_modules/
+TODO.md
+
+
+.build/
