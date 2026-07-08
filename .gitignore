@@ -7,6 +7,7 @@ jspm_packages/
 .env.local
 *.env.json
 .app-config.json
+.catalystrc
 
 # Catalyst CLI logs and temporary build outputs
 .catalyst/
@@ -21,7 +22,7 @@ Thumbs.db
 resources/
 data_pipeline/data/
 data_pipeline/node_modules/
-TODO.md
-
-
+# Large generated artifacts
+.build/
+functions/entity-matching-engine/output/candidate_matches.json
 .build/
