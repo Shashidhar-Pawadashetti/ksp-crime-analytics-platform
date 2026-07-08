@@ -2,6 +2,12 @@
   "functions": {
     "targets": [
       "test",
+      "session",
+      "classifier",
+      "nl_sql",
+      "rag",
+      "query_exec",
+      "pipeline",
       "entity-matching-engine",
       "personmaster-writer",
       "sync-incremental",
