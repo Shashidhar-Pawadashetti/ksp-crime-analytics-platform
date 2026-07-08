@@ -1,24 +1,31 @@
 'use strict';
 
-const { IncomingMessage, ServerResponse } = require("http");
+var { bfsTraverse } = require('./bfs');
+var { TraversalService } = require('./traversalService');
+var { validateInput, validateOutput } = require('./validation');
+var { buildParentMap, reconstructPath, findAllPathsBetween } = require('./pathUtils');
 
-/**
- * 
- * @param {IncomingMessage} req 
- * @param {ServerResponse} res 
- */
-module.exports = (req, res) => {
-	var url = req.url;
+var sharedInstance = null;
 
-	switch (url) {
-		case '/':
-			res.writeHead(200, { 'Content-Type': 'text/html' });
-			res.write('<h1>Hello from index.js<h1>');
-			break;
-		default:
-			res.writeHead(404);
-			res.write('You might find the page you are looking for at "/" path');
-			break;
-	}
-	res.end();
+function getInstance(graphService) {
+  if (!sharedInstance) {
+    sharedInstance = new TraversalService(graphService);
+  }
+  return sharedInstance;
+}
+
+function resetInstance() {
+  sharedInstance = null;
+}
+
+module.exports = {
+  bfsTraverse: bfsTraverse,
+  TraversalService: TraversalService,
+  getInstance: getInstance,
+  resetInstance: resetInstance,
+  validateInput: validateInput,
+  validateOutput: validateOutput,
+  buildParentMap: buildParentMap,
+  reconstructPath: reconstructPath,
+  findAllPathsBetween: findAllPathsBetween
 };
