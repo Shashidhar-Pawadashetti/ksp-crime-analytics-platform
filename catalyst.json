@@ -7,7 +7,13 @@
       "nl_sql",
       "rag",
       "query_exec",
-      "pipeline"
+      "pipeline",
+      "entity-matching-engine",
+      "personmaster-writer",
+      "sync-incremental",
+      "sync-full",
+      "graph-traversal",
+      "personmaster-api"
     ],
     "ignore": [],
     "source": "functions"

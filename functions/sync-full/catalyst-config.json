@@ -1,0 +1,11 @@
+{
+	"deployment": {
+		"name": "sync-full",
+		"stack": "node24",
+		"type": "advancedio",
+		"env_variables": {}
+	},
+	"execution": {
+		"main": "index.js"
+	}
+}

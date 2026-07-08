@@ -1,0 +1,307 @@
+{
+  "calibration_timestamp": "2026-07-06T11:25:06.111Z",
+  "dataset": "ground_truth_identities.csv (synthetic, Faker-generated)",
+  "total_accused_records": 5300,
+  "total_ground_truth_records": 758,
+  "unique_profiles": 150,
+  "same_person_pairs_available": 1905,
+  "same_person_pairs_in_same_bucket": 31,
+  "pct_missed_due_to_bucketing": 98.4,
+  "profiles_split_across_buckets": 145,
+  "pct_profiles_split": 96.7,
+  "accused_pairs_scored": 163506,
+  "thresholds_evaluated": [
+    {
+      "threshold": 0.6,
+      "tp": 6,
+      "fp": 34336,
+      "fn": 25,
+      "precision": 0.0002,
+      "recall": 0.1935,
+      "f1": 0.0003
+    },
+    {
+      "threshold": 0.61,
+      "tp": 6,
+      "fp": 32242,
+      "fn": 25,
+      "precision": 0.0002,
+      "recall": 0.1935,
+      "f1": 0.0004
+    },
+    {
+      "threshold": 0.62,
+      "tp": 6,
+      "fp": 29593,
+      "fn": 25,
+      "precision": 0.0002,
+      "recall": 0.1935,
+      "f1": 0.0004
+    },
+    {
+      "threshold": 0.63,
+      "tp": 6,
+      "fp": 26209,
+      "fn": 25,
+      "precision": 0.0002,
+      "recall": 0.1935,
+      "f1": 0.0005
+    },
+    {
+      "threshold": 0.64,
+      "tp": 5,
+      "fp": 21805,
+      "fn": 26,
+      "precision": 0.0002,
+      "recall": 0.1613,
+      "f1": 0.0005
+    },
+    {
+      "threshold": 0.65,
+      "tp": 5,
+      "fp": 17508,
+      "fn": 26,
+      "precision": 0.0003,
+      "recall": 0.1613,
+      "f1": 0.0006
+    },
+    {
+      "threshold": 0.66,
+      "tp": 3,
+      "fp": 13260,
+      "fn": 28,
+      "precision": 0.0002,
+      "recall": 0.0968,
+      "f1": 0.0005
+    },
+    {
+      "threshold": 0.67,
+      "tp": 3,
+      "fp": 10379,
+      "fn": 28,
+      "precision": 0.0003,
+      "recall": 0.0968,
+      "f1": 0.0006
+    },
+    {
+      "threshold": 0.68,
+      "tp": 3,
+      "fp": 7299,
+      "fn": 28,
+      "precision": 0.0004,
+      "recall": 0.0968,
+      "f1": 0.0008
+    },
+    {
+      "threshold": 0.69,
+      "tp": 3,
+      "fp": 4289,
+      "fn": 28,
+      "precision": 0.0007,
+      "recall": 0.0968,
+      "f1": 0.0014
+    },
+    {
+      "threshold": 0.7,
+      "tp": 0,
+      "fp": 1738,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.71,
+      "tp": 0,
+      "fp": 861,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.72,
+      "tp": 0,
+      "fp": 389,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.73,
+      "tp": 0,
+      "fp": 297,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.74,
+      "tp": 0,
+      "fp": 68,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.75,
+      "tp": 0,
+      "fp": 63,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.76,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.77,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.78,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.79,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.8,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.81,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.82,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.83,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.84,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.85,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.86,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.87,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.88,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.89,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    {
+      "threshold": 0.9,
+      "tp": 0,
+      "fp": 0,
+      "fn": 31,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    }
+  ],
+  "best_threshold_candidate": 0.69,
+  "best_f1": 0.0014,
+  "best_precision": 0.0007,
+  "best_recall": 0.0968,
+  "best_confusion_matrix": {
+    "tp": 3,
+    "fp": 4289,
+    "fn": 28
+  },
+  "current_threshold": 0.78,
+  "current_candidate_min": 0.55,
+  "decision": "Kept current THRESHOLD. Calibration data unreliable due to synthetic name variations (initials) that split ground-truth pairs across buckets. Re-calibrate after improving blocking strategy.",
+  "recommendation": "Add initial-expansion or multi-token phonetic key for blocking (e.g., soundex of first token + soundex of last token) before re-calibrating."
+}
