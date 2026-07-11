@@ -8,6 +8,7 @@
 // Exports both the provider and the reducer for standalone testing (used in Plan 01-05).
 
 import { createContext, useReducer, useCallback } from 'react';
+import { queryPipeline } from '../services/api';
 
 /** @type {import('react').Context<*>} */
 export const ChatContext = createContext(null);
@@ -84,8 +85,9 @@ export function chatReducer(state, action) {
     }
 
     case 'SET_ERROR': {
-      const errorMsg = action.payload?.message || action.payload || 'An error occurred';
-      const fallbackAnswer = action.payload?.fallbackAnswer || null;
+      const errorPayload = action.payload || {};
+      const errorMsg = errorPayload.message || errorPayload || 'An error occurred';
+      const fallbackAnswer = errorPayload.fallback || errorPayload.fallbackAnswer || null;
       const newMessage = {
         id: nextMessageId(),
         role: 'assistant',
@@ -108,7 +110,11 @@ export function chatReducer(state, action) {
         ...state,
         messages: [...state.messages, newMessage],
         isLoading: false,
-        error: errorMsg
+        error: {
+          message: errorMsg,
+          fallback: fallbackAnswer,
+          query: errorPayload.query || null
+        }
       };
     }
 
@@ -133,15 +139,50 @@ export function ChatProvider({ children }) {
 
   /**
    * Send a user message and get an assistant response.
-   * Stub — full implementation in Plan 01-03.
+   * Dispatches ADD_USER_MESSAGE → calls queryPipeline with AbortController timeout (35s)
+   * → dispatches ADD_ASSISTANT_RESPONSE on success or SET_ERROR on failure.
+   *
+   * The AbortController is created fresh per request (no shared controller).
+   * Timeout (35000ms) exceeds the Catalyst hard timeout (30000ms) so the user
+   * gets a client-side error before the server timeout.
+   *
    * @param {string} query - The user's natural language query
    * @param {string} employeeId - Employee ID from AuthContext
    * @param {string} sessionId - Current session ID
-   * @param {AbortSignal} [signal] - Optional abort signal for cancellation
    * @returns {Promise<void>}
    */
-  const sendMessage = useCallback(async (query, employeeId, sessionId, signal) => {
-    throw new Error('sendMessage not yet implemented — see Plan 01-03');
+  const sendMessage = useCallback(async (query, employeeId, sessionId) => {
+    if (!query || !query.trim()) return;
+
+    dispatch({ type: 'ADD_USER_MESSAGE', payload: { content: query } });
+    dispatch({ type: 'SET_LOADING' });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 35000);
+
+    try {
+      const data = await queryPipeline(query, employeeId, sessionId, controller.signal);
+      clearTimeout(timeoutId);
+      dispatch({ type: 'ADD_ASSISTANT_RESPONSE', payload: data });
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        dispatch({
+          type: 'SET_ERROR',
+          payload: {
+            message: 'Request timed out after 35 seconds',
+            fallback: 'The system is taking longer than expected. Please try again.',
+            query
+          }
+        });
+      } else {
+        const fallback = err.fallbackAnswer || 'I was unable to process your request. Please try again.';
+        dispatch({
+          type: 'SET_ERROR',
+          payload: { message: err.message, fallback, query }
+        });
+      }
+    }
   }, []);
 
   const value = { ...state, dispatch, sendMessage };
