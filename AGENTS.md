@@ -256,7 +256,7 @@ function extractGLMContent(response) {
 ### Token
 - Self Client OAuth token (starts with `1000.`)
 - **Expires every hour** — no auto-refresh
-- Current token: `1000.f08140870560bab8cb87fd8d6de486a8.8a354a3956e2b2f1d35e43e56be17713`
+- Current token: `1000.b0af700fbc3b95a7b3f019c27d38e01c.24ac88b165c38e4a7bb60132add23101`
 
 ---
 

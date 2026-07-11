@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useAuth } from './hooks/useAuth'
 import { useUI } from './hooks/useUI'
 import { showEmbeddedAuth } from './services/auth'
@@ -6,10 +7,26 @@ import ChatArea from './components/Chat/ChatArea'
 import EvidencePanel from './components/Citations/EvidencePanel'
 
 function App() {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, dispatch, employee } = useAuth()
   const { evidencePanelOpen } = useUI()
+  const skipAuth = import.meta.env.VITE_SKIP_AUTH === 'true'
 
-  if (isLoading) {
+  useEffect(() => {
+    if (skipAuth && !employee) {
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: {
+          employee: { employee_id: 'DEV001', name: 'Dev User', rank: 'Developer', unit: 'Development' },
+          sessionToken: 'mock_token',
+          sessionId: 'mock_session_001'
+        }
+      })
+    }
+  }, [skipAuth, employee, dispatch])
+
+  const canAccess = skipAuth || isAuthenticated
+
+  if (!skipAuth && isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-dominant text-foreground font-body">
         Loading...
@@ -21,7 +38,7 @@ function App() {
     <div className="flex h-screen overflow-hidden bg-dominant">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
-        {isAuthenticated ? (
+        {canAccess ? (
           <ChatArea />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">

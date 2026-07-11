@@ -10,7 +10,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:9000'  // Catalyst dev server
+      '/api': {
+        target: 'https://datathon2026-60073929329.development.catalystserverless.in',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
     }
   }
 })
