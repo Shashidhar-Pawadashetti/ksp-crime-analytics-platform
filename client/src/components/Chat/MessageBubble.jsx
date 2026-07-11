@@ -5,6 +5,8 @@
 // and timestamp. All content rendered via JSX text interpolation
 // (React auto-escapes by default, preventing XSS).
 
+import CitationLink from '../Citations/CitationLink';
+
 /**
  * Map backend intent string to human-readable label.
  * @type {Object<string, string>}
@@ -142,6 +144,26 @@ function MessageBubble({ message }) {
         <div className="font-body text-base leading-relaxed">
           {message.content}
         </div>
+
+        {/* Citations (assistant only) — max 3 inline with [+N more] overflow */}
+        {!isUser && message.source_refs && message.source_refs.length > 0 && (
+          <div className="mt-2 font-body text-sm leading-relaxed">
+            <span className="text-xs font-medium text-foreground/60">Sources: </span>
+            {message.source_refs.slice(0, 3).map((ref, index) => (
+              <CitationLink
+                key={`${ref}-${index}`}
+                index={index + 1}
+                reference={ref}
+                sourceType={ref.split(':')[0]}
+              />
+            ))}
+            {message.source_refs.length > 3 && (
+              <span className="cursor-pointer text-xs text-foreground/60 hover:underline">
+                {' '}[+{message.source_refs.length - 3} more]
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Data table (assistant only) */}
         {!isUser && renderDataTable(message.data)}
