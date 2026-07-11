@@ -2,6 +2,7 @@ import { useAuth } from './hooks/useAuth'
 import { useUI } from './hooks/useUI'
 import { showEmbeddedAuth } from './services/auth'
 import Sidebar from './components/Layout/Sidebar'
+import ChatArea from './components/Chat/ChatArea'
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth()
@@ -20,11 +21,7 @@ function App() {
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         {isAuthenticated ? (
-          <div className="flex h-full flex-col">
-            <div className="flex flex-1 items-center justify-center text-foreground/50 font-body">
-              <p>Chat interface loading in Plan 01-03</p>
-            </div>
-          </div>
+          <ChatArea />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
             <h1 className="font-heading text-[28px] font-semibold text-foreground">KSP Crime Analytics</h1>
