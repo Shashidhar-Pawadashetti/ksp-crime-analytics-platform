@@ -3,6 +3,7 @@ import { useUI } from './hooks/useUI'
 import { showEmbeddedAuth } from './services/auth'
 import Sidebar from './components/Layout/Sidebar'
 import ChatArea from './components/Chat/ChatArea'
+import EvidencePanel from './components/Citations/EvidencePanel'
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth()
@@ -35,7 +36,7 @@ function App() {
           </div>
         )}
       </main>
-      {evidencePanelOpen && <div className="hidden">{/* EvidencePanel via shadcn Sheet in Plan 01-04 */}</div>}
+      <EvidencePanel />
     </div>
   )
 }

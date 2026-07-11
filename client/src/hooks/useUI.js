@@ -18,3 +18,15 @@ export function useUI() {
   }
   return context;
 }
+
+/**
+ * Convenience hook for evidence panel state and actions.
+ * Wraps useUI with evidence-specific helpers.
+ * @returns {{ evidencePanelOpen: boolean, activeCitation: object|null, openEvidence: function, closeEvidence: function }}
+ */
+export function useEvidence() {
+  const { evidencePanelOpen, activeCitation, dispatch } = useUI();
+  const openEvidence = (citation) => dispatch({ type: 'OPEN_EVIDENCE', payload: citation });
+  const closeEvidence = () => dispatch({ type: 'CLOSE_EVIDENCE' });
+  return { evidencePanelOpen, activeCitation, openEvidence, closeEvidence };
+}
