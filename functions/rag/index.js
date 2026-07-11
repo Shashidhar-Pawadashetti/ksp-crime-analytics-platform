@@ -112,23 +112,48 @@ function extractKeywords(query) {
 	return words.slice(0, 5);
 }
 
+async function expandKeywords(query) {
+	const prompt = `Extract 5-8 key search terms from this police crime query. Return ONLY a JSON array of strings. Do not include stop words or very common words. Focus on crime types, locations, person names, and case-specific terms.
+
+Query: "${query}"
+
+Return ONLY a JSON array like: ["theft", "Bengaluru", "2024"]`;
+
+	try {
+		const response = await callQuickML(prompt, { temperature: 0.1, max_tokens: 200 });
+		const content = extractGLMContent(response);
+		if (!content) return extractKeywords(query);
+		const cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+		const parsed = JSON.parse(cleaned);
+		if (Array.isArray(parsed) && parsed.length > 0) {
+			return parsed.filter(k => k.length > 2).slice(0, 8);
+		}
+		return extractKeywords(query);
+	} catch {
+		return extractKeywords(query);
+	}
+}
+
 async function searchBriefFacts(app, query) {
-	const keywords = extractKeywords(query);
+	const keywords = await expandKeywords(query);
 	if (keywords.length === 0) {
 		return [];
 	}
 
 	const conditions = keywords.map(k => `cm.BriefFacts LIKE '*${k}*'`);
-	const sql = `SELECT cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, d.DistrictName 
-FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID
+	const sql = `SELECT cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, cm.CrimeMajorHeadID, d.DistrictName, ch.CrimeGroupName
+FROM CaseMaster cm
+INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID
+INNER JOIN District d ON u.DistrictID = d.ROWID
+LEFT JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID
 WHERE (${conditions.join(' OR ')}) 
 AND cm.BriefFacts IS NOT NULL 
-ORDER BY cm.IncidentFromDate DESC 
-LIMIT ${MAX_EXCERPTS}`;
+ORDER BY cm.IncidentFromDate DESC
+LIMIT 15`;
 
 	try {
 		const rows = await app.zcql().executeZCQLQuery(sql);
-		return rows.map(r => {
+		const flatRows = rows.map(r => {
 			const flat = {};
 			for (const key of Object.keys(r)) {
 				const val = r[key];
@@ -140,30 +165,43 @@ LIMIT ${MAX_EXCERPTS}`;
 			}
 			return flat;
 		}).filter(Boolean);
+
+		return flatRows.map(row => {
+			const text = (row.BriefFacts || '').toLowerCase();
+			const matches = keywords.filter(k => text.includes(k.toLowerCase()));
+			return { ...row, _score: matches.length, _matchCount: matches.length };
+		}).sort((a, b) => b._score - a._score || new Date(b.IncidentFromDate || 0) - new Date(a.IncidentFromDate || 0))
+		.slice(0, MAX_EXCERPTS);
 	} catch {
 		return [];
 	}
 }
 
 async function generateAnswer(query, excerpts) {
+	const maxScore = Math.max(...excerpts.map(e => e._score || 0), 0);
+	const lowConfidence = maxScore <= 1 && excerpts.length > 0;
+
 	const contextBlock = excerpts.map((e, i) =>
-		`[Case ${i + 1}] CaseMasterID: ${e.CaseMasterID}, CrimeNo: ${e.CrimeNo || 'N/A'}, District: ${e.DistrictName || 'N/A'}, Date: ${e.IncidentFromDate || 'N/A'}
-BriefFacts: ${e.BriefFacts || 'No details available'}`
+		`[Case ${i + 1}] CaseMasterID: ${e.CaseMasterID}, CrimeNo: ${e.CrimeNo || 'N/A'}, District: ${e.DistrictName || 'N/A'}, Date: ${e.IncidentFromDate || 'N/A'}`
+		+ (e.CrimeGroupName ? `, Crime Type: ${e.CrimeGroupName}` : '')
+		+ `\nBriefFacts: ${e.BriefFacts || 'No details available'}`
 	).join('\n\n');
 
 	const prompt = `You are a crime analysis assistant for Karnataka State Police. 
 
 The user asked: "${query}"
 
-Below are relevant case excerpts from the police database. Answer the user's question based ONLY on these excerpts. If the excerpts don't contain enough information to answer, say so honestly.
+Below are relevant case excerpts from the police database. Answer the user's question based ONLY on these excerpts. 
 
 ${contextBlock}
 
 Rules:
 1. Answer based ONLY on the provided excerpts — never add external information
-2. Cite the CaseMasterID for each piece of information you use
+2. Cite the CaseMasterID for each piece of information you use like [CaseMasterID:123]
 3. Be concise and factual
-4. If excerpts are empty or irrelevant, say "I don't have enough information to answer that question."`;
+4. If the excerpts don't fully answer the query, say "Based on available records, ..." and state what you can confirm
+5. When multiple excerpts are relevant, synthesize across them
+6. If excerpts are empty or irrelevant, say "I don't have enough information to answer that question."`;
 
 	const response = await callQuickML(prompt, { temperature: 0.1, max_tokens: 500 });
 	const content = extractGLMContent(response);
