@@ -86,7 +86,12 @@ IMPORTANT: All FK columns store the target table's Catalyst ROWID (a long alphan
 `;
 
 function sendJson(res, status, data) {
-	res.writeHead(status, { 'Content-Type': 'application/json' });
+	res.writeHead(status, {
+		'Content-Type': 'application/json',
+		'Access-Control-Allow-Origin': '*',
+		'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+		'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+	});
 	res.end(JSON.stringify(data));
 }
 
@@ -602,22 +607,22 @@ async function handleAnalytical(app, query) {
 
 	const [crimeTypeRows, monthlyRows, locationRows] = await Promise.all([
 		app.zcql().executeZCQLQuery(
-			`SELECT ch.CrimeGroupName, COUNT(cm.CaseMasterID) AS cnt
+			`SELECT ch.CrimeGroupName, COUNT(cm.CaseMasterID)
 FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID
 ${whereSQL}
-GROUP BY ch.CrimeGroupName ORDER BY cnt DESC LIMIT 10`
+GROUP BY ch.CrimeGroupName ORDER BY COUNT(cm.CaseMasterID) DESC LIMIT 10`
 		).catch(() => []),
 		app.zcql().executeZCQLQuery(
-			`SELECT cm.CrimeRegisteredDate, COUNT(cm.CaseMasterID) AS cnt
+			`SELECT cm.CrimeRegisteredDate, COUNT(cm.CaseMasterID)
 FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID
 ${whereSQL}
 GROUP BY cm.CrimeRegisteredDate ORDER BY cm.CrimeRegisteredDate DESC LIMIT 12`
 		).catch(() => []),
 		app.zcql().executeZCQLQuery(
-			`SELECT d.DistrictName, COUNT(cm.CaseMasterID) AS cnt
+			`SELECT d.DistrictName, COUNT(cm.CaseMasterID)
 FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID
 ${whereSQL}
-GROUP BY d.DistrictName ORDER BY cnt DESC LIMIT 10`
+GROUP BY d.DistrictName ORDER BY COUNT(cm.CaseMasterID) DESC LIMIT 10`
 		).catch(() => [])
 	]);
 
@@ -625,12 +630,20 @@ GROUP BY d.DistrictName ORDER BY cnt DESC LIMIT 10`
 	const monthly = zcqlRows(monthlyRows);
 	const byLocation = zcqlRows(locationRows);
 
-	const total = crimeTypes.reduce((s, r) => s + Number(r.cnt || 0), 0);
+	function getAggCount(row) {
+		const vals = Object.values(row);
+		for (const v of vals) {
+			if (v != null && !isNaN(Number(v))) return Number(v);
+		}
+		return 0;
+	}
+
+	const total = crimeTypes.reduce((s, r) => s + getAggCount(r), 0);
 	const topCrime = crimeTypes.length > 0 ? crimeTypes[0].CrimeGroupName : 'N/A';
-	const topCrimeCount = crimeTypes.length > 0 ? crimeTypes[0].cnt : 0;
+	const topCrimeCount = crimeTypes.length > 0 ? getAggCount(crimeTypes[0]) : 0;
 	const topLocation = byLocation.length > 0 ? byLocation[0].DistrictName : 'N/A';
 	const trend = monthly.length >= 2
-		? (Number(monthly[0].cnt || 0) > Number(monthly[monthly.length - 1].cnt || 0) ? 'increasing' : 'decreasing')
+		? (getAggCount(monthly[0]) > getAggCount(monthly[monthly.length - 1]) ? 'increasing' : 'decreasing')
 		: 'stable';
 
 	const answer = `Crime analysis ${contextLabel}: ${total} total case(s). Top crime type: ${topCrime} (${topCrimeCount} case(s)). Highest crime district: ${topLocation}. Trend: ${trend}.`;
@@ -750,6 +763,17 @@ async function appendTurn(app, employeeId, sessionId, turn) {
 module.exports = async (req, res) => {
 	const { path, params } = parseUrl(req.url);
 	const method = req.method.toUpperCase();
+
+	if (method === 'OPTIONS') {
+		res.writeHead(204, {
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+			'Access-Control-Max-Age': '86400'
+		});
+		res.end();
+		return;
+	}
 
 	if (method === 'GET' && path === '/') {
 		sendJson(res, 200, { status: 'ok', service: 'pipeline', version: '1.0.0' });
