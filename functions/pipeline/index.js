@@ -83,6 +83,11 @@ IMPORTANT: All FK columns store the target table's Catalyst ROWID (a long alphan
 - Employee.UnitID = Unit.ROWID
 - Employee.DistrictID = District.ROWID
 - Employee.DesignationID = Designation.ROWID
+
+CRITICAL: Two paths to CrimeHead — choose based on query intent:
+1. CrimeMajorHeadID → CrimeHead (DIRECT path) — Use when query asks about crime TYPE/GROUP/CATEGORY (CrimeGroupName column). Example: "theft cases", "murder cases", "crime types by count", "crimes against body". JOIN: INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID. Returns CrimeGroupName like "Crimes Against Body".
+2. CrimeMinorHeadID → CrimeSubHead → CrimeHead (VIA CrimeSubHead) — Use ONLY when query asks about SPECIFIC crime SUB-HEAD/SUB-TYPE (CrimeHeadName column). Example: "pickpocketing", "dacoity". JOIN: INNER JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.ROWID INNER JOIN CrimeHead ch ON cs.CrimeHeadID = ch.ROWID. Returns CrimeHeadName.
+RULE: If query asks about crime GROUP/COUNT/TREND by type, use Path 1 (direct). ONLY use Path 2 if query explicitly asks about sub-types or needs CrimeHeadName.
 `;
 
 function sendJson(res, status, data) {
@@ -266,7 +271,9 @@ Rules:
 
 Template:
 Query: "list FIRs for theft in Bengaluru Urban"
-SQL: SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.ROWID INNER JOIN CrimeHead ch ON cs.CrimeHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName = 'Bengaluru Urban' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
+SQL PATH 1 (direct via CrimeMajorHeadID — for crime GROUP queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName = 'Bengaluru Urban' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
+SQL PATH 2 (via CrimeMinorHeadID → CrimeSubHead — for crime SUB-TYPE queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, cs.CrimeHeadName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.ROWID INNER JOIN CrimeHead ch ON cs.CrimeHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE cs.CrimeHeadName LIKE '*theft*' AND d.DistrictName = 'Bengaluru Urban' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
+PREFER Path 1 unless query explicitly asks for sub-head names.
 
 Query: "${query}"
 
