@@ -4,6 +4,7 @@ const https = require('https');
 const catalyst = require('zcatalyst-sdk-node');
 
 const QUICKML_URL = process.env.QUICKML_URL || 'https://api.catalyst.zoho.in/quickml/v1/project/47995000000013046/glm/chat';
+const RAG_ANSWER_URL = process.env.RAG_ANSWER_URL || 'https://api.catalyst.zoho.in/quickml/v1/project/47995000000013046/rag/answer';
 const QUICKML_MODEL = process.env.QUICKML_MODEL || 'crm-di-glm47b_30b_it';
 const CATALYST_ORG = process.env.CATALYST_ORG || '60073929329';
 const MAX_EXCERPTS = 3;
@@ -208,6 +209,49 @@ Rules:
 	return content || 'I was unable to generate an answer.';
 }
 
+async function queryRAGFallback(query) {
+	const token = process.env.QUICKML_TOKEN;
+	if (!token) return null;
+
+	const body = JSON.stringify({ query });
+
+	const urlObj = new URL(RAG_ANSWER_URL);
+
+	return new Promise((resolve) => {
+		const opts = {
+			hostname: urlObj.hostname,
+			path: urlObj.pathname,
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Zoho-oauthtoken ${token}`,
+				'CATALYST-ORG': CATALYST_ORG,
+				'Content-Length': Buffer.byteLength(body),
+			},
+			timeout: 20000,
+		};
+
+		const req = https.request(opts, (res) => {
+			let data = '';
+			res.on('data', (chunk) => (data += chunk));
+			res.on('end', () => {
+				try {
+					const parsed = JSON.parse(data);
+					const answer = parsed.answer || parsed.response || parsed.result;
+					resolve(answer || null);
+				} catch {
+					resolve(null);
+				}
+			});
+		});
+
+		req.on('timeout', () => { req.destroy(); resolve(null); });
+		req.on('error', () => resolve(null));
+		req.write(body);
+		req.end();
+	});
+}
+
 module.exports = async (req, res) => {
 	const { path } = parseUrl(req.url);
 	const method = req.method.toUpperCase();
@@ -243,6 +287,17 @@ module.exports = async (req, res) => {
 		const sourceRefs = excerpts.map(e => `CaseMasterID:${e.CaseMasterID}`);
 
 		if (excerpts.length === 0) {
+			const ragAnswer = await queryRAGFallback(query);
+			if (ragAnswer) {
+				sendJson(res, 200, {
+					status: 'ok',
+					data: {
+						answer: ragAnswer,
+						source_refs: ['RAG:Catalyst']
+					}
+				});
+				return;
+			}
 			sendJson(res, 200, {
 				status: 'ok',
 				data: {
@@ -253,7 +308,23 @@ module.exports = async (req, res) => {
 			return;
 		}
 
+		const maxScore = Math.max(...excerpts.map(e => e._score || 0), 0);
 		const answer = await generateAnswer(query, excerpts);
+
+		if (maxScore <= 1) {
+			const ragAnswer = await queryRAGFallback(query);
+			if (ragAnswer) {
+				sendJson(res, 200, {
+					status: 'ok',
+					data: {
+						answer: ragAnswer,
+						source_refs: sourceRefs.concat(['RAG:Catalyst'])
+					}
+				});
+				return;
+			}
+		}
+
 		sendJson(res, 200, {
 			status: 'ok',
 			data: {
