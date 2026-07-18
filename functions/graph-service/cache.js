@@ -44,13 +44,17 @@ GraphCache.prototype.load = async function () {
   if (this._loading) return this._loading;
 
   this._loading = (async function () {
-    var data = await this._loader();
-    this._nodes = data.nodes;
-    this._edges = data.edges;
-    this._buildIndexes();
-    this._loadedAt = Date.now();
-    this._loaded = true;
-    this._loading = null;
+    try {
+      var data = await this._loader();
+      this._nodes = data.nodes;
+      this._edges = data.edges;
+      this._buildIndexes();
+      this._loadedAt = Date.now();
+      this._loaded = true;
+    } catch (e) {
+      this._loading = null;
+      throw e;
+    }
   }).call(this);
 
   return this._loading;
