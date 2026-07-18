@@ -1,0 +1,11 @@
+{
+  "deploy": {
+    "functions": {
+      "current": {
+        "type": "advancedio",
+        "runtime": "node24",
+        "handler": "index.js"
+      }
+    }
+  }
+}

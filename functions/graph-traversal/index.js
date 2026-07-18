@@ -28,7 +28,10 @@ function getAppInstance(req) {
  */
 app.post('/traverse', async function (req, res) {
   var appInstance = getAppInstance(req);
-  if (!appInstance) return;
+  if (!appInstance) {
+    res.status(500).json({ status: 'error', error_code: 'INIT_FAILED', message: 'Failed to initialize Catalyst app' });
+    return;
+  }
 
   var body = req.body || {};
   var personId = body.person_id;

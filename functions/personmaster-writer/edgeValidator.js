@@ -14,12 +14,12 @@ var { VALID_EDGE_TYPES } = require('./edgeTypes');
  * Validate an edge object.
  *
  * Checks:
- *   - edge_type ∈ VALID_EDGE_TYPES
+ *   - type ∈ VALID_EDGE_TYPES
  *   - confidence is a number between 0 and 1 (inclusive)
- *   - source_person_id !== target_person_id
- *   - target_person_id is a non-empty string
+ *   - source_person_id !== with_person_id
+ *   - with_person_id is a non-empty string
  *   - case_ids is an array
- *   - evidence is an array
+ *   - source_records is an array
  *
  * @param {Object} edge  — edge object to validate
  * @param {Object} [context]  — optional context with source_person_id
@@ -33,11 +33,11 @@ function validateEdge(edge, context) {
     return { valid: false, errors: ['edge must be a non-null object'] };
   }
 
-  /* -- edge_type -- */
-  if (!edge.edge_type) {
-    errors.push('edge_type is required');
-  } else if (VALID_EDGE_TYPES.indexOf(edge.edge_type) === -1) {
-    errors.push('edge_type "' + edge.edge_type + '" is not a valid type (valid: ' + VALID_EDGE_TYPES.join(', ') + ')');
+  /* -- type -- */
+  if (!edge.type) {
+    errors.push('type is required');
+  } else if (VALID_EDGE_TYPES.indexOf(edge.type) === -1) {
+    errors.push('type "' + edge.type + '" is not a valid type (valid: ' + VALID_EDGE_TYPES.join(', ') + ')');
   }
 
   /* -- confidence -- */
@@ -49,15 +49,15 @@ function validateEdge(edge, context) {
     errors.push('confidence must be between 0 and 1 (inclusive)');
   }
 
-  /* -- target_person_id -- */
-  if (!edge.target_person_id || typeof edge.target_person_id !== 'string') {
-    errors.push('target_person_id is required and must be a non-empty string');
+  /* -- with_person_id -- */
+  if (!edge.with_person_id || typeof edge.with_person_id !== 'string') {
+    errors.push('with_person_id is required and must be a non-empty string');
   }
 
   /* -- source != target -- */
   if (context && context.source_person_id) {
-    if (edge.target_person_id === context.source_person_id) {
-      errors.push('source_person_id and target_person_id must be different');
+    if (edge.with_person_id === context.source_person_id) {
+      errors.push('source_person_id and with_person_id must be different');
     }
   }
 
@@ -66,9 +66,9 @@ function validateEdge(edge, context) {
     errors.push('case_ids must be an array');
   }
 
-  /* -- evidence -- */
-  if (edge.evidence !== undefined && !Array.isArray(edge.evidence)) {
-    errors.push('evidence must be an array');
+  /* -- source_records -- */
+  if (edge.source_records !== undefined && !Array.isArray(edge.source_records)) {
+    errors.push('source_records must be an array');
   }
 
   return {

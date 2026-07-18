@@ -405,7 +405,7 @@ async function detectChanges(appInstance) {
 app.post('/detect', async function (req, res) {
   var appInstance;
   try {
-    appInstance = catalyst.initializeApp(req);
+    appInstance = catalyst.initialize(req);
   } catch (e) {
     res.status(500).json({
       status: 'error',
@@ -466,7 +466,7 @@ function getIncrementalResolver() {
 app.post('/reconcile', async function (req, res) {
   var appInstance;
   try {
-    appInstance = catalyst.initializeApp(req);
+    appInstance = catalyst.initialize(req);
   } catch (e) {
     res.status(500).json({
       status: 'error',
