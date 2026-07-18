@@ -29,9 +29,13 @@ expressApp.get('/', (req, res) => {
   });
 });
 
-expressApp.get('/person/:personId/graph', (req, res) => {
-  const routeRes = routeRequest({ url: req.originalUrl, method: req.method });
-  res.status(routeRes.statusCode || 200).set(routeRes.headers || {}).send(routeRes.body);
+expressApp.get('/person/:personId/graph', async (req, res) => {
+  try {
+    const routeRes = await routeRequest({ url: req.originalUrl, method: req.method });
+    res.status(routeRes.statusCode || 200).set(routeRes.headers || {}).send(routeRes.body);
+  } catch (e) {
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: e.message });
+  }
 });
 
 expressApp.post('/visualize', (req, res) => {

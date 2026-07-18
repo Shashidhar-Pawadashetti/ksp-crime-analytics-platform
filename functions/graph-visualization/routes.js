@@ -39,7 +39,7 @@ function matchRoute(pathname) {
   return null;
 }
 
-function handleGraph(req, res, params, query) {
+async function handleGraph(req, res, params, query) {
   var errors = validators.validatePersonId(params.personId);
   if (errors.length > 0) return responseFormatter.validationError(errors);
 
@@ -64,16 +64,20 @@ function handleGraph(req, res, params, query) {
   };
 
   var result;
-  switch (format) {
-    case 'cytoscape':
-      result = exportService.toCytoscape(params.personId, options);
-      break;
-    case 'compact':
-      result = exportService.toCompact(params.personId, options);
-      break;
-    case 'debug':
-      result = exportService.toDebug(params.personId, options);
-      break;
+  try {
+    switch (format) {
+      case 'cytoscape':
+        result = await exportService.toCytoscape(params.personId, options);
+        break;
+      case 'compact':
+        result = await exportService.toCompact(params.personId, options);
+        break;
+      case 'debug':
+        result = await exportService.toDebug(params.personId, options);
+        break;
+    }
+  } catch (e) {
+    return responseFormatter.serverError(e.message);
   }
 
   if (!result) {
@@ -110,7 +114,7 @@ var routeHandlers = {
   'home': handleHome
 };
 
-function route(req) {
+async function route(req) {
   var parsed = parsePath(req.url);
   var match = matchRoute(parsed.pathname);
 
@@ -124,7 +128,7 @@ function route(req) {
   }
 
   req.query = parsed.query;
-  return handler(req, null, match.params, parsed.query);
+  return await handler(req, null, match.params, parsed.query);
 }
 
 module.exports = { route: route, matchRoute: matchRoute, parsePath: parsePath };

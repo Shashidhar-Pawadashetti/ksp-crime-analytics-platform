@@ -1,72 +1,151 @@
 'use strict';
 
+var https = require('https');
 var { toCytoscape } = require('./cytoscapeFormatter');
 
-function GraphExportService() {
-  this._traversal = null;
-  this._graphService = null;
+var BASE_HOST = 'datathon2026-60073929329.development.catalystserverless.in';
+
+function httpGet(path) {
+  return new Promise(function(resolve, reject) {
+    var options = {
+      hostname: BASE_HOST,
+      path: '/server' + path,
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 15000
+    };
+    var req = https.request(options, function(res) {
+      var data = '';
+      res.on('data', function(chunk) { data += chunk; });
+      res.on('end', function() {
+        try { resolve(JSON.parse(data)); }
+        catch (e) { reject(new Error('Invalid JSON response from ' + path)); }
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', function() { req.destroy(); reject(new Error('Timeout for ' + path)); });
+    req.end();
+  });
 }
 
-GraphExportService.prototype._ensureLoaded = function() {
-  if (!this._graphService) {
-    try {
-      var gs = require('./graph-service/index');
-      this._graphService = gs.getInstance();
-    } catch (e) {
-      try {
-        var gs2 = require('../graph-service/index');
-        this._graphService = gs2.getInstance();
-      } catch (e2) {
-        throw new Error('graph-service not available: ' + e2.message);
-      }
+function httpPost(path, body) {
+  return new Promise(function(resolve, reject) {
+    var bodyStr = JSON.stringify(body);
+    var options = {
+      hostname: BASE_HOST,
+      path: '/server' + path,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(bodyStr)
+      },
+      timeout: 15000
+    };
+    var req = https.request(options, function(res) {
+      var data = '';
+      res.on('data', function(chunk) { data += chunk; });
+      res.on('end', function() {
+        try { resolve(JSON.parse(data)); }
+        catch (e) { reject(new Error('Invalid JSON response from ' + path)); }
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', function() { req.destroy(); reject(new Error('Timeout for ' + path)); });
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
+function GraphExportService() {}
+
+GraphExportService.prototype._personExists = async function(personId) {
+  try {
+    var result = await httpGet('/graph-service/person/' + encodeURIComponent(personId) + '/exists');
+    if (result.status === 'ok' && result.data) {
+      return result.data.exists === true;
     }
-  }
-  if (!this._traversal) {
-    try {
-      var gt = require('./graph-traversal/index');
-      this._traversal = gt.getInstance ? gt.getInstance() : null;
-    } catch (e) {
-      try {
-        var gt2 = require('../graph-traversal/index');
-        this._traversal = gt2.getInstance ? gt2.getInstance() : null;
-      } catch (e2) {
-        throw new Error('graph-traversal not available: ' + e2.message);
-      }
-    }
+    return false;
+  } catch (e) {
+    return false;
   }
 };
 
-GraphExportService.prototype._getTraversalResult = function(personId, options) {
-  try {
-    this._ensureLoaded();
-  } catch (e) {
-    return { error: [e.message] };
+GraphExportService.prototype._traverse = async function(personId, options) {
+  var maxHops = (options && options.max_hops !== undefined) ? options.max_hops : 2;
+  var maxNodes = 50;
+
+  var result = await httpPost('/graph-traversal/traverse', {
+    person_id: personId,
+    hops: maxHops,
+    max_nodes: maxNodes
+  });
+
+  if (result.status !== 'ok' || !result.data) {
+    return { error: ['Traversal failed'] };
   }
 
-  var maxHops = (options && options.max_hops !== undefined) ? options.max_hops : 2;
-  var includeUnconfirmed = options && options.include_unconfirmed === true;
-  var edgeTypeFilter = options && options.edge_type_filter;
+  var data = result.data;
 
-  if (!this._graphService.personExists(personId)) {
+  var traversalResult = {
+    nodes: (data.nodes || []).map(function(n) {
+      return {
+        person_id: n.person_id,
+        canonical_name: n.label || n.person_id,
+        roles_summary: n.roles_summary || {},
+        degree: 0,
+        hop_distance: 0
+      };
+    }),
+    statistics: {
+      nodes_visited: (data.nodes || []).length,
+      edges_traversed: (data.edges || []).length + ((data.unconfirmed_edges || []).length),
+      elapsed_ms: 0
+    }
+  };
+
+  var includeUnconfirmed = options && options.include_unconfirmed === true;
+  var allEdges = data.edges || [];
+  if (includeUnconfirmed && data.unconfirmed_edges) {
+    allEdges = allEdges.concat(data.unconfirmed_edges);
+  }
+
+  var edgeTypeFilter = options && options.edge_type_filter;
+  if (edgeTypeFilter && edgeTypeFilter.length > 0) {
+    allEdges = allEdges.filter(function(e) {
+      return edgeTypeFilter.indexOf(e.type) !== -1;
+    });
+  }
+
+  traversalResult.edges = allEdges.map(function(e) {
+    return {
+      edge_id: e.edge_id || (e.from + '-' + e.to + '-' + (e.type || 'unknown')),
+      source: e.from,
+      target: e.to,
+      edge_type: e.type || 'UNKNOWN',
+      weight: e.confirmed !== false ? 1 : 0.5,
+      occurrence_count: (e.case_ids || []).length || 1
+    };
+  });
+
+  return traversalResult;
+};
+
+GraphExportService.prototype._getTraversalResult = async function(personId, options) {
+  var exists = await this._personExists(personId);
+  if (!exists) {
     return { error: ['Person ' + personId + ' not found'] };
   }
-
-  return this._traversal.traverse(personId, {
-    max_hops: maxHops,
-    include_unconfirmed: includeUnconfirmed,
-    edge_type_filter: edgeTypeFilter
-  });
+  return await this._traverse(personId, options);
 };
 
-GraphExportService.prototype.toCytoscape = function(personId, options) {
-  var result = this._getTraversalResult(personId, options);
+GraphExportService.prototype.toCytoscape = async function(personId, options) {
+  var result = await this._getTraversalResult(personId, options);
   if (result.error) return result;
-
   return toCytoscape(result);
 };
 
-GraphExportService.prototype.toCompact = function(personId, options) {
-  var result = this._getTraversalResult(personId, options);
+GraphExportService.prototype.toCompact = async function(personId, options) {
+  var result = await this._getTraversalResult(personId, options);
   if (result.error) return result;
 
   var compactNodes = [];
@@ -99,8 +178,8 @@ GraphExportService.prototype.toCompact = function(personId, options) {
   };
 };
 
-GraphExportService.prototype.toDebug = function(personId, options) {
-  var result = this._getTraversalResult(personId, options);
+GraphExportService.prototype.toDebug = async function(personId, options) {
+  var result = await this._getTraversalResult(personId, options);
   if (result.error) return result;
 
   var nodeSet = {};
@@ -115,7 +194,6 @@ GraphExportService.prototype.toDebug = function(personId, options) {
   for (var ei = 0; ei < result.edges.length; ei++) {
     var e = result.edges[ei];
     edgeSet[e.edge_id] = e;
-
     if (!nodeSet[e.source]) missingSource.push(e.edge_id);
     if (!nodeSet[e.target]) missingTarget.push(e.edge_id);
   }
