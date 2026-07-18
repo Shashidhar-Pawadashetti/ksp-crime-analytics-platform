@@ -1,11 +1,11 @@
 {
-  "deploy": {
-    "functions": {
-      "current": {
-        "type": "advancedio",
-        "runtime": "node24",
-        "handler": "index.js"
-      }
-    }
+  "deployment": {
+    "name": "pm-migration",
+    "stack": "node24",
+    "type": "advancedio",
+    "env_variables": {}
+  },
+  "execution": {
+    "main": "index.js"
   }
 }

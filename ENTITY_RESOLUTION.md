@@ -192,56 +192,30 @@ This combined key is used as a blocking strategy input.
 
 ## Stage 3: Blocking
 
-**File:** `functions/entity-matching-engine/blocking.js` (160 lines)
+**File:** `functions/entity-matching-engine/blocking.js` (125 lines)
 
 Blocking reduces the O(n^2) comparison space by grouping records that share
-a common key. The engine uses 4 blocking strategies in parallel.
+a common key. The engine uses a single blocking strategy per the LLD specification.
 
-### Strategy 1: firstTokenPhoneticKey
+### LLD Strategy: lldPhoneticBlockKey (sole active strategy)
 
-Groups records whose first name (first token) sounds similar.
+Groups records whose first token (first name) produces the same phonetic key.
 
 **Key format:** `{Soundex} {Indian Metaphone}` of first token
 
 **Example:** `Ramesh Kumar` and `Ramesh K` both produce `R520 RMX`
 
-### Strategy 2: lastTokenPhoneticKey
-
-Groups records whose last name (last token) sounds similar.
-
-**Key format:** `{Soundex} {Indian Metaphone}` of last token
-
-**Example:** `Ramesh Kumar` and `Suresh Kumar` both produce `K560 KMR`
-
-### Strategy 3: firstInitialSurnameKey
-
-Groups records with same first initial and phonetically similar surname.
-
-**Key format:** `{FirstInitial}:{Soundex of last token}`
-
-**Example:** `Ramesh Kumar` and `Ravi K` → `R:K560`
-
-### Strategy 4: surnameAgeBandKey
-
-Groups records with phonetically similar surname and age within 5-year band.
-
-**Key format:** `{Soundex of last token}:{age_band}`
-
-**Example:** `Kumar (age 32)` and `Kumar (age 34)` → `K560:30`
-
-### Strategy 5: surnameDistrictKey (not used in STRATEGIES array)
-
-Groups records with phonetically similar surname and same district.
-
-**Key format:** `{Soundex of last token}:{district_id}`
-
-This strategy is exported but not included in the active strategy set.
+This single-strategy approach was adopted per the LLD specification after
+analysis showed it provides the best balance of recall vs. precision for
+the KSP dataset. The old multi-strategy approach (4 parallel strategies
+including lastTokenPhoneticKey, firstInitialSurnameKey, surnameAgeBandKey,
+and surnameDistrictKey) was removed during Phase 4 refactoring.
 
 ### MultiStrategyBlocker
 
 The `generateUniquePairs` function:
 
-1. For each strategy, builds blocks (hash map of key -> records)
+1. Builds blocks (hash map of key -> records) using the sole strategy
 2. For each block with 2+ records, generates all unique pairs
 3. Deduplicates across strategies using `source_id::source_id` set
 
@@ -249,10 +223,12 @@ The `generateUniquePairs` function:
 
 | Strategy | Blocks on | Catches |
 |----------|-----------|---------|
-| firstTokenPhoneticKey | First name sound | Name variations, typos in first name |
-| lastTokenPhoneticKey | Last name sound | Name variations in surname |
-| firstInitialSurnameKey | Initial + surname | Abbreviated first name |
-| surnameAgeBandKey | Surname + age band | Same person, different first name variants |
+| lldPhoneticBlockKey | First name sound | Name variations, typos in first name |
+
+### Supporting Function
+
+`generateUniquePairsWithStrategy(records, strategies)` allows callers to
+pass a custom strategy array (e.g., for calibration or testing purposes).
 
 ---
 
@@ -552,56 +528,52 @@ tables (Accused, Victim, ComplainantDetails).
 ### Flow
 
 ```
-Signal received (new/updated record)
+POST /detect  (change detection)
   │
   ▼
-candidateLoader.js:
-  prepareRecord(name, age, gender, case_id, source_table, source_id)
-  computeBlockingKeys() — uses STRATEGIES from blocking.js
-  precomputeBlockingIndex() — builds blocking index across all PM docs
-  findCandidates() — finds candidate PMs via blocking key intersection
+index.js — detectChanges():
+  ┌─ Load existing PersonMaster documents from NoSQL
+  ├─ Build source-to-person index
+  ├─ Load current source records from Data Store (Accused, Victim, ComplainantDetails)
+  ├─ Build current records index
+  ├─ Compare checksums per PersonMaster document
+  │    └─ Changed vs unchanged vs orphaned records
+  └─ Detect new records (present in Data Store, not in PersonMaster)
   │
   ▼
-incrementalResolver.js:
-  For each candidate PM, compute composite score
-    (max of pairwise matches against all source_records using
-     entity-matching-engine scorer)
-  Sort by score descending
-  Return best match if score >= THRESHOLD
+POST /reconcile  (detect + resolve in one call)
   │
   ▼
-personUpdater.js:
-  applyMatch() — merges new record into existing PM
-    dedup records + aliases
-    recompute demographics, roles_summary, canonical_name
-  createNew() — creates fresh PM document with PM_XXXXXX ID
-  │
-  ▼
-edgeUpdater.js:
-  recomputeEdgesForPM() — identifies affected cases
-    rebuilds CO_ACCUSED/ACCUSED_TO_VICTIM/SHARED_LOCATION edges
-    preserves UNCONFIRMED_MATCH edges
-    deduplicates by occurrence_count
-  extractAdjacencyForPM()
+index.js → incrementalResolver.js — incrementalResolve():
+  ┌─ Step 1: Load existing PersonMaster documents
+  ├─ Step 2: Build affected-case scope from changed persons
+  ├─ Step 3: Load affected source records (by case IDs)
+  ├─ Step 4: Normalise + phoneticize + entity matching
+  │    └─ Uses entity-matching-engine blocking.js, scorer.js, threshold.js
+  ├─ Step 5: Map clusters to PersonMaster docs (Union-Find DSU)
+  ├─ Step 6: Handle orphaned records (remove deleted sources, mark empty docs for deletion)
+  ├─ Step 7-8: Merge orphan-handled docs into rebuilt docs
+  ├─ Step 9: Regenerate edges via edgeGenerator + edgePersistence
+  └─ Step 10: Persist to Catalyst NoSQL (upsert full docs, edge-only updates for shared-case persons)
 ```
 
 ### Files
 
 | File | Lines | Purpose |
 |------|-------|---------|
-| `signalHandler.js` | 124 | Main flow orchestration |
-| `candidateLoader.js` | 118 | Blocking index, candidate retrieval |
-| `incrementalResolver.js` | 94 | Score-based resolution |
-| `personUpdater.js` | 129 | PersonMaster create/update |
-| `edgeUpdater.js` | 143 | Edge recomputation |
-| `simulate-signal.js` | 111 | CLI simulation tool |
+| `index.js` | 524 | Change detection (POST /detect), orchestration (POST /reconcile), health check |
+| `incrementalResolver.js` | 889 | Full incremental resolution pipeline: load, match, cluster, rebuild, edge-gen, persist |
+| `test_change_detection.js` | — | Test suite for change detection |
+| `test_incremental_resolver.js` | — | Test suite for incremental resolver |
 
-### Simulation Tool
+### Key Design
 
-`node simulate-signal.js` supports two modes:
-
-- **`synthetic`** — Creates a random new person and processes it
-- **`existing N`** — Re-processes the Nth record from PersonMaster PM_000001
+- **Change detection** uses checksum comparison (hash of name|age|case_id|unit_id|district_id) to determine which PersonMaster documents have changed.
+- **Entity matching** is re-run only on affected cases (targeted scope, not full graph rebuild).
+- **Union-Find DSU** clusters newly matched pairs into connected components.
+- **Deterministic person IDs** are computed via CRC32 of sorted source keys (`table:id` concatenation) — same algorithm as `personmaster-writer/builder.js`.
+- **Edge regeneration** uses `generateConfirmedEdges()` and `generateCandidateMatchEdges()` from `personmaster-writer/edgeGenerator.js`, persisted via `mergeEdgesIntoDocument()`.
+- **NoSQL persistence** uses upsert (insert-or-update) with batch size 75. Edge-only updates are applied to shared-case persons without rebuilding their full documents.
 
 ---
 
@@ -609,27 +581,37 @@ edgeUpdater.js:
 
 **Directory:** `functions/sync-full/`
 
-### Pipeline
+### Overview
 
-`pipeline.js` (475 lines) runs the complete 8-stage process:
+`sync-full` is a lightweight HTTP-triggered function that delegates the
+full reconciliation to `personmaster-writer/resolve`. It does NOT contain
+an inline pipeline — the entire entity resolution + building + writing
+process lives in `personmaster-writer`.
 
-1. Load CSVs from `data_pipeline/data/` (Accused, Victim, ComplainantDetails)
-2. Normalize all names (normaliser.js)
-3. Generate phonetic keys (phonetic.js)
-4. Block on 4 strategies (blocking.js)
-5. Score all candidate pairs (scorer.js)
-6. Threshold classification (threshold.js)
-7. Cluster via Union-Find (clusterBuilder.js)
-8. Build PersonMaster documents (documentBuilder.js)
-9. Build edges (edgeBuilder.js)
-10. Write to Catalyst NoSQL (writer.js)
+### Flow
+
+```
+POST / (trigger full reconciliation)
+  │
+  ▼
+index.js — callResolveEndpoint():
+  └─ POST /server/personmaster-writer/resolve
+       with { records_per_table: 50000, run_id: 'FULL-NIGHTLY-...' }
+       │
+       ▼
+  personmaster-writer runs its full resolve pipeline:
+  1. Load source records from Data Store (all Accused, Victim, ComplainantDetails)
+  2. Normalise names
+  3. Generate phonetic keys
+  4. Block + score + threshold
+  5. Cluster via Union-Find (DSU)
+  6. Build PersonMaster documents
+  7. Generate edges
+  8. Persist to Catalyst NoSQL (batch writes, size 75)
+```
 
 ### Files
 
-| File | Purpose |
-|------|---------|
-| `index.js` | Entry point |
-| `pipeline.js` | Full pipeline orchestration (475 lines) |
-| `cronHandler.js` | Cron/interval trigger handler |
-| `statistics.js` | Pipeline run statistics |
-| `simulate-cron.js` | Local simulation |
+| File | Lines | Purpose |
+|------|-------|---------|
+| `index.js` | 99 | Entry point — POST / triggers reconcile, GET / returns health check |

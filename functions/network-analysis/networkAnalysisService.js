@@ -1,14 +1,51 @@
 'use strict';
 
-var { getInstance: getGraphService } = require('../graph-service/index');
-var { TraversalService } = require('../graph-traversal/traversalService');
-
 function NetworkAnalysisService() {
-  this._graphService = getGraphService();
-  this._traversalService = new TraversalService(this._graphService);
+  this._graphService = null;
+  this._traversalService = null;
 }
 
+NetworkAnalysisService.prototype._ensureLoaded = function() {
+  if (this._graphService && this._traversalService) return;
+
+  var gsInstance = null;
+  var TraversalServiceType = null;
+
+  try {
+    var gs = require('./graph-service/index');
+    gsInstance = gs.getInstance();
+  } catch (e) {
+    try {
+      var gs2 = require('../graph-service/index');
+      gsInstance = gs2.getInstance();
+    } catch (e2) {
+      throw new Error('graph-service not available: ' + e2.message);
+    }
+  }
+
+  try {
+    var gt = require('./graph-traversal/traversalService');
+    TraversalServiceType = gt.TraversalService;
+  } catch (e) {
+    try {
+      var gt2 = require('../graph-traversal/traversalService');
+      TraversalServiceType = gt2.TraversalService;
+    } catch (e2) {
+      try {
+        var gt3 = require('./graph-traversal/index');
+        if (gt3.TraversalService) TraversalServiceType = gt3.TraversalService;
+      } catch (e3) {
+        throw new Error('graph-traversal/traversalService not available: ' + e3.message);
+      }
+    }
+  }
+
+  this._graphService = gsInstance;
+  this._traversalService = new TraversalServiceType(gsInstance);
+};
+
 NetworkAnalysisService.prototype.getPerson = async function (personId) {
+  this._ensureLoaded();
   var exists = await this._graphService.personExists(personId);
   if (!exists) return null;
   var person = await this._graphService.getPerson(personId);
@@ -17,6 +54,7 @@ NetworkAnalysisService.prototype.getPerson = async function (personId) {
 };
 
 NetworkAnalysisService.prototype.getKnownAssociates = async function (personId, options) {
+  this._ensureLoaded();
   var exists = await this._graphService.personExists(personId);
   if (!exists) return null;
 
@@ -49,6 +87,7 @@ NetworkAnalysisService.prototype.getKnownAssociates = async function (personId, 
 };
 
 NetworkAnalysisService.prototype.getCoAccusedNetwork = async function (personId) {
+  this._ensureLoaded();
   var exists = await this._graphService.personExists(personId);
   if (!exists) return null;
 
@@ -72,6 +111,7 @@ NetworkAnalysisService.prototype.getCoAccusedNetwork = async function (personId)
 };
 
 NetworkAnalysisService.prototype.getVictimRelationships = async function (personId) {
+  this._ensureLoaded();
   var exists = await this._graphService.personExists(personId);
   if (!exists) return null;
 
@@ -95,6 +135,7 @@ NetworkAnalysisService.prototype.getVictimRelationships = async function (person
 };
 
 NetworkAnalysisService.prototype.getNetworkSummary = async function (personId) {
+  this._ensureLoaded();
   var exists = await this._graphService.personExists(personId);
   if (!exists) return null;
 
@@ -154,6 +195,7 @@ NetworkAnalysisService.prototype.getNetworkSummary = async function (personId) {
 };
 
 NetworkAnalysisService.prototype.personExists = async function (personId) {
+  this._ensureLoaded();
   return this._graphService.personExists(personId);
 };
 

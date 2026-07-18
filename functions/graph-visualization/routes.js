@@ -1,8 +1,8 @@
 'use strict';
 
 var { GraphExportService } = require('./graphExportService');
-var responseFormatter = require('../network-analysis/responseFormatter');
-var validators = require('../network-analysis/validators');
+var responseFormatter = require('./responseFormatter');
+var validators = require('./validators');
 
 var exportService = new GraphExportService();
 

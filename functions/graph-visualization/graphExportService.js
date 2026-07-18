@@ -1,15 +1,48 @@
 'use strict';
 
-var { getInstance: getTraversal } = require('../graph-traversal/index');
-var { getInstance: getGraphService } = require('../graph-service/index');
 var { toCytoscape } = require('./cytoscapeFormatter');
 
 function GraphExportService() {
-  this._traversal = getTraversal();
-  this._graphService = getGraphService();
+  this._traversal = null;
+  this._graphService = null;
 }
 
+GraphExportService.prototype._ensureLoaded = function() {
+  if (!this._graphService) {
+    try {
+      var gs = require('./graph-service/index');
+      this._graphService = gs.getInstance();
+    } catch (e) {
+      try {
+        var gs2 = require('../graph-service/index');
+        this._graphService = gs2.getInstance();
+      } catch (e2) {
+        throw new Error('graph-service not available: ' + e2.message);
+      }
+    }
+  }
+  if (!this._traversal) {
+    try {
+      var gt = require('./graph-traversal/index');
+      this._traversal = gt.getInstance ? gt.getInstance() : null;
+    } catch (e) {
+      try {
+        var gt2 = require('../graph-traversal/index');
+        this._traversal = gt2.getInstance ? gt2.getInstance() : null;
+      } catch (e2) {
+        throw new Error('graph-traversal not available: ' + e2.message);
+      }
+    }
+  }
+};
+
 GraphExportService.prototype._getTraversalResult = function(personId, options) {
+  try {
+    this._ensureLoaded();
+  } catch (e) {
+    return { error: [e.message] };
+  }
+
   var maxHops = (options && options.max_hops !== undefined) ? options.max_hops : 2;
   var includeUnconfirmed = options && options.include_unconfirmed === true;
   var edgeTypeFilter = options && options.edge_type_filter;
