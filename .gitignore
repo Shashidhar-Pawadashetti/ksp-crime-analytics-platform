@@ -13,7 +13,6 @@ jspm_packages/
 .catalyst/
 catalyst-debug.log
 build/
-dist/
 
 # OS files
 .DS_Store
@@ -22,7 +21,14 @@ Thumbs.db
 resources/
 data_pipeline/data/
 data_pipeline/node_modules/
+data_pipeline/output/
+
 # Large generated artifacts
 .build/
-functions/entity-matching-engine/output/candidate_matches.json
-.build/
+functions/entity-matching-engine/output/
+functions/sync-incremental/output/
+functions/sync-full/output/
+functions/personmaster-builder/output/
+
+# Production bundle artifacts (keep dist/ for deployed functions, ignore local build output)
+*.local.json

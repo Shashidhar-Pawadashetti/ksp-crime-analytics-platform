@@ -6,24 +6,24 @@ var { computeStats } = require('./statistics');
 
 function GraphService(options) {
   var repo = new GraphRepository(options);
-  this._cache = new GraphCache(function() {
+  this._cache = new GraphCache(function () {
     return repo.loadGraph();
   });
 }
 
-GraphService.prototype._ensureLoaded = function() {
-  this._cache.load();
+GraphService.prototype._ensureLoaded = async function () {
+  await this._cache.load();
 };
 
-GraphService.prototype.getPerson = function(personId) {
-  this._ensureLoaded();
+GraphService.prototype.getPerson = async function (personId) {
+  await this._ensureLoaded();
   var node = this._cache.getNode(personId);
   if (!node) return null;
   return JSON.parse(JSON.stringify(node));
 };
 
-GraphService.prototype.getNeighbours = function(personId) {
-  this._ensureLoaded();
+GraphService.prototype.getNeighbours = async function (personId) {
+  await this._ensureLoaded();
   if (!this._cache.nodeExists(personId)) return [];
 
   var edges = this._cache.getEdgesForNode(personId);
@@ -43,24 +43,24 @@ GraphService.prototype.getNeighbours = function(personId) {
   return neighbours;
 };
 
-GraphService.prototype.getEdges = function(personId) {
-  this._ensureLoaded();
+GraphService.prototype.getEdges = async function (personId) {
+  await this._ensureLoaded();
   if (!this._cache.nodeExists(personId)) return [];
   return JSON.parse(JSON.stringify(this._cache.getEdgesForNode(personId)));
 };
 
-GraphService.prototype.getDegree = function(personId) {
-  this._ensureLoaded();
+GraphService.prototype.getDegree = async function (personId) {
+  await this._ensureLoaded();
   return this._cache.getDegree(personId);
 };
 
-GraphService.prototype.personExists = function(personId) {
-  this._ensureLoaded();
+GraphService.prototype.personExists = async function (personId) {
+  await this._ensureLoaded();
   return this._cache.nodeExists(personId);
 };
 
-GraphService.prototype.getPersonsByRole = function(role) {
-  this._ensureLoaded();
+GraphService.prototype.getPersonsByRole = async function (role) {
+  await this._ensureLoaded();
   var nodes = this._cache.getNodes();
   var roleKey = role.toLowerCase();
   var results = [];
@@ -85,29 +85,29 @@ GraphService.prototype.getPersonsByRole = function(role) {
   return results;
 };
 
-GraphService.prototype.getEdge = function(edgeId) {
-  this._ensureLoaded();
+GraphService.prototype.getEdge = async function (edgeId) {
+  await this._ensureLoaded();
   var edge = this._cache.getEdge(edgeId);
   if (!edge) return null;
   return JSON.parse(JSON.stringify(edge));
 };
 
-GraphService.prototype.getGraphStatistics = function() {
-  this._ensureLoaded();
+GraphService.prototype.getGraphStatistics = async function () {
+  await this._ensureLoaded();
   var nodes = this._cache.getNodes();
   var edges = this._cache.getEdges();
   return computeStats(nodes, edges);
 };
 
-GraphService.prototype.reload = function() {
-  this._cache.reload();
+GraphService.prototype.reload = async function () {
+  await this._cache.reload();
 };
 
-GraphService.prototype.clearCache = function() {
+GraphService.prototype.clearCache = function () {
   this._cache.clear();
 };
 
-GraphService.prototype.getCacheInfo = function() {
+GraphService.prototype.getCacheInfo = function () {
   return {
     loaded: this._cache.isLoaded(),
     loadedAt: this._cache.getLoadedAt(),

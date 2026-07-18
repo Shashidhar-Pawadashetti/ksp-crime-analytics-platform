@@ -1,9 +1,11 @@
 {
-	"name": "personmaster-api",
-	"version": "1.0.0",
-	"main": "index.js",
-	"author": "shashipshetti@gmail.com",
-	"dependencies": {
-		"zcatalyst-sdk-node": "latest"
-	}
+  "name": "personmaster-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "shashipshetti@gmail.com",
+  "dependencies": {
+    "zcatalyst-sdk-node": "latest",
+    "express": "^4.18.0",
+    "helmet": "^7.0.0"
+  }
 }

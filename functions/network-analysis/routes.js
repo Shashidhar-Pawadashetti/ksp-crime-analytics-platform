@@ -52,13 +52,13 @@ function matchRoute(pathname) {
   return null;
 }
 
-function handlePerson(req, res, params, query) {
+async function handlePerson(req, res, params, query) {
   var errors = validators.validatePersonId(params.personId);
   if (errors.length > 0) {
     return responseFormatter.validationError(errors);
   }
 
-  var result = service.getPerson(params.personId);
+  var result = await service.getPerson(params.personId);
   if (!result) {
     return responseFormatter.notFound('Person ' + params.personId + ' not found');
   }
@@ -66,7 +66,7 @@ function handlePerson(req, res, params, query) {
   return responseFormatter.success(result);
 }
 
-function handleAssociates(req, res, params, query) {
+async function handleAssociates(req, res, params, query) {
   var errors = validators.validatePersonId(params.personId);
   if (errors.length > 0) return responseFormatter.validationError(errors);
 
@@ -79,7 +79,7 @@ function handleAssociates(req, res, params, query) {
   var filterErrors = validators.validateEdgeTypeFilter(query.edge_type_filter);
   if (filterErrors.length > 0) return responseFormatter.validationError(filterErrors);
 
-  var result = service.getKnownAssociates(params.personId, {
+  var result = await service.getKnownAssociates(params.personId, {
     max_hops: validators.parseMaxHops(query.max_hops),
     include_unconfirmed: validators.parseIncludeUnconfirmed(query.include_unconfirmed),
     edge_type_filter: validators.parseEdgeTypeFilter(query.edge_type_filter)
@@ -96,11 +96,11 @@ function handleAssociates(req, res, params, query) {
   return responseFormatter.success(result);
 }
 
-function handleCoAccused(req, res, params, query) {
+async function handleCoAccused(req, res, params, query) {
   var errors = validators.validatePersonId(params.personId);
   if (errors.length > 0) return responseFormatter.validationError(errors);
 
-  var result = service.getCoAccusedNetwork(params.personId);
+  var result = await service.getCoAccusedNetwork(params.personId);
   if (!result) {
     return responseFormatter.notFound('Person ' + params.personId + ' not found');
   }
@@ -112,11 +112,11 @@ function handleCoAccused(req, res, params, query) {
   return responseFormatter.success(result);
 }
 
-function handleVictims(req, res, params, query) {
+async function handleVictims(req, res, params, query) {
   var errors = validators.validatePersonId(params.personId);
   if (errors.length > 0) return responseFormatter.validationError(errors);
 
-  var result = service.getVictimRelationships(params.personId);
+  var result = await service.getVictimRelationships(params.personId);
   if (!result) {
     return responseFormatter.notFound('Person ' + params.personId + ' not found');
   }
@@ -128,11 +128,11 @@ function handleVictims(req, res, params, query) {
   return responseFormatter.success(result);
 }
 
-function handleNetworkSummary(req, res, params, query) {
+async function handleNetworkSummary(req, res, params, query) {
   var errors = validators.validatePersonId(params.personId);
   if (errors.length > 0) return responseFormatter.validationError(errors);
 
-  var result = service.getNetworkSummary(params.personId);
+  var result = await service.getNetworkSummary(params.personId);
   if (!result) {
     return responseFormatter.notFound('Person ' + params.personId + ' not found');
   }
@@ -152,7 +152,7 @@ var routeHandlers = {
   'network-summary': handleNetworkSummary
 };
 
-function route(req) {
+async function route(req) {
   var parsed = parsePath(req.url);
   var match = matchRoute(parsed.pathname);
 

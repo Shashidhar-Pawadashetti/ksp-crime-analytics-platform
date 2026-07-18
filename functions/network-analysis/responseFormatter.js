@@ -5,7 +5,7 @@ function success(data, statusCode) {
     statusCode: statusCode || 200,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      success: true,
+      status: 'ok',
       data: data
     })
   };
@@ -13,8 +13,9 @@ function success(data, statusCode) {
 
 function error(message, statusCode, details) {
   var body = {
-    success: false,
-    error: message
+    status: 'error',
+    error_code: 'VALIDATION_ERROR',
+    message: message
   };
   if (details) {
     body.details = details;
@@ -27,15 +28,40 @@ function error(message, statusCode, details) {
 }
 
 function notFound(message) {
-  return error(message || 'Resource not found', 404);
+  return {
+    statusCode: 404,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      status: 'error',
+      error_code: 'NOT_FOUND',
+      message: message || 'Resource not found'
+    })
+  };
 }
 
 function serverError(message) {
-  return error(message || 'Internal server error', 500);
+  return {
+    statusCode: 500,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      status: 'error',
+      error_code: 'INTERNAL_ERROR',
+      message: message || 'Internal server error'
+    })
+  };
 }
 
 function validationError(errors) {
-  return error('Validation failed', 400, errors);
+  return {
+    statusCode: 400,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      status: 'error',
+      error_code: 'VALIDATION_ERROR',
+      message: 'Validation failed',
+      details: errors
+    })
+  };
 }
 
 module.exports = {

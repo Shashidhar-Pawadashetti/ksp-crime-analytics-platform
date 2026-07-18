@@ -1,8 +1,11 @@
 {
 	"name": "pipeline",
 	"version": "1.0.0",
-	"main": "index.js",
+	"main": "dist/index.js",
 	"author": "shashipshetti@gmail.com",
+	"scripts": {
+		"build": "esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node"
+	},
 	"dependencies": {
 		"zcatalyst-sdk-node": "latest"
 	}
