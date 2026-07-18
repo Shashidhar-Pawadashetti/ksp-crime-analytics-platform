@@ -5,35 +5,17 @@ var catalyst = require('zcatalyst-sdk-node');
 var PM_TABLE_NAME = process.env.PM_TABLE_NAME || 'PersonMaster';
 var PM_PARTITION_VALUE = 'PM';
 
-function GraphRepository(options) {
-  this._options = options || {};
+function GraphRepository() {
   this._app = null;
 }
 
-GraphRepository.prototype._getApp = function () {
-  if (this._app) return this._app;
-  try {
-    this._app = catalyst.app();
-  } catch (e) {
-    var projectKey = process.env.CATALYST_PROJECT_KEY;
-    if (projectKey) {
-      this._app = catalyst.initializeApp({
-        project_id: process.env.CATALYST_PROJECT_ID || '47995000000013046',
-        project_key: projectKey,
-        environment: process.env.CATALYST_ENVIRONMENT || 'development'
-      });
-    } else {
-      throw new Error(
-        'Cannot initialize Catalyst. Deploy to Catalyst or set CATALYST_PROJECT_KEY.'
-      );
-    }
-  }
-  return this._app;
+GraphRepository.prototype.init = function (req) {
+  this._app = catalyst.initialize(req);
+  return this;
 };
 
 GraphRepository.prototype.loadNodes = async function () {
-  var app = this._getApp();
-  var noSql = app.nosql();
+  var noSql = this._app.nosql();
   var table = await noSql.getTable(PM_TABLE_NAME);
   var { NoSQLMarshall, NoSQLEnum } = require('zcatalyst-sdk-node/lib/no-sql');
   var { NoSQLOperator } = NoSQLEnum;

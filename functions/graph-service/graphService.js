@@ -4,14 +4,22 @@ var { GraphRepository } = require('./graphRepository');
 var { GraphCache } = require('./cache');
 var { computeStats } = require('./statistics');
 
-function GraphService(options) {
-  var repo = new GraphRepository(options);
-  this._cache = new GraphCache(function () {
-    return repo.loadGraph();
-  });
+function GraphService() {
+  this._repo = null;
+  this._cache = null;
 }
 
+GraphService.prototype.init = function (req) {
+  this._repo = new GraphRepository();
+  this._repo.init(req);
+  this._cache = new GraphCache(function () {
+    return this._repo.loadGraph();
+  }.bind(this));
+  return this;
+};
+
 GraphService.prototype._ensureLoaded = async function () {
+  if (!this._repo || !this._cache) throw new Error('Not initialized. Call init(req) first.');
   await this._cache.load();
 };
 

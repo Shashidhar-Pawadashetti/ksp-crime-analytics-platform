@@ -384,30 +384,16 @@ console.log('\nGraph Service Tests\n');
   });
 })();
 
-// --- Singleton via index ---
+// --- GraphService direct instantiation ---
 (function() {
-  console.log('\nindex.js singleton');
+  console.log('\nGraphService direct instantiation');
 
-  test('getInstance returns GraphService', function() {
-    var { getInstance } = require('./index');
-    var instance = getInstance();
-    assert(instance.getPerson);
-    assert(instance.getNeighbours);
-  });
-
-  test('getInstance returns same instance twice', function() {
-    var { getInstance } = require('./index');
-    var a = getInstance();
-    var b = getInstance();
-    assert.strictEqual(a, b);
-  });
-
-  test('resetInstance clears singleton', function() {
-    var { getInstance, resetInstance } = require('./index');
-    var a = getInstance();
-    resetInstance();
-    var b = getInstance();
-    assert.notStrictEqual(a, b);
+  test('GraphService has expected methods', function() {
+    var gs = new GraphService();
+    assert(gs.getPerson);
+    assert(gs.getNeighbours);
+    assert(gs.init);
+    assert(typeof gs.init === 'function');
   });
 })();
 
