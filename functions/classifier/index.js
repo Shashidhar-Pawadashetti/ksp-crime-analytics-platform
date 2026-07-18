@@ -1,6 +1,5 @@
 'use strict';
 
-const { IncomingMessage, ServerResponse } = require('http');
 const https = require('https');
 
 const QUICKML_URL = process.env.QUICKML_URL || 'https://api.catalyst.zoho.in/quickml/v1/project/47995000000013046/glm/chat';

@@ -171,6 +171,14 @@ Rules:
 }
 
 module.exports = async (req, res) => {
+	let app;
+	try {
+		app = catalyst.initialize(req);
+	} catch {
+		sendError(res, 500, 'INIT_FAILED', 'Failed to initialize Catalyst SDK');
+		return;
+	}
+
 	const { path } = parseUrl(req.url);
 	const method = req.method.toUpperCase();
 
@@ -189,14 +197,6 @@ module.exports = async (req, res) => {
 
 	if (!query || typeof query !== 'string') {
 		sendError(res, 400, 'MISSING_QUERY', 'query field is required');
-		return;
-	}
-
-	let app;
-	try {
-		app = catalyst.initialize(req);
-	} catch {
-		sendError(res, 500, 'INIT_FAILED', 'Failed to initialize Catalyst SDK');
 		return;
 	}
 

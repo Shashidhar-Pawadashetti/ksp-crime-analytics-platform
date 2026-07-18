@@ -9,12 +9,149 @@ const CATALYST_ORG = process.env.CATALYST_ORG || '60073929329';
 const CACHE_SEGMENT = 'session';
 const SESSION_TTL_HOURS = 1;
 
+const ALLOWED_ZCQL_TABLES = {
+	CaseMaster: true, Accused: true, Victim: true, ComplainantDetails: true,
+	CrimeHead: true, CrimeSubHead: true, Unit: true, District: true,
+	State: true, Employee: true, CaseStatusMaster: true, CaseCategory: true,
+	GravityOffence: true, Court: true, Rank: true, Designation: true,
+	UnitType: true, ReligionMaster: true, CasteMaster: true, OccupationMaster: true,
+	Act: true, Section: true, ActSectionAssociation: true, CrimeHeadActSection: true,
+	ChargesheetDetails: true, ArrestSurrender: true
+};
+
 const STRUCTURED_PATTERNS = /\b(how many|count|total|list\s+\w+|show\s+(me|all|the|FIR)|find\s+\w+|get\s+(me|all|the)|cases?\s+(in|registered|filed|reported)|FIR\s+details?|accused\s+details?|victim\s+details?|officer\s+|section\s+\w+|IPC|CrPC|charge\s+sheet)\b/i;
 const NARRATIVE_PATTERNS = /\b(describe|what\s+happened|tell\s+me\s+about|modus\s+operandi|summary\s+of|overview\s+of|details?\s+about\s+case|brief\s+facts|incident\s+details?|sequence\s+of\s+events)\b/i;
 const NETWORK_PATTERNS = /\b(associates?|linked\s+to|connected|co-accused|network|relationships?)\b/i;
 const RISK_PATTERNS = /\b(risk\s+score|high-risk|repeat\s+offender|risk\s+level|dangerous|threat\s+level)\b/i;
 const FORECAST_PATTERNS = /\b(predict|forecast|next\s+month|hotspot|trend(?:s|ing)?|pattern(?:s)?|seasonal|analysis|analytics|statistics?|breakdown|compare|most\s+common|crime\s+(?:trends?|analysis|statistics?|pattern|data|overview))\b/i;
-const FORBIDDEN_KEYWORDS = ['DROP', 'DELETE', 'INSERT', 'UPDATE', 'TRUNCATE', 'ALTER', 'CREATE', 'EXEC', 'EXECUTE'];
+const PM_TABLE_NAME = 'PersonMaster';
+var _pmCache = null;
+
+async function ensurePersonMasterCache(app) {
+	if (_pmCache && _pmCache.loaded) return _pmCache;
+
+	var persons = {};
+	var edges = [];
+
+	try {
+		var noSql = app.nosql();
+		var table = await noSql.getTable(PM_TABLE_NAME);
+		var { NoSQLItem, NoSQLEnum, NoSQLMarshall } = require('zcatalyst-sdk-node/lib/no-sql');
+		var { NoSQLOperator } = NoSQLEnum;
+
+		var queryBody = {
+			key_condition: {
+				attribute: ['person_id'],
+				operator: NoSQLOperator.BEGINS_WITH,
+				value: NoSQLMarshall.makeString('PM_')
+			}
+		};
+
+		var response = await table.queryTable(queryBody);
+		var items = response.getResponseData();
+
+		for (var di = 0; di < items.length; di++) {
+			var data = items[di];
+			if (data && data.item) {
+				var doc = data.item.to();
+				if (doc && doc.person_id) {
+					persons[doc.person_id] = doc;
+					if (doc.adjacency) {
+						var typeKeys = ['co_accused', 'accused_to_victim', 'shared_location', 'unconfirmed_matches'];
+						for (var ti = 0; ti < typeKeys.length; ti++) {
+							var list = doc.adjacency[typeKeys[ti]] || [];
+							for (var ei = 0; ei < list.length; ei++) {
+								edges.push({
+									edge_id: list[ei].edge_id,
+									source: doc.person_id,
+									target: list[ei].person_id,
+									edge_type: typeKeys[ti] === 'co_accused' ? 'CO_ACCUSED' :
+										typeKeys[ti] === 'accused_to_victim' ? 'ACCUSED_TO_VICTIM' :
+										typeKeys[ti] === 'shared_location' ? 'SHARED_LOCATION' : 'UNCONFIRMED_MATCH',
+									weight: list[ei].weight || 1,
+									occurrence_count: list[ei].occurrence_count || 0
+								});
+							}
+						}
+					}
+				}
+			}
+		}
+	} catch (err) {
+		console.error('Failed to load PersonMaster cache: ' + err.message);
+	}
+
+	_pmCache = { persons: persons, edges: edges, loaded: true };
+	return _pmCache;
+}
+
+function computeDegreeFromEdges(personId, edges) {
+	var degree = { total: 0, CO_ACCUSED: 0, ACCUSED_TO_VICTIM: 0, SHARED_LOCATION: 0, UNCONFIRMED_MATCH: 0 };
+	for (var ei = 0; ei < edges.length; ei++) {
+		var e = edges[ei];
+		if (e.source === personId || e.target === personId) {
+			degree.total++;
+			if (degree.hasOwnProperty(e.edge_type)) degree[e.edge_type]++;
+		}
+	}
+	return degree;
+}
+
+function bfsTraversePM(persons, edges, startId, maxHops) {
+	var visitedNodeIds = {};
+	var visitedEdgeIds = {};
+	var resultNodes = [];
+	var resultEdges = [];
+
+	var queue = [{ personId: startId, hopDistance: 0 }];
+	visitedNodeIds[startId] = true;
+
+	while (queue.length > 0) {
+		var current = queue.shift();
+		var person = persons[current.personId];
+		resultNodes.push({
+			person_id: current.personId,
+			canonical_name: person ? person.canonical_name : 'Unknown',
+			roles_summary: person ? person.roles_summary : {},
+			degree: computeDegreeFromEdges(current.personId, edges),
+			hop_distance: current.hopDistance
+		});
+
+		if (current.hopDistance >= maxHops) continue;
+
+		var nodeEdges = [];
+		for (var ei = 0; ei < edges.length; ei++) {
+			var e = edges[ei];
+			if (e.source !== current.personId && e.target !== current.personId) continue;
+			if (e.edge_type === 'UNCONFIRMED_MATCH') continue;
+			if (visitedEdgeIds[e.edge_id]) continue;
+			nodeEdges.push(e);
+		}
+
+		var neighbours = {};
+		for (var vi = 0; vi < nodeEdges.length; vi++) {
+			var ve = nodeEdges[vi];
+			neighbours[ve.source === current.personId ? ve.target : ve.source] = true;
+		}
+
+		for (var nid in neighbours) {
+			if (visitedNodeIds[nid]) continue;
+			visitedNodeIds[nid] = true;
+			queue.push({ personId: nid, hopDistance: current.hopDistance + 1 });
+
+			for (var vi2 = 0; vi2 < nodeEdges.length; vi2++) {
+				var ve2 = nodeEdges[vi2];
+				var otherId = ve2.source === current.personId ? ve2.target : ve2.source;
+				if (otherId === nid && !visitedEdgeIds[ve2.edge_id]) {
+					visitedEdgeIds[ve2.edge_id] = true;
+					resultEdges.push(ve2);
+				}
+			}
+		}
+	}
+
+	return { nodes: resultNodes, edges: resultEdges };
+}
 
 const SCHEMA_DESCRIPTION = `
 Tables:
@@ -281,13 +418,36 @@ Respond ONLY with JSON.`;
 }
 
 function validateSQL(sql) {
-	const upper = sql.toUpperCase();
-	for (const kw of FORBIDDEN_KEYWORDS) {
-		if (new RegExp(`\\b${kw}\\b`).test(upper)) {
-			throw new Error(`UNSAFE_SQL: ${kw} not allowed`);
+	const FORBIDDEN = ['DROP', 'DELETE', 'INSERT', 'UPDATE', 'TRUNCATE', 'ALTER', 'CREATE', 'EXEC', 'EXECUTE', 'MERGE', 'REPLACE', 'GRANT', 'REVOKE', 'CALL', 'LOAD', 'RENAME'];
+
+	var upper = sql.toUpperCase();
+	var noStrings = upper.replace(/'[^']*'/g, '');
+	noStrings = noStrings.replace(/--.*$/gm, '');
+
+	if (!/^\s*SELECT\b/.test(noStrings)) {
+		throw new Error('UNSAFE_SQL: Only SELECT queries are allowed');
+	}
+
+	if ((noStrings.match(/;/g) || []).length > 0) {
+		throw new Error('UNSAFE_SQL: Multiple statements detected');
+	}
+
+	for (var i = 0; i < FORBIDDEN.length; i++) {
+		if (new RegExp('\\b' + FORBIDDEN[i] + '\\b').test(noStrings)) {
+			throw new Error('UNSAFE_SQL: ' + FORBIDDEN[i] + ' not allowed');
 		}
 	}
-	if (!/^\s*SELECT\b/i.test(sql)) throw new Error('UNSAFE_SQL: Only SELECT allowed');
+
+	var tableRefs = noStrings.match(/(?:FROM|JOIN)\s+(\w+)/g) || [];
+	for (var ti = 0; ti < tableRefs.length; ti++) {
+		var parts = tableRefs[ti].split(/\s+/);
+		var tableName = parts[1];
+		if (tableName && tableName !== 'FROM' && tableName !== 'JOIN' && tableName.length > 3) {
+			if (!ALLOWED_ZCQL_TABLES[tableName]) {
+				throw new Error('UNSAFE_SQL: Table "' + tableName + '" is not in the allowed whitelist');
+			}
+		}
+	}
 }
 
 async function executeSQL(app, sql) {
@@ -460,93 +620,95 @@ function zcqlRows(rows) {
 async function handleNetwork(app, query) {
 	const name = extractPersonName(query);
 	if (!name) {
-		return { intent: 'network', answer: 'Please specify a person name (e.g. "show associates of Ravi").', nodes: [], edges: [], source_refs: [] };
+		return { intent: 'network', answer: 'Please specify a person name (e.g. "show associates of Ravi").', data: [{ nodes: [], edges: [] }], source_refs: [] };
 	}
 
-	const [accusedAll, victimAll, complainantAll] = await Promise.all([
-		app.zcql().executeZCQLQuery(
-			`SELECT a.ROWID, a.AccusedName, a.CaseMasterID, cm.CrimeNo, cm.IncidentFromDate
-FROM Accused a INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID WHERE LOWER(a.AccusedName) LIKE '*${name.toLowerCase()}*' LIMIT 50`
-		).catch(() => []),
-		app.zcql().executeZCQLQuery(
-			`SELECT v.ROWID, v.VictimName, v.CaseMasterID, cm.CrimeNo
-FROM Victim v INNER JOIN CaseMaster cm ON v.CaseMasterID = cm.ROWID WHERE LOWER(v.VictimName) LIKE '*${name.toLowerCase()}*' LIMIT 50`
-		).catch(() => []),
-		app.zcql().executeZCQLQuery(
-			`SELECT c.ComplainantID, c.ComplainantName, c.CaseMasterID, cm.CrimeNo
-FROM ComplainantDetails c INNER JOIN CaseMaster cm ON c.CaseMasterID = cm.ROWID WHERE LOWER(c.ComplainantName) LIKE '*${name.toLowerCase()}*' LIMIT 50`
-		).catch(() => [])
-	]);
-
-	const accused = zcqlRows(accusedAll);
-	const victims = zcqlRows(victimAll);
-	const complainants = zcqlRows(complainantAll);
-	const allMatches = [...accused, ...victims, ...complainants];
-
-	if (allMatches.length === 0) {
-		return { intent: 'network', answer: `No records found for "${name}" in the database.`, nodes: [], edges: [], source_refs: [] };
-	}
-
-	const caseIds = [...new Set(allMatches.map(r => r.CaseMasterID).filter(Boolean))];
-	const nodes = [];
-	const edges = [];
-	const seenNodes = new Set();
-	const sourceRefs = [];
-
-	for (const a of accused) {
-		const nid = `accused:${a.ROWID}`;
-		if (!seenNodes.has(nid)) {
-			seenNodes.add(nid);
-			nodes.push({ id: nid, name: a.AccusedName || name, type: 'person', role: 'accused' });
-			sourceRefs.push(`Accused:${a.AccusedName || name}`);
+	try {
+		var cache = await ensurePersonMasterCache(app);
+		if (!cache || !cache.loaded || Object.keys(cache.persons).length === 0) {
+			return { intent: 'network', answer: 'PersonMaster data is not available. Please run sync-full first.', data: [{ nodes: [], edges: [] }], source_refs: [] };
 		}
-		if (a.CaseMasterID) {
-			const cid = `case:${a.CaseMasterID}`;
-			if (!seenNodes.has(cid)) {
-				seenNodes.add(cid);
-				nodes.push({ id: cid, name: a.CrimeNo || `Case ${a.CaseMasterID}`, type: 'case' });
+
+		var nameLower = name.toLowerCase();
+		var matchedPersonIds = [];
+		var personIds = Object.keys(cache.persons);
+
+		for (var pi = 0; pi < personIds.length; pi++) {
+			var doc = cache.persons[personIds[pi]];
+			var match = false;
+
+			if (doc.canonical_name && doc.canonical_name.toLowerCase().indexOf(nameLower) !== -1) match = true;
+			if (!match && doc.aliases) {
+				for (var ai = 0; ai < doc.aliases.length; ai++) {
+					if (doc.aliases[ai].toLowerCase().indexOf(nameLower) !== -1) {
+						match = true;
+						break;
+					}
+				}
 			}
-			edges.push({ from: nid, to: cid, label: 'accused_in' });
-		}
-	}
-	for (const v of victims) {
-		const nid = `victim:${v.ROWID}`;
-		if (!seenNodes.has(nid)) {
-			seenNodes.add(nid);
-			nodes.push({ id: nid, name: v.VictimName || name, type: 'person', role: 'victim' });
-			sourceRefs.push(`Victim:${v.VictimName || name}`);
-		}
-		if (v.CaseMasterID) {
-			const cid = `case:${v.CaseMasterID}`;
-			if (!seenNodes.has(cid)) {
-				seenNodes.add(cid);
-				nodes.push({ id: cid, name: v.CrimeNo || `Case ${v.CaseMasterID}`, type: 'case' });
-			}
-			edges.push({ from: nid, to: cid, label: 'victim_in' });
-		}
-	}
-	for (const c of complainants) {
-		const nid = `complainant:${c.ComplainantID}`;
-		if (!seenNodes.has(nid)) {
-			seenNodes.add(nid);
-			nodes.push({ id: nid, name: c.ComplainantName || name, type: 'person', role: 'complainant' });
-			sourceRefs.push(`Complainant:${c.ComplainantName || name}`);
-		}
-		if (c.CaseMasterID) {
-			const cid = `case:${c.CaseMasterID}`;
-			if (!seenNodes.has(cid)) {
-				seenNodes.add(cid);
-				nodes.push({ id: cid, name: c.CrimeNo || `Case ${c.CaseMasterID}`, type: 'case' });
-			}
-			edges.push({ from: nid, to: cid, label: 'filed' });
-		}
-	}
 
-	const personNodeCount = nodes.filter(n => n.type === 'person').length;
-	const caseNodeCount = nodes.filter(n => n.type === 'case').length;
-	const answer = `Found a network with ${personNodeCount} person(s) connected across ${caseNodeCount} case(s).`;
+			if (match) matchedPersonIds.push(personIds[pi]);
+		}
 
-	return { intent: 'network', answer, nodes, edges, source_refs: [...new Set(sourceRefs)] };
+		if (matchedPersonIds.length === 0) {
+			return { intent: 'network', answer: `No PersonMaster records found for "${name}". Try a different name or check if sync-full has been run.`, data: [{ nodes: [], edges: [] }], source_refs: [] };
+		}
+
+		var primaryId = matchedPersonIds[0];
+		var maxHops = matchedPersonIds.length > 1 ? 1 : 2;
+		var traversal = bfsTraversePM(cache.persons, cache.edges, primaryId, maxHops);
+
+		var nodes = [];
+		var edges = [];
+		var seenNodeIds = {};
+		var sourceRefs = [];
+		var personNodeCount = 0;
+		var caseNodeCount = 0;
+
+		for (var ni = 0; ni < traversal.nodes.length; ni++) {
+			var tn = traversal.nodes[ni];
+			if (seenNodeIds[tn.person_id]) continue;
+			seenNodeIds[tn.person_id] = true;
+
+			var r = tn.roles_summary || {};
+			var roles = [];
+			if (r.accused_count > 0) roles.push('accused');
+			if (r.victim_count > 0) roles.push('victim');
+			if (r.complainant_count > 0) roles.push('complainant');
+
+			nodes.push({
+				id: tn.person_id,
+				name: tn.canonical_name,
+				type: 'person',
+				roles: roles,
+				hop_distance: tn.hop_distance
+			});
+			personNodeCount++;
+			sourceRefs.push(tn.canonical_name);
+		}
+
+		for (var ei = 0; ei < traversal.edges.length; ei++) {
+			var te = traversal.edges[ei];
+			var edgeKey = te.source + '-' + te.target + '-' + te.edge_type;
+			if (seenNodeIds[edgeKey]) continue;
+			seenNodeIds[edgeKey] = true;
+
+			edges.push({
+				from: te.source,
+				to: te.target,
+				label: te.edge_type === 'CO_ACCUSED' ? 'co-accused' :
+					te.edge_type === 'ACCUSED_TO_VICTIM' ? 'accused_to_victim' :
+					te.edge_type === 'SHARED_LOCATION' ? 'shared_location' : te.edge_type
+			});
+		}
+
+		var answer = 'Found a network with ' + personNodeCount + ' person(s) connected across ' + edges.length + ' case(s).';
+
+		return { intent: 'network', answer: answer, data: [{ nodes: nodes, edges: edges }], source_refs: sourceRefs };
+	} catch (err) {
+		console.error('handleNetwork error: ' + err.message);
+		return { intent: 'network', answer: 'Unable to process network query. PersonMaster lookup failed.', data: [{ nodes: [], edges: [] }], source_refs: [] };
+	}
 }
 
 async function handleRisk(app, query) {
@@ -748,6 +910,14 @@ async function appendTurn(app, employeeId, sessionId, turn) {
 }
 
 module.exports = async (req, res) => {
+	let app;
+	try {
+		app = catalyst.initialize(req);
+	} catch {
+		sendError(res, 500, 'INIT_FAILED', 'Failed to initialize Catalyst SDK');
+		return;
+	}
+
 	const { path, params } = parseUrl(req.url);
 	const method = req.method.toUpperCase();
 
@@ -758,14 +928,6 @@ module.exports = async (req, res) => {
 
 	if (method !== 'POST' || path !== '/query') {
 		sendError(res, 404, 'NOT_FOUND', 'Route not found');
-		return;
-	}
-
-	let app;
-	try {
-		app = catalyst.initialize(req);
-	} catch {
-		sendError(res, 500, 'INIT_FAILED', 'Failed to initialize Catalyst SDK');
 		return;
 	}
 

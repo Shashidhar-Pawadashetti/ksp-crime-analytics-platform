@@ -2,7 +2,10 @@
 	"name": "rag",
 	"version": "1.0.0",
 	"description": "RAG function for BriefFacts search",
-	"main": "index.js",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node"
+	},
 	"dependencies": {
 		"zcatalyst-sdk-node": "^3.4.0"
 	}

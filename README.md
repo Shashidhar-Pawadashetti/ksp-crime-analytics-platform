@@ -1,217 +1,203 @@
 # KSP Crime Analytics Platform
 
-**Intelligent Conversational AI & Crime Analytics Platform** — Built for **Datathon 2026** (Hack2skill × Karnataka State Police), Challenge 1.
+> **Built for:** Datathon 2026 (Hack2skill x Karnataka State Police), Challenge 1
+> **Platform:** Catalyst by Zoho (Node.js 24, AdvancedIO)
+> **Repository:** [ksp-crime-analytics-platform](https://github.com/Shashidhar-Pawadashetti/ksp-crime-analytics-platform)
+> **Branch:** `feature/core_conversational_platform`
 
-A conversational AI and analytics platform that allows investigators, analysts, and policymakers to query and analyze the KSP crime database (FIR records and related entities) using natural language. Supports network analysis, pattern detection, risk scoring, and crime forecasting.
+## Problem Statement
 
-**Platform constraint:** All components deploy on **Catalyst by Zoho**.
+The Karnataka State Police (KSP) crime database spans 24+ relational tables
+(CaseMaster, Accused, Victim, ComplainantDetails, CrimeHead, Unit, District,
+Employee, etc.) with complex foreign-key chains. Investigators, analysts, and
+policymakers need to query this data using **natural language** — not SQL — and
+receive structured answers, narrative summaries, network graphs, risk scores,
+and crime trends.
 
----
+## Solution
 
-## Architecture Overview
+A conversational AI and analytics platform that:
 
-The system follows a 7-tier layered architecture:
+- Accepts natural-language queries via REST API
+- Classifies intent using keyword heuristics (fast path) or GLM LLM (fallback)
+- Routes to 5 handler types: structured (SQL), narrative (RAG), network
+  (graph), risk (scoring), and analytical (trends)
+- Resolves person identities across source tables using a 5-stage entity
+  matching engine (normalize → phonetic → block → score → threshold)
+- Builds a person-centric graph (PersonMaster nodes, 4 edge types) stored in
+  Catalyst NoSQL
+- Exposes graph traversal (BFS, max 3 hops) and visualization (Cytoscape.js
+  export) via REST APIs
 
-| Tier | Components |
-|---|---|
-| Edge | Catalyst Authentication, API Gateway |
-| Frontend | Slate / Web Client Hosting (chat UI, network graph, dashboards) |
-| Orchestration | Catalyst Functions (routing, tool-calling), pipeline function |
-| AI/ML | QuickML (GLM chat LLM), Zia AutoML (tabular models), Zia Services |
-| Data | Data Store (relational), NoSQL (PersonMaster), Cache (session state) |
-| Response Assembly | pipeline formatting (evidence trail, citations) |
-| Supporting | Stratus, SmartBrowz, Cron, Signals, Mail/Push |
+**Governing principle:** The language model narrates, it never computes. Every
+statistic, risk score, or prediction originates from a deterministic query or
+trained model.
 
-**Governing principle:** *The language model narrates, it never computes.* Every statistic, risk score, or prediction originates from a deterministic query or trained model — the LLM only translates questions and narrates answers with citations.
+## Key Features
 
----
+| Feature | Description |
+|---------|-------------|
+| **5 Query Intents** | Structured, Narrative, Network, Risk, Analytical |
+| **Entity Resolution** | 5-stage pipeline (normalize → phonetic → block → score → threshold), 4 Indian-script transliterators, Soundex + Indian Metaphone, Union-Find clustering |
+| **Graph Analytics** | PersonMaster nodes (481 clusters, 10,487 members), 4 edge types, BFS traversal (max 3 hops), Cytoscape.js export |
+| **REST APIs** | 7 endpoints: person profile, associates, co-accused, victims, network summary, graph visualization |
+| **Synthetic Data** | 9-phase generator producing 24+ tables with 3,000+ cases, 5,000+ accused, 150 habitual offenders with name variations |
+| **Incremental Sync** | Real-time signal-based update of PersonMaster documents when source records are added |
 
-## Data Flow
+## Technology Stack
+
+| Component | Technology |
+|-----------|------------|
+| Platform | Zoho Catalyst |
+| Functions Runtime | Node.js 24 (AdvancedIO) |
+| Functions SDK | zcatalyst-sdk-node (v3.4.0) |
+| Relational DB | Catalyst Data Store (ZCQL V2) |
+| Document Store | Catalyst NoSQL (PersonMaster table) |
+| Cache | Catalyst Cache (session TTL: 1 hour) |
+| LLM | Catalyst QuickML — `crm-di-glm47b_30b_it` |
+| CLI | zcatalyst-cli (v1.26.2) |
+| Data Pipeline | Node.js, @faker-js/faker, csv-writer |
+
+## Architecture
 
 ```
-User Query
-  │
-  ▼
-session.createSession(employee_id) → resolves rank/unit/district hierarchy
-  │
-  ▼
-classifier.classifyIntent(query)
-  │  keyword match → returns instantly
-  │  ambiguous     → GLM LLM fallback (enable_thinking: false)
-  ▼
-  ┌─ structured → pipeline: GLM SQL gen → ZCQL execution → formatted result
-  ├─ narrative  → pipeline: rag.searchBriefFacts() → GLM answer generation
-  ├─ network    → pipeline: inline handler → Accused/Victim/Complainant graph
-  ├─ risk       → pipeline: inline handler → recidivism-based score
-  └─ analytical → pipeline: inline handler → aggregation trends
-  │
-  ▼
-pipeline formats response + appends turns to session (Cache, 1hr TTL)
-  │
-  ▼
-Response to user (JSON with intent, answer, data, source_refs, confidence)
+                   User query
+                      |
+                      v
+          pipeline/query (orchestrator)
+                      |
+              classifier (inline)
+              /    |    |    |    \
+        struct narr network risk analytical
+              |    |    |    |    |
+              v    v    v    v    v
+          ZCQL  GLM  Graph  Score  Agg
+           SQL   RAG  BFS   Calc   SQL
+              |    |    |    |    |
+              v    v    v    v    v
+          Catalyst Data Store / NoSQL / Cache
 ```
 
----
+The platform deploys as **12 Catalyst Functions** across 6 layers:
+
+| Layer | Functions |
+|-------|-----------|
+| **Edge** | entity-matching-engine, graph-service, graph-traversal |
+| **Frontend/REST** | network-analysis (5 endpoints), graph-visualization (2 endpoints) |
+| **Orchestration** | pipeline (full orchestrator, inline handlers) |
+| **AI/ML** | classifier, nl_sql, rag |
+| **Data** | query_exec, session |
+| **Supporting** | personmaster-builder, personmaster-writer, personmaster-api, sync-full, sync-incremental |
 
 ## Repository Structure
 
 ```
 ksp-crime-analytics-platform/
-├── .catalystrc                  # Catalyst project config
-├── catalyst.json                # Functions deployment targets (7 functions)
-├── AGENTS.md                    # AI agent context file
-├── CHANGELOG.md                 # Version history
-├── ONBOARDING.md                # Team onboarding guide
-├── TODO.md                      # Task tracker
-├── README.md                    # This file
-├── .env                         # Local secrets (gitignored)
-├── .env.example                 # Template for .env (committed)
+├── catalyst.json                # 17-function deployment manifest
+├── AGENTS.md                    # AI agent onboarding
+├── ONBOARDING.md                # Human team guide
 │
-├── functions/                   # 7 Catalyst Functions (Node.js 24, AdvancedIO)
-│   ├── classifier/              #   Intent classifier (deployed, working)
-│   │   ├── index.js             #   2-stage: keyword heuristic + GLM fallback
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── nl_sql/                  #   NL-to-ZCQL translator (deployed, working)
-│   │   ├── index.js             #   Generates SQL + executes via ZCQL, returns rows
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── rag/                     #   RAG dispatcher (deployed, working)
-│   │   ├── index.js             #   BriefFacts LIKE search + GLM narrative answer
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── session/                 #   Session manager (deployed, working)
-│   │   ├── index.js             #   Cache-backed CRUD + RBAC hierarchy resolution
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── query_exec/              #   Query executor (deployed)
-│   │   ├── index.js             #   ZCQL validation + execution + RBAC scope injection
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── pipeline/                #   Orchestrator (deployed, partial)
-│   │   ├── index.js             #   Classify → route → execute → format → session
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   └── test/                    #   Health check placeholder (deployed)
-│       ├── index.js
-│       ├── catalyst-config.json
-│       └── package.json
+├── functions/                   # 12 Catalyst Function directories
+│   ├── entity-matching-engine/  # Person dedup (normalise / phonetic / block / score / threshold)
+│   ├── graph-service/           # Graph data structure (nodes, edges, adjacency)
+│   ├── graph-traversal/         # BFS traversal (max 3 hops)
+│   ├── network-analysis/        # REST API (5 endpoints)
+│   ├── graph-visualization/     # REST API (Cytoscape.js export)
+│   ├── pipeline/                # Full orchestrator (inline handlers)
+│   ├── classifier/              # Intent classification (keyword + GLM)
+│   ├── nl_sql/                  # NL-to-ZCQL generation + execution
+│   ├── rag/                     # BriefFacts search + narrative
+│   ├── session/                 # Conversation memory (Cache CRUD)
+│   ├── query_exec/              # Raw ZCQL executor with safety
+│   └── test/                    # Health check
 │
-├── data_pipeline/               # Synthetic data generation & import
-│   ├── src/
-│   │   ├── index.js             #   Phase 1: 16 lookup table generators
-│   │   ├── generators/          #   Individual table generators (16 files)
-│   │   └── helpers/csv.js       #   CSV writer utility
-│   ├── mappings/                #   ROWID mappings (business ID ↔ Catalyst ROWID)
-│   ├── generate_*.cjs           #   Phase 2-6 generators
-│   ├── run_phase.js             #   Catalyst import orchestrator
-│   └── validate_*.cjs           #   Validation scripts
-│
+├── data_pipeline/               # Synthetic data generation (9 phases, 24+ tables)
 ├── docs/                        # Documentation
-│   └── production-auth.md       #   OAuth migration guide (Self Client → Server App)
-│
-├── ../KSP_Datathon_FRD.md       # Functional Requirements Document
-├── ../KSP_Datathon_HLD.md       # High-Level Design / Architecture
-├── ../KSP_Datathon_LLD.md       # Low-Level Design (module specs, pseudocode)
-└── ../KSP_Datathon_WBS.md       # Work Breakdown Structure
+│   ├── images/                  # Screenshots and diagrams
+│   └── production-auth.md       # OAuth migration guide
+└── knowlede.md                  # Knowledge base
 ```
 
----
-
-## Functions — Roles & Status
-
-| Function | WBS | Role | Status | Endpoint |
-|----------|-----|------|--------|----------|
-| **classifier** | 3.3 | Intent routing (keyword + GLM) | ✅ Deployed, working | `POST /classifier/classify` |
-| **nl_sql** | 3.2 | NL → ZCQL translation + execution | ✅ Deployed, working | `POST /nl_sql/query` |
-| **rag** | 3.5 | BriefFacts search + narrative answers | ✅ Deployed, working | `POST /rag/query` |
-| **session** | 3.4 | Conversation memory (Cache, 1hr TTL) | ✅ Deployed, working | `GET /session/`, `POST /session/create` |
-| **query_exec** | 3.1 | ZCQL execution + RBAC scope | ✅ Deployed | `POST /query_exec/` |
-| **pipeline** | 7.0 | Full orchestrator (classify → route → execute → format) | ✅ Deployed, all 5 intents working | `POST /pipeline/query` |
-| **test** | — | Health check | ✅ Deployed | `GET /test/` |
-
----
-
-## Pipeline — Intent Routing
-
-| Intent | Matched by | Routes to | Status |
-|--------|------------|-----------|--------|
-| `structured` | keyword: how many, count, list, show, FIR details | pipeline: GLM SQL → ZCQL | ✅ Complete, with auto-retry |
-| `narrative` | keyword: describe, what happened, tell me about, modus operandi | pipeline: rag search → GLM answer | ✅ Complete, working |
-| `network` | keyword: associates, linked to, co-accused, network | pipeline inline handler | ✅ Complete |
-| `risk` | keyword: risk score, high-risk, repeat offender | pipeline inline handler | ✅ Complete |
-| `analytical` | keyword: predict, forecast, hotspot, trend | pipeline inline handler | ✅ Complete |
-
----
-
-## Technology Stack
-
-| Component | Technology |
-|---|---|
-| Platform | Zoho Catalyst |
-| Functions Runtime | Node.js 24 (AdvancedIO) |
-| Functions SDK | zcatalyst-sdk-node (v3.4.0) |
-| Relational DB | Catalyst Data Store (ZCQL) |
-| Document Store | Catalyst NoSQL |
-| Cache | Catalyst Cache (TTL in hours) |
-| LLM | Catalyst QuickML — model: `crm-di-glm47b_30b_it` |
-| Tabular ML | Catalyst Zia AutoML |
-| CLI | zcatalyst-cli (v1.26.2) |
-| Data Pipeline | Node.js, @faker-js/faker, csv-writer |
-
----
-
-## Environment Variables (Catalyst Console)
-
-Set per-function via Catalyst Console → Functions → {name} → Environment Variables:
-
-| Variable | Required For | Notes |
-|----------|--------------|-------|
-| `QUICKML_TOKEN` | classifier, nl_sql, rag, pipeline | Self Client OAuth (1hr expiry) |
-| `CATALYST_ORG` | All QuickML callers | Reserved keyword — set via Console only, NOT in catalyst-config.json. Default: `60073929329` |
-
----
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
 - Node.js 24+
-- zcatalyst-cli installed globally: `npm i -g zoho-catalyst-cli`
+- `zcatalyst-cli` installed globally: `npm i -g zoho-catalyst-cli`
 - Catalyst project credentials
+- Zoho Self Client OAuth token for QuickML
 
-### Quick Start
+### Install & Deploy
 
 ```bash
-# 1. Install function dependencies
-foreach ($fn in @("classifier","nl_sql","rag","session","query_exec","pipeline")) {
-  Push-Location "functions/$fn"
-  npm install
-  Pop-Location
-}
+# Clone the repository
+git clone https://github.com/Shashidhar-Pawadashetti/ksp-crime-analytics-platform.git
+cd ksp-crime-analytics-platform
 
-# 2. Deploy all functions
+# Install function dependencies
+Push-Location functions/pipeline; npm install; Pop-Location
+Push-Location functions/classifier; npm install; Pop-Location
+Push-Location functions/nl_sql; npm install; Pop-Location
+Push-Location functions/rag; npm install; Pop-Location
+Push-Location functions/session; npm install; Pop-Location
+Push-Location functions/query_exec; npm install; Pop-Location
+
+# Deploy all functions
 catalyst deploy
-
-# 3. Set QUICKML_TOKEN in Catalyst Console for each function that needs it
 ```
 
-See `ONBOARDING.md` for detailed setup steps.
+### Post-Deploy
 
----
+After `catalyst deploy`, re-add `QUICKML_TOKEN` in Catalyst Console for these
+4 functions: **classifier**, **nl_sql**, **rag**, **pipeline**.
 
-## Design Documents
+### Environment Variables
+
+| Variable | Required By | Notes |
+|----------|-------------|-------|
+| `QUICKML_TOKEN` | classifier, nl_sql, rag, pipeline | Self Client OAuth (1hr expiry) |
+| `CATALYST_ORG` | All QuickML callers | Default: `60073929329` |
+
+## Documentation
 
 | Document | Description |
-|---|---|
-| `../KSP_Datathon_FRD.md` | Functional Requirements Document |
-| `../KSP_Datathon_HLD.md` | High-Level Design / Architecture |
-| `../KSP_Datathon_LLD.md` | Low-Level Design (module specs, pseudocode) |
-| `../KSP_Datathon_WBS.md` | Work Breakdown Structure |
+|----------|-------------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Full architecture, data flows, sequence diagrams, design decisions |
+| [API.md](API.md) | Complete REST API reference with examples |
+| [ENTITY_RESOLUTION.md](ENTITY_RESOLUTION.md) | Entity matching engine, clustering, edge building |
+| [DATA_PIPELINE.md](DATA_PIPELINE.md) | Synthetic data generation, 9-phase process |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Deployment guide, env vars, troubleshooting |
+| [TESTING.md](TESTING.md) | Test suites, running tests, integration strategy |
+| [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) | Quick index with links to all docs |
 
----
+## Screenshots
+
+<!-- TODO: Add screenshots -->
+<!-- ![Pipeline Query Response](docs/images/pipeline-response.png) -->
+<!-- ![Network Graph Visualization](docs/images/network-graph.png) -->
+<!-- ![Entity Resolution Pipeline](docs/images/entity-resolution.png) -->
+
+## Demo
+
+<!-- TODO: Add demo video/gif link -->
+
+## Stats
+
+| Metric | Value |
+|--------|-------|
+| Total tests | 265+ |
+| Test LOC | ~2,390 |
+| Total LOC | ~18,958 |
+| Catalyst Functions | 12 deployed |
+| REST Endpoints | 7 |
+| ZCQL Tables | 24+ |
+| PersonMaster clusters | 481 |
+| PersonMaster members | 10,487 |
 
 ## License
 
 ISC
+
+## Team
+
+Built for **Datathon 2026** by the KSP Crime Analytics team.

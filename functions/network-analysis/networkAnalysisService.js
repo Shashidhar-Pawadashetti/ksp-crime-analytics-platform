@@ -8,21 +8,23 @@ function NetworkAnalysisService() {
   this._traversalService = new TraversalService(this._graphService);
 }
 
-NetworkAnalysisService.prototype.getPerson = function(personId) {
-  if (!this._graphService.personExists(personId)) return null;
-  var person = this._graphService.getPerson(personId);
-  person.degree = this._graphService.getDegree(personId);
+NetworkAnalysisService.prototype.getPerson = async function (personId) {
+  var exists = await this._graphService.personExists(personId);
+  if (!exists) return null;
+  var person = await this._graphService.getPerson(personId);
+  person.degree = await this._graphService.getDegree(personId);
   return person;
 };
 
-NetworkAnalysisService.prototype.getKnownAssociates = function(personId, options) {
-  if (!this._graphService.personExists(personId)) return null;
+NetworkAnalysisService.prototype.getKnownAssociates = async function (personId, options) {
+  var exists = await this._graphService.personExists(personId);
+  if (!exists) return null;
 
   var maxHops = (options && options.max_hops !== undefined) ? options.max_hops : 2;
   var includeUnconfirmed = options && options.include_unconfirmed === true;
   var edgeTypeFilter = options && options.edge_type_filter;
 
-  var result = this._traversalService.traverse(personId, {
+  var result = await this._traversalService.traverse(personId, {
     max_hops: maxHops,
     include_unconfirmed: includeUnconfirmed,
     edge_type_filter: edgeTypeFilter
@@ -46,32 +48,11 @@ NetworkAnalysisService.prototype.getKnownAssociates = function(personId, options
   };
 };
 
-NetworkAnalysisService.prototype.getCoAccusedNetwork = function(personId) {
-  if (!this._graphService.personExists(personId)) return null;
+NetworkAnalysisService.prototype.getCoAccusedNetwork = async function (personId) {
+  var exists = await this._graphService.personExists(personId);
+  if (!exists) return null;
 
-  var result = this._traversalService.traverseCoAccused(personId, 3);
-
-  if (result.error) return { error: result.error };
-
-  var associates = [];
-  for (var ni = 0; ni < result.nodes.length; ni++) {
-    if (result.nodes[ni].person_id !== personId) {
-      associates.push(result.nodes[ni]);
-    }
-  }
-
-  return {
-    root: personId,
-    associates: associates,
-    edges: result.edges,
-    statistics: result.statistics
-  };
-};
-
-NetworkAnalysisService.prototype.getVictimRelationships = function(personId) {
-  if (!this._graphService.personExists(personId)) return null;
-
-  var result = this._traversalService.traverseAccusedVictim(personId, 3);
+  var result = await this._traversalService.traverseCoAccused(personId, 3);
 
   if (result.error) return { error: result.error };
 
@@ -90,20 +71,44 @@ NetworkAnalysisService.prototype.getVictimRelationships = function(personId) {
   };
 };
 
-NetworkAnalysisService.prototype.getNetworkSummary = function(personId) {
-  if (!this._graphService.personExists(personId)) return null;
+NetworkAnalysisService.prototype.getVictimRelationships = async function (personId) {
+  var exists = await this._graphService.personExists(personId);
+  if (!exists) return null;
 
-  var person = this._graphService.getPerson(personId);
-  var degree = this._graphService.getDegree(personId);
+  var result = await this._traversalService.traverseAccusedVictim(personId, 3);
 
-  var fullTraversal = this._traversalService.traverse(personId, { max_hops: 3, include_unconfirmed: false });
+  if (result.error) return { error: result.error };
+
+  var associates = [];
+  for (var ni = 0; ni < result.nodes.length; ni++) {
+    if (result.nodes[ni].person_id !== personId) {
+      associates.push(result.nodes[ni]);
+    }
+  }
+
+  return {
+    root: personId,
+    associates: associates,
+    edges: result.edges,
+    statistics: result.statistics
+  };
+};
+
+NetworkAnalysisService.prototype.getNetworkSummary = async function (personId) {
+  var exists = await this._graphService.personExists(personId);
+  if (!exists) return null;
+
+  var person = await this._graphService.getPerson(personId);
+  var degree = await this._graphService.getDegree(personId);
+
+  var fullTraversal = await this._traversalService.traverse(personId, { max_hops: 3, include_unconfirmed: false });
 
   if (fullTraversal.error) {
     return { error: fullTraversal.error, person: person, degree: degree };
   }
 
-  var coAccusedResult = this._traversalService.traverseCoAccused(personId, 3);
-  var victimResult = this._traversalService.traverseAccusedVictim(personId, 3);
+  var coAccusedResult = await this._traversalService.traverseCoAccused(personId, 3);
+  var victimResult = await this._traversalService.traverseAccusedVictim(personId, 3);
 
   var knownAssociates = [];
   for (var ni = 0; ni < fullTraversal.nodes.length; ni++) {
@@ -130,8 +135,8 @@ NetworkAnalysisService.prototype.getNetworkSummary = function(personId) {
     }
   }
 
+  var allEdges = await this._graphService.getEdges(personId);
   var edgeBreakdown = {};
-  var allEdges = this._graphService.getEdges(personId);
   for (var ei = 0; ei < allEdges.length; ei++) {
     var et = allEdges[ei].edge_type;
     if (!edgeBreakdown[et]) edgeBreakdown[et] = 0;
@@ -148,7 +153,7 @@ NetworkAnalysisService.prototype.getNetworkSummary = function(personId) {
   };
 };
 
-NetworkAnalysisService.prototype.personExists = function(personId) {
+NetworkAnalysisService.prototype.personExists = async function (personId) {
   return this._graphService.personExists(personId);
 };
 

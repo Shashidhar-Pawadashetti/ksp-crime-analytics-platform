@@ -7,22 +7,19 @@ function formatNodes(traversalNodes) {
 
   for (var ni = 0; ni < traversalNodes.length; ni++) {
     var n = traversalNodes[ni];
-    var role = styleHints.getPrimaryRole(n.roles_summary);
     var nodeStyle = styleHints.getNodeStyle(n.roles_summary);
 
     nodes.push({
       data: {
         id: n.person_id,
         label: n.canonical_name,
-        role: role,
-        degree: n.degree,
-        hop_distance: n.hop_distance
-      },
-      style: {
-        size: nodeStyle.size,
-        color: nodeStyle.color,
-        borderColor: nodeStyle.borderColor,
-        icon: nodeStyle.icon
+        roles_summary: n.roles_summary,
+        node_style: {
+          size: nodeStyle.size,
+          color: nodeStyle.color,
+          borderColor: nodeStyle.borderColor,
+          icon: nodeStyle.icon
+        }
       }
     });
   }
@@ -42,20 +39,88 @@ function formatEdges(traversalEdges) {
         id: e.edge_id,
         source: e.source,
         target: e.target,
-        type: e.edge_type,
-        weight: e.weight,
-        occurrence_count: e.occurrence_count
-      },
-      style: {
-        color: edgeStyle.color,
-        width: edgeStyle.width,
-        lineStyle: edgeStyle.style,
-        label: edgeStyle.label
+        label: edgeStyle.label,
+        edge_style: {
+          color: edgeStyle.color,
+          width: edgeStyle.width,
+          style: edgeStyle.style,
+          label: edgeStyle.label
+        }
       }
     });
   }
 
   return edges;
+}
+
+function buildStylesheet(nodes, edges) {
+  var seenRoles = {};
+  var seenEdgeTypes = {};
+  var styles = [];
+
+  for (var ni = 0; ni < nodes.length; ni++) {
+    var nd = nodes[ni].data;
+    var style = nd.node_style;
+    var roleKey = style.color + '-' + style.size;
+    if (seenRoles[roleKey]) continue;
+    seenRoles[roleKey] = true;
+
+    styles.push({
+      selector: 'node#' + nd.id,
+      css: {
+        'background-color': style.color,
+        'width': style.size,
+        'height': style.size,
+        'border-color': style.borderColor,
+        'border-width': 2
+      }
+    });
+  }
+
+  if (styles.length === 0) {
+    var def = styleHints.getNodeStyle(null);
+    styles.push({
+      selector: 'node',
+      css: {
+        'background-color': def.color,
+        'width': def.size,
+        'height': def.size,
+        'border-color': def.borderColor,
+        'border-width': 2
+      }
+    });
+  }
+
+  for (var ei = 0; ei < edges.length; ei++) {
+    var ed = edges[ei].data;
+    var eStyle = ed.edge_style;
+    var eKey = eStyle.color + '-' + eStyle.style;
+    if (seenEdgeTypes[eKey]) continue;
+    seenEdgeTypes[eKey] = true;
+
+    styles.push({
+      selector: 'edge#' + ed.id,
+      css: {
+        'line-color': eStyle.color,
+        'width': eStyle.width,
+        'line-style': eStyle.style
+      }
+    });
+  }
+
+  if (styles.length <= (nodes.length > 0 ? 1 : 0)) {
+    var eDef = styleHints.getEdgeStyle(null);
+    styles.push({
+      selector: 'edge',
+      css: {
+        'line-color': eDef.color,
+        'width': eDef.width,
+        'line-style': eDef.style
+      }
+    });
+  }
+
+  return styles;
 }
 
 function toCytoscape(traversalResult) {
@@ -65,12 +130,14 @@ function toCytoscape(traversalResult) {
 
   var nodes = formatNodes(traversalResult.nodes);
   var edges = formatEdges(traversalResult.edges);
+  var stylesheet = buildStylesheet(nodes, edges);
 
   return {
     elements: {
       nodes: nodes,
       edges: edges
     },
+    style: stylesheet,
     statistics: traversalResult.statistics || null
   };
 }
@@ -78,5 +145,6 @@ function toCytoscape(traversalResult) {
 module.exports = {
   formatNodes: formatNodes,
   formatEdges: formatEdges,
+  buildStylesheet: buildStylesheet,
   toCytoscape: toCytoscape
 };

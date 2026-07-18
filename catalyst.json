@@ -13,9 +13,22 @@
       "sync-incremental",
       "sync-full",
       "graph-traversal",
-      "personmaster-api"
+      "personmaster-api",
+      "pm-migration",
+      "sync-full-job"
     ],
     "ignore": [],
     "source": "functions"
-  }
+  },
+  "job_scheduling": {
+    "targets": [
+      "full-reconciliation"
+    ]
+  },
+  "slate": [
+    {
+      "name": "slate-app",
+      "source": "C:\\Users\\shash\\OneDrive\\Desktop\\Hackathon\\Datathon2026\\slate-app"
+    }
+  ]
 }

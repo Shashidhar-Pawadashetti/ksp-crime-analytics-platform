@@ -4,6 +4,8 @@
 	"main": "index.js",
 	"author": "shashipshetti@gmail.com",
 	"dependencies": {
-		"zcatalyst-sdk-node": "latest"
+		"zcatalyst-sdk-node": "latest",
+		"express": "^4.18.0",
+		"helmet": "^7.0.0"
 	}
 }
