@@ -25,20 +25,29 @@ expressApp.get('/', (req, res) => {
   });
 });
 
-expressApp.post('/validate', (req, res) => {
-  const { data, rules } = req.body;
-  if (!data) {
+expressApp.post('/validate', async (req, res) => {
+  var catApp;
+  try {
+    catApp = catalyst.initialize(req);
+  } catch (e) {
+    return res.status(500).json({ status: 'error', error_code: 'INIT_FAILED', message: 'Failed to initialize Catalyst' });
+  }
+
+  if (!req.body || !req.body.data) {
     return res.status(400).json({ status: 'error', error_code: 'VALIDATION_ERROR', message: 'data field is required' });
   }
 
-  res.json({
-    status: 'ok',
-    data: {
-      valid: true,
-      checks: [],
-      summary: 'Validation stub — implement groundTruthValidator.js logic here'
-    }
-  });
+  try {
+    var { validateAgainstGroundTruth } = require('./groundTruthValidator');
+    var opts = {};
+    if (req.body.data.type === 'full') opts.type = 'full';
+    if (req.body.data.ground_truth_path) opts.ground_truth_path = req.body.data.ground_truth_path;
+    var result = await validateAgainstGroundTruth(catApp, opts);
+    res.json({ status: 'ok', data: result });
+  } catch (err) {
+    console.error('[validation] Error: ' + err.message);
+    res.status(500).json({ status: 'error', error_code: 'VALIDATION_FAILED', message: err.message });
+  }
 });
 
 module.exports = async (req, res) => {

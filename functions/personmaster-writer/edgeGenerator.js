@@ -218,7 +218,93 @@ function generateCandidateMatchEdges(unconfirmedPairs, personIdLookup, personDoc
   };
 }
 
+function generateSharedLocationEdges(personDocuments) {
+  if (!Array.isArray(personDocuments) || personDocuments.length === 0) {
+    return { shared_location_edges_by_person: {}, all_shared_location_edges: [] };
+  }
+
+  var locationIndex = {};
+  personDocuments.forEach(function (pm) {
+    var pid = pm.person_id;
+    if (!pid) return;
+    var seenUnits = {};
+    (pm.source_records || []).forEach(function (sr) {
+      var unitId = sr.unit_id;
+      if (!unitId) return;
+      if (seenUnits[unitId]) return;
+      seenUnits[unitId] = true;
+      if (!locationIndex[unitId]) locationIndex[unitId] = [];
+      locationIndex[unitId].push(pid);
+    });
+  });
+
+  var edgesByPerson = {};
+  var allEdges = {};
+
+  Object.keys(locationIndex).forEach(function (unitId) {
+    var personIds = locationIndex[unitId];
+    if (personIds.length < 2) return;
+
+    for (var i = 0; i < personIds.length; i++) {
+      for (var j = i + 1; j < personIds.length; j++) {
+        var src = personIds[i];
+        var tgt = personIds[j];
+        var tgtName = getPersonName(personDocuments, tgt);
+        var srcName = getPersonName(personDocuments, src);
+
+        var scoreBreakdown = { location_score: 1.0 };
+
+        [
+          { src: src, tgt: tgt, tgtName: tgtName },
+          { src: tgt, tgt: src, tgtName: srcName }
+        ].forEach(function (dir) {
+          var edge = createEdge({
+            source_person_id: dir.src,
+            target_person_id: dir.tgt,
+            type: EDGE_TYPES.SHARED_LOCATION,
+            with_name_normalised: dir.tgtName,
+            confidence: 0.4,
+            score_breakdown: scoreBreakdown,
+            source_records: [],
+            case_ids: []
+          });
+
+          if (!edgesByPerson[dir.src]) edgesByPerson[dir.src] = {};
+          var existing = edgesByPerson[dir.src][edge.edge_id];
+          if (existing) {
+            mergeEdge(existing, edge);
+          } else {
+            edgesByPerson[dir.src][edge.edge_id] = edge;
+          }
+        });
+      }
+    }
+  });
+
+  var sharedLocationEdgesByPerson = {};
+  Object.keys(edgesByPerson).forEach(function (pid) {
+    sharedLocationEdgesByPerson[pid] = Object.keys(edgesByPerson[pid]).map(function (k) {
+      return edgesByPerson[pid][k];
+    });
+  });
+
+  Object.keys(edgesByPerson).forEach(function (pid) {
+    var edgeMap = edgesByPerson[pid];
+    Object.keys(edgeMap).forEach(function (eid) {
+      if (!allEdges[eid]) {
+        allEdges[eid] = JSON.parse(JSON.stringify(edgeMap[eid]));
+      }
+    });
+  });
+
+  return {
+    shared_location_edges_by_person: sharedLocationEdgesByPerson,
+    all_shared_location_edges: Object.keys(allEdges).map(function (k) { return allEdges[k]; })
+  };
+}
+
 module.exports = {
   generateConfirmedEdges: generateConfirmedEdges,
-  generateCandidateMatchEdges: generateCandidateMatchEdges
+  generateCandidateMatchEdges: generateCandidateMatchEdges,
+  generateSharedLocationEdges: generateSharedLocationEdges
 };
