@@ -1,13 +1,12 @@
 import { useEffect } from 'react'
 import { useAuth } from './hooks/useAuth'
 import { useUI } from './hooks/useUI'
-import { showEmbeddedAuth } from './services/auth'
 import Sidebar from './components/Layout/Sidebar'
 import ChatArea from './components/Chat/ChatArea'
 import EvidencePanel from './components/Citations/EvidencePanel'
 
 function App() {
-  const { isAuthenticated, isLoading, dispatch, employee } = useAuth()
+  const { isAuthenticated, isLoading, dispatch, employee, login } = useAuth()
   const { evidencePanelOpen } = useUI()
   const skipAuth = import.meta.env.VITE_SKIP_AUTH === 'true'
 
@@ -46,7 +45,7 @@ function App() {
             <p className="font-body text-sm text-foreground/70">Please log in to access the crime database query interface.</p>
             <button
               className="rounded-md bg-accent px-6 py-2 font-body text-sm font-medium text-white transition-colors hover:bg-accent-hover"
-              onClick={() => showEmbeddedAuth()}
+              onClick={login}
             >
               Log In with Catalyst Account
             </button>

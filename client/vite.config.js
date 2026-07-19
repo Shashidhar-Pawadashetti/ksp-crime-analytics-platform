@@ -10,6 +10,14 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/__catalyst': {
+        target: 'https://datathon2026-60073929329.development.catalystserverless.in',
+        changeOrigin: true
+      },
+      '/baas': {
+        target: 'https://datathon2026-60073929329.development.catalystserverless.in',
+        changeOrigin: true
+      },
       '/api': {
         target: 'https://datathon2026-60073929329.development.catalystserverless.in',
         changeOrigin: true,

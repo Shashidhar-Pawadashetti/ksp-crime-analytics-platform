@@ -10,12 +10,12 @@ import { useChat } from '../../hooks/useChat';
 import { useAuth } from '../../hooks/useAuth';
 
 function EmptyState() {
-  const { dispatch, sendMessage } = useChat();
-  const { employee, sessionId } = useAuth();
+  const { dispatch, sessionId, sendMessage } = useChat();
+  const { employee, sessionToken } = useAuth();
 
   const handleExampleClick = (query) => {
-    if (employee?.employee_id && sessionId) {
-      sendMessage(query, employee.employee_id, sessionId);
+    if (employee?.employee_id) {
+      sendMessage(query, employee.employee_id, sessionId, sessionToken);
     }
   };
 

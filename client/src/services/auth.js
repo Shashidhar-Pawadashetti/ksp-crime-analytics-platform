@@ -1,16 +1,27 @@
 // ksp-crime-analytics-platform/client/src/services/auth.js
 //
 // Catalyst Embedded Authentication service.
-// The Catalyst Web SDK (catalystWebSDK.js v4.4.0) is loaded via CDN in index.html.
+// The Catalyst Web SDK (catalystWebSDK.js v4.6.1) is loaded via CDN in index.html.
 // The global `catalyst` object is available after /__catalyst/sdk/init.js loads.
 // These functions assume the SDK is already loaded — they do not inject scripts.
 
 /**
- * Initialise the Catalyst Embedded Authentication iFrame inside the given container.
- * @param {string} containerId - DOM element ID to render the auth form into
+ * Check if the user currently has an active Catalyst session.
+ * Returns a promise that resolves with user info if authenticated,
+ * or rejects if no session exists.
+ * @returns {Promise<object>}
  */
-export function initEmbeddedAuth(containerId = 'catalyst-auth-container') {
-  const config = {};
+export function isUserAuthenticated() {
+  return catalyst.auth.isUserAuthenticated();
+}
+
+/**
+ * Initialise the Catalyst Embedded Authentication iFrame inside the given container.
+ * Call this once after confirming no session exists. The iFrame renders the login form.
+ * @param {string} [containerId='catalyst-auth-container'] - DOM element ID to render the auth form into
+ * @param {object} [config={}] - Optional config (css_url, service_url, etc.)
+ */
+export function initEmbeddedAuth(containerId = 'catalyst-auth-container', config = {}) {
   catalyst.auth.signIn(containerId, config);
 }
 
@@ -50,7 +61,7 @@ export async function getAuthToken() {
  * Returns null if no session exists.
  * @returns {object|null}
  */
-export function getCurrentUser() {
+export function getUserDetails() {
   try {
     return catalyst.auth.getUserDetails();
   } catch {

@@ -13,11 +13,12 @@ import { queryPipeline } from '../services/api';
 /** @type {import('react').Context<*>} */
 export const ChatContext = createContext(null);
 
-/** @type {{ messages: Array, isLoading: boolean, error: string|null }} */
+/** @type {{ messages: Array, isLoading: boolean, error: string|null, sessionId: string|null }} */
 export const initialState = {
   messages: [],     // { id, role, content, intent, data, source_refs, citations, trends, risk_score, confidence, severity, factors, fallback, timestamp, isLoading, isError }
   isLoading: false,
-  error: null
+  error: null,
+  sessionId: null
 };
 
 let messageIdCounter = 0;
@@ -57,7 +58,7 @@ export function chatReducer(state, action) {
       return { ...state, isLoading: action.payload ?? true, error: null };
 
     case 'ADD_ASSISTANT_RESPONSE': {
-      const { answer, intent, data, source_refs, citations, trends, risk_score, confidence, severity, factors, fallback } = action.payload;
+      const { answer, intent, data, source_refs, citations, trends, risk_score, confidence, severity, factors, fallback, session_id } = action.payload;
       const newMessage = {
         id: nextMessageId(),
         role: 'assistant',
@@ -79,10 +80,14 @@ export function chatReducer(state, action) {
       return {
         ...state,
         messages: [...state.messages, newMessage],
+        sessionId: session_id || state.sessionId,
         isLoading: false,
         error: null
       };
     }
+
+    case 'UPDATE_SESSION_ID':
+      return { ...state, sessionId: action.payload };
 
     case 'SET_ERROR': {
       const errorPayload = action.payload || {};
@@ -151,7 +156,7 @@ export function ChatProvider({ children }) {
    * @param {string} sessionId - Current session ID
    * @returns {Promise<void>}
    */
-  const sendMessage = useCallback(async (query, employeeId, sessionId) => {
+  const sendMessage = useCallback(async (query, employeeId, sessionId, authToken) => {
     if (!query || !query.trim()) return;
 
     dispatch({ type: 'ADD_USER_MESSAGE', payload: { content: query } });
@@ -161,7 +166,8 @@ export function ChatProvider({ children }) {
     const timeoutId = setTimeout(() => controller.abort(), 35000);
 
     try {
-      const data = await queryPipeline(query, employeeId, sessionId, controller.signal);
+      const sid = sessionId || state.sessionId;
+      const data = await queryPipeline(query, employeeId, sid, controller.signal, authToken);
       clearTimeout(timeoutId);
       dispatch({ type: 'ADD_ASSISTANT_RESPONSE', payload: data });
     } catch (err) {

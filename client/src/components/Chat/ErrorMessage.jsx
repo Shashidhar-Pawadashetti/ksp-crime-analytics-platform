@@ -8,15 +8,15 @@ import { useChat } from '../../hooks/useChat';
 import { useAuth } from '../../hooks/useAuth';
 
 function ErrorMessage() {
-  const { error, dispatch, sendMessage } = useChat();
-  const { employee, sessionId } = useAuth();
+  const { error, dispatch, sessionId, sendMessage } = useChat();
+  const { employee, sessionToken } = useAuth();
 
   if (!error) return null;
 
   const handleRetry = () => {
     dispatch({ type: 'CLEAR_ERROR' });
-    if (error.query && employee?.employee_id && sessionId) {
-      sendMessage(error.query, employee.employee_id, sessionId);
+    if (error.query && employee?.employee_id) {
+      sendMessage(error.query, employee.employee_id, sessionId, sessionToken);
     }
   };
 

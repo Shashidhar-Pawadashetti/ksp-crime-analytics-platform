@@ -9,6 +9,8 @@ const QUICKML_MODEL = process.env.QUICKML_MODEL || 'crm-di-glm47b_30b_it';
 const CATALYST_ORG = process.env.CATALYST_ORG || '60073929329';
 const MAX_EXCERPTS = 3;
 
+const GENDER_MAP = { '1': 'Male', '2': 'Female', '3': 'Other' };
+
 function sendJson(res, status, data) {
 	res.writeHead(status, { 'Content-Type': 'application/json' });
 	res.end(JSON.stringify(data));
@@ -114,7 +116,7 @@ function extractKeywords(query) {
 }
 
 async function expandKeywords(query) {
-	const prompt = `Extract 5-8 key search terms from this police crime query. Return ONLY a JSON array of strings. Do not include stop words or very common words. Focus on crime types, locations, person names, and case-specific terms.
+	const prompt = `Extract key search terms from this police crime query. Return ONLY a JSON array of strings. Do not include stop words or very common words. Focus on crime types, locations, person names, and case-specific terms.
 
 Query: "${query}"
 
@@ -123,26 +125,54 @@ Return ONLY a JSON array like: ["theft", "Bengaluru", "2024"]`;
 	try {
 		const response = await callQuickML(prompt, { temperature: 0.1, max_tokens: 200 });
 		const content = extractGLMContent(response);
-		if (!content) return extractKeywords(query);
+		if (!content) return [];
 		const cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
 		const parsed = JSON.parse(cleaned);
-		if (Array.isArray(parsed) && parsed.length > 0) {
+		if (Array.isArray(parsed)) {
 			return parsed.filter(k => k.length > 2).slice(0, 8);
 		}
-		return extractKeywords(query);
+		return [];
 	} catch {
-		return extractKeywords(query);
+		return [];
 	}
 }
 
-async function searchBriefFacts(app, query) {
-	const keywords = await expandKeywords(query);
-	if (keywords.length === 0) {
-		return [];
+async function getKeywords(query) {
+	const basic = extractKeywords(query);
+	try {
+		const expanded = await expandKeywords(query);
+		const all = [...new Set([...basic, ...expanded])];
+		return all.slice(0, 8);
+	} catch {
+		return basic;
 	}
+}
 
-	const conditions = keywords.map(k => `cm.BriefFacts LIKE '*${k}*'`);
-	const sql = `SELECT cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, cm.CrimeMajorHeadID, d.DistrictName, ch.CrimeGroupName
+function flatRows(rows) {
+	return rows.map(r => {
+		const flat = {};
+		for (const key of Object.keys(r)) {
+			const val = r[key];
+			if (val && typeof val === 'object' && !Array.isArray(val)) {
+				Object.assign(flat, val);
+			} else {
+				flat[key] = val;
+			}
+		}
+		return flat;
+	}).filter(Boolean);
+}
+
+function sanitize(val) {
+	if (!val || typeof val !== 'string') return '';
+	return val.replace(/'/g, "\\'");
+}
+
+async function searchBriefFacts(app, keywords) {
+	if (keywords.length === 0) return [];
+
+	const conditions = keywords.slice(0, 5).map(k => `cm.BriefFacts LIKE '*${k}*'`);
+	const sql = `SELECT cm.ROWID, cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, cm.CrimeMajorHeadID, d.DistrictName, ch.CrimeGroupName, u.UnitName
 FROM CaseMaster cm
 INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID
 INNER JOIN District d ON u.DistrictID = d.ROWID
@@ -154,23 +184,11 @@ LIMIT 15`;
 
 	try {
 		const rows = await app.zcql().executeZCQLQuery(sql);
-		const flatRows = rows.map(r => {
-			const flat = {};
-			for (const key of Object.keys(r)) {
-				const val = r[key];
-				if (val && typeof val === 'object' && !Array.isArray(val)) {
-					Object.assign(flat, val);
-				} else {
-					flat[key] = val;
-				}
-			}
-			return flat;
-		}).filter(Boolean);
-
-		return flatRows.map(row => {
+		const flat = flatRows(rows);
+		return flat.map(row => {
 			const text = (row.BriefFacts || '').toLowerCase();
 			const matches = keywords.filter(k => text.includes(k.toLowerCase()));
-			return { ...row, _score: matches.length, _matchCount: matches.length };
+			return { ...row, _score: matches.length, _source: 'briefFacts' };
 		}).sort((a, b) => b._score - a._score || new Date(b.IncidentFromDate || 0) - new Date(a.IncidentFromDate || 0))
 		.slice(0, MAX_EXCERPTS);
 	} catch {
@@ -178,35 +196,164 @@ LIMIT 15`;
 	}
 }
 
-async function generateAnswer(query, excerpts) {
-	const maxScore = Math.max(...excerpts.map(e => e._score || 0), 0);
-	const lowConfidence = maxScore <= 1 && excerpts.length > 0;
+async function searchPersons(app, keywords) {
+	if (keywords.length === 0) return [];
 
-	const contextBlock = excerpts.map((e, i) =>
-		`[Case ${i + 1}] CaseMasterID: ${e.CaseMasterID}, CrimeNo: ${e.CrimeNo || 'N/A'}, District: ${e.DistrictName || 'N/A'}, Date: ${e.IncidentFromDate || 'N/A'}`
-		+ (e.CrimeGroupName ? `, Crime Type: ${e.CrimeGroupName}` : '')
-		+ `\nBriefFacts: ${e.BriefFacts || 'No details available'}`
-	).join('\n\n');
+	const queries = [
+		(kw) => `SELECT CaseMasterID, AccusedName AS person_name FROM Accused WHERE AccusedName LIKE '*${kw}*' LIMIT 15`,
+		(kw) => `SELECT CaseMasterID, VictimName AS person_name FROM Victim WHERE VictimName LIKE '*${kw}*' LIMIT 15`,
+		(kw) => `SELECT CaseMasterID, ComplainantName AS person_name FROM ComplainantDetails WHERE ComplainantName LIKE '*${kw}*' LIMIT 15`,
+	];
+
+	const caseRowIds = new Set();
+	const personInfo = {};
+
+	for (const kw of keywords) {
+		for (const q of queries) {
+			try {
+				const sql = q(kw);
+				const result = await app.zcql().executeZCQLQuery(sql);
+				const rows = flatRows(result);
+				for (const r of rows) {
+					const rid = r.CaseMasterID;
+					caseRowIds.add(rid);
+					if (!personInfo[rid]) personInfo[rid] = [];
+					personInfo[rid].push(r.AccusedName || r.VictimName || r.ComplainantName || r.person_name || 'unknown');
+				}
+			} catch (e) {
+				continue;
+			}
+		}
+	}
+
+	if (caseRowIds.size === 0) return [];
+
+	const caseIds = Array.from(caseRowIds);
+	const ids = caseIds.map(id => `'${id}'`).join(',');
+	const caseSql = `SELECT cm.ROWID, cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate
+FROM CaseMaster cm
+WHERE cm.ROWID IN (${ids}) AND cm.BriefFacts IS NOT NULL
+LIMIT 15`;
+
+	let caseRows = [];
+	try {
+		caseRows = flatRows(await app.zcql().executeZCQLQuery(caseSql));
+	} catch {
+		return [];
+	}
+
+	return caseRows.map(r => {
+		const names = personInfo[r.ROWID] || [];
+		const unique = [...new Set(names)];
+		return {
+			...r,
+			_matchedPersons: unique.map(n => ({ name: n })),
+			_score: unique.length * 2,
+			_source: 'person',
+		};
+	}).sort((a, b) => b._score - a._score || new Date(b.IncidentFromDate || 0) - new Date(a.IncidentFromDate || 0))
+	.slice(0, MAX_EXCERPTS);
+}
+
+async function enrichMatches(app, matches) {
+	if (matches.length === 0) return [];
+
+	const rowids = matches.map(m => m.ROWID).filter(Boolean);
+	if (rowids.length === 0) return matches;
+
+	const ids = rowids.map(id => `'${id}'`).join(',');
+	const enrichSql = `SELECT cm.ROWID, cs.CaseStatusName, ct.CourtName
+FROM CaseMaster cm
+LEFT JOIN CaseStatusMaster cs ON cm.CaseStatusID = cs.ROWID
+LEFT JOIN Court ct ON cm.CourtID = ct.ROWID
+WHERE cm.ROWID IN (${ids})`;
+
+	const sectionSql = `SELECT a.CaseMasterID, act.ShortName, act.ActDescription, sec.SectionCode
+FROM ActSectionAssociation a
+LEFT JOIN Act act ON a.ActID = act.ROWID
+LEFT JOIN Section sec ON a.SectionID = sec.ROWID
+WHERE a.CaseMasterID IN (${ids})`;
+
+	let enrichRows = [];
+	let sectionRows = [];
+	try {
+		enrichRows = flatRows(await app.zcql().executeZCQLQuery(enrichSql));
+	} catch {}
+	try {
+		sectionRows = flatRows(await app.zcql().executeZCQLQuery(sectionSql));
+	} catch {}
+
+	const enrichMap = new Map(enrichRows.map(r => [r.ROWID, r]));
+	const sectionMap = new Map();
+	for (const s of sectionRows) {
+		const key = s.CaseMasterID;
+		if (!sectionMap.has(key)) sectionMap.set(key, []);
+		const label = s.ShortName || s.ActDescription || '';
+		const code = s.SectionCode || '';
+		const full = code ? `${label} ${code}` : label;
+		if (full) sectionMap.get(key).push(full);
+	}
+
+	for (const m of matches) {
+		const e = enrichMap.get(m.ROWID);
+		if (e) {
+			m.CaseStatusName = e.CaseStatusName;
+			m.CourtName = e.CourtName;
+		}
+		const secs = sectionMap.get(m.ROWID);
+		if (secs && secs.length > 0) {
+			m.Sections = secs.join(', ');
+		}
+	}
+
+	return matches;
+}
+
+function buildContext(matches) {
+	return matches.map((m, i) => {
+		const lines = [];
+		lines.push(`[Case ${i + 1}] CaseMasterID: ${m.CaseMasterID || 'N/A'}, CrimeNo: ${m.CrimeNo || 'N/A'}`);
+		if (m.DistrictName) lines.push(`  District: ${m.DistrictName}`);
+		if (m.UnitName) lines.push(`  Station: ${m.UnitName}`);
+		if (m.CrimeGroupName) lines.push(`  Crime Type: ${m.CrimeGroupName}`);
+		if (m.CaseStatusName) lines.push(`  Status: ${m.CaseStatusName}`);
+		if (m.CourtName) lines.push(`  Court: ${m.CourtName}`);
+		if (m.IncidentFromDate) lines.push(`  Date: ${m.IncidentFromDate}`);
+		if (m.Sections) lines.push(`  Sections: ${m.Sections}`);
+		if (m._matchedPersons && m._matchedPersons.length > 0) {
+			const persons = m._matchedPersons.map(p => p.name || p).join(', ');
+			lines.push(`  Persons Matched: ${persons}`);
+		}
+		lines.push(`  BriefFacts: ${m.BriefFacts || 'No details available'}`);
+		return lines.join('\n');
+	}).join('\n\n');
+}
+
+async function generateAnswer(query, matches) {
+	if (matches.length === 0) {
+		return 'I could not find any case records matching your query.';
+	}
+
+	const contextBlock = buildContext(matches);
 
 	const prompt = `You are a crime analysis assistant for Karnataka State Police. 
 
 The user asked: "${query}"
 
-Below are relevant case excerpts from the police database. Answer the user's question based ONLY on these excerpts. 
+Below are relevant case records from the police database. Answer the user's question based ONLY on these records.
 
 ${contextBlock}
 
 Rules:
-1. Answer based ONLY on the provided excerpts — never add external information
+1. Answer based ONLY on the provided records — never add external information
 2. Cite the CaseMasterID for each piece of information you use like [CaseMasterID:123]
 3. Be concise and factual
-4. If the excerpts don't fully answer the query, say "Based on available records, ..." and state what you can confirm
-5. When multiple excerpts are relevant, synthesize across them
-6. If excerpts are empty or irrelevant, say "I don't have enough information to answer that question."`;
+4. If the records don't fully answer the query, say "Based on available records, ..." and state what you can confirm
+5. When multiple records are relevant, synthesize across them
+6. If records are empty or irrelevant, say "I don't have enough information to answer that question."`;
 
 	const response = await callQuickML(prompt, { temperature: 0.1, max_tokens: 500 });
-	const content = extractGLMContent(response);
-	return content || 'I was unable to generate an answer.';
+	return extractGLMContent(response) || 'I was unable to generate an answer.';
 }
 
 async function queryRAGFallback(query) {
@@ -252,12 +399,16 @@ async function queryRAGFallback(query) {
 	});
 }
 
+function gender(val) {
+	return GENDER_MAP[String(val)] || val || '';
+}
+
 module.exports = async (req, res) => {
 	const { path } = parseUrl(req.url);
 	const method = req.method.toUpperCase();
 
 	if (method === 'GET' && path === '/') {
-		sendJson(res, 200, { status: 'ok', service: 'rag', version: '1.0.0' });
+		sendJson(res, 200, { status: 'ok', service: 'rag', version: '2.0.0' });
 		return;
 	}
 
@@ -283,10 +434,43 @@ module.exports = async (req, res) => {
 	}
 
 	try {
-		const excerpts = await searchBriefFacts(app, query);
-		const sourceRefs = excerpts.map(e => `CaseMasterID:${e.CaseMasterID}`);
+		const user = await app.userManagement().getCurrentUser();
+		if (!user) console.warn('RAG: unauthenticated request (dev mode or missing session)');
+	} catch {
+		console.warn('RAG: unauthenticated request (dev mode or missing session)');
+	}
 
-		if (excerpts.length === 0) {
+	try {
+		const keywords = await getKeywords(query);
+		if (keywords.length === 0) {
+			sendJson(res, 200, {
+				status: 'ok',
+				data: {
+					answer: 'I could not find any case records matching your query.',
+					source_refs: []
+				}
+			});
+			return;
+		}
+
+		const [bfResults, personResults] = await Promise.all([
+			searchBriefFacts(app, keywords),
+			searchPersons(app, keywords),
+		]);
+
+		const seen = new Set();
+		const merged = [];
+
+		for (const r of [...bfResults, ...personResults]) {
+			if (seen.has(r.ROWID)) continue;
+			seen.add(r.ROWID);
+			merged.push(r);
+		}
+
+		const enriched = await enrichMatches(app, merged);
+		const sourceRefs = enriched.map(e => `CaseMasterID:${e.CaseMasterID}`);
+
+		if (enriched.length === 0) {
 			const ragAnswer = await queryRAGFallback(query);
 			if (ragAnswer) {
 				sendJson(res, 200, {
@@ -301,15 +485,15 @@ module.exports = async (req, res) => {
 			sendJson(res, 200, {
 				status: 'ok',
 				data: {
-					answer: 'I could not find any case records matching your query in the BriefFacts database.',
+					answer: 'I could not find any case records matching your query.',
 					source_refs: []
 				}
 			});
 			return;
 		}
 
-		const maxScore = Math.max(...excerpts.map(e => e._score || 0), 0);
-		const answer = await generateAnswer(query, excerpts);
+		const maxScore = Math.max(...enriched.map(e => e._score || 0), 0);
+		let answer = await generateAnswer(query, enriched);
 
 		if (maxScore <= 1) {
 			const ragAnswer = await queryRAGFallback(query);

@@ -130,6 +130,26 @@ function validateGeneratedSQL(sql) {
 	}
 }
 
+function cleanSQL(sql) {
+	return sql.replace(/\bAS\s+\w+\b/gi, '');
+}
+
+function zcqlRows(rows) {
+	if (!Array.isArray(rows)) return [];
+	return rows.map(r => {
+		const flat = {};
+		for (const key of Object.keys(r)) {
+			const val = r[key];
+			if (val && typeof val === 'object' && !Array.isArray(val)) {
+				Object.assign(flat, val);
+			} else {
+				flat[key] = val;
+			}
+		}
+		return flat;
+	});
+}
+
 async function callQuickML(prompt, options = {}) {
 	const token = process.env.QUICKML_TOKEN;
 	if (!token) {
@@ -231,13 +251,14 @@ Rules:
 16. Subqueries are supported in WHERE clause
 17. HAVING clause supported with GROUP BY
 18. Operator IS works like =, use IS NULL / IS NOT NULL for null checks
+19. No column aliases — never use AS in SELECT (ZCQL silently ignores them, which breaks ORDER BY)
 
 Examples:
 Query: "show FIRs for theft in Bengaluru last month"
 SQL PATH 1 (direct via CrimeMajorHeadID — for crime GROUP queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName = 'Bengaluru' AND cm.CrimeRegisteredDate >= '2025-06-01' AND cm.CrimeRegisteredDate < '2025-07-01' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
 
 Query: "count of cases in Bengaluru Urban"
-SQL: SELECT COUNT(cm.CaseMasterID) AS case_count FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE d.DistrictName = 'Bengaluru Urban'
+SQL: SELECT COUNT(cm.CaseMasterID) FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE d.DistrictName = 'Bengaluru Urban'
 
 Query: "list accused in case 2024-00412"
 SQL: SELECT a.AccusedMasterID, a.AccusedName, a.AgeYear, a.GenderID FROM Accused a INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID WHERE cm.CrimeNo = '2024-00412'
@@ -266,14 +287,23 @@ function extractColumnMeta(sql) {
 }
 
 function extractSourceRefs(rows) {
+	const flat = zcqlRows(rows);
 	const refs = [];
-	for (const row of rows) {
-		const entry = Object.values(row)[0];
-		if (entry && entry.CaseMasterID) {
-			refs.push(`CaseMasterID:${entry.CaseMasterID}`);
+	for (const row of flat) {
+		if (row.CaseMasterID) {
+			refs.push(`CaseMasterID:${row.CaseMasterID}`);
 		}
 	}
 	return refs;
+}
+
+async function requireAuth(app) {
+	try {
+		const user = await app.userManagement().getCurrentUser();
+		return user;
+	} catch {
+		return null;
+	}
 }
 
 module.exports = async (req, res) => {
@@ -306,10 +336,36 @@ module.exports = async (req, res) => {
 		return;
 	}
 
+	const authUser = await requireAuth(app);
+	if (!authUser) {
+		console.warn('NL_SQL: unauthenticated request (dev mode or missing session)');
+	}
+
 	let result;
+	let rows;
+	let lastError;
 	try {
 		result = await translateToSQL(query);
-		const rows = await app.zcql().executeZCQLQuery(result.sql);
+		for (let attempt = 0; attempt < 2; attempt++) {
+			try {
+				const cleanedSQL = cleanSQL(result.sql);
+				validateGeneratedSQL(cleanedSQL);
+				rows = await app.zcql().executeZCQLQuery(cleanedSQL);
+				break;
+			} catch (err) {
+				lastError = err.message;
+				if (attempt === 0) {
+					const fixPrompt = `The following ZCQL V2 query failed: "${lastError}". Fix it. Rules: LIKE uses * not %, no column aliases, no DATEDIFF, max 4 JOINs, max 5 WHERE, every alias MUST be joined. Return ONLY {"sql": "SELECT ...", "explanation": "..."}.\n\nFailing SQL: ${result.sql}\n\nOriginal request: ${query}`;
+					const response = await callQuickML(fixPrompt, { temperature: 0, max_tokens: 200 });
+					const content = extractGLMContent(response);
+					if (content) {
+						const cleaned = content.replace(/```sql\s*/gi, '').replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+						result = JSON.parse(cleaned);
+					}
+				}
+			}
+		}
+		if (!rows) throw new Error(lastError || 'SQL execution failed');
 		const columnMeta = extractColumnMeta(result.sql);
 		const sourceRefs = extractSourceRefs(rows);
 		sendJson(res, 200, {

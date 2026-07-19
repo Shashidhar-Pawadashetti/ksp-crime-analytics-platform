@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useChat } from '../../hooks/useChat';
 import { useAuth } from '../../hooks/useAuth';
+import * as session from '../../services/session';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
 import LoadingSkeleton from './LoadingSkeleton';
@@ -20,11 +21,18 @@ import ErrorMessage from './ErrorMessage';
  * Manages scroll position, auto-scroll behavior, and user input submission.
  */
 function ChatArea() {
-  const { messages, isLoading, error, sendMessage, dispatch } = useChat();
-  const { employee, sessionId, isAuthenticated } = useAuth();
+  const { messages, isLoading, error, sessionId, sendMessage, dispatch } = useChat();
+  const { employee, sessionToken, isAuthenticated } = useAuth();
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
+
+  // Persist real session_id across page refreshes
+  useEffect(() => {
+    if (sessionId && employee) {
+      session.saveSession({ sessionId, employee });
+    }
+  }, [sessionId, employee]);
 
   // Scroll anchor detection: is user within 100px of bottom?
   const handleScroll = useCallback(() => {
@@ -48,12 +56,12 @@ function ChatArea() {
     }
   }, [isLoading]);
 
-  // Bridge: extract employee_id and sessionId from AuthContext, pass to sendMessage
+  // Bridge: extract employee_id and auth credentials from AuthContext, pass to sendMessage
   const handleSend = useCallback((query) => {
-    if (employee?.employee_id && sessionId) {
-      sendMessage(query, employee.employee_id, sessionId);
+    if (employee?.employee_id) {
+      sendMessage(query, employee.employee_id, sessionId, sessionToken);
     }
-  }, [employee, sessionId, sendMessage]);
+  }, [employee, sessionId, sessionToken, sendMessage]);
 
   return (
     <div className="flex h-full flex-col">

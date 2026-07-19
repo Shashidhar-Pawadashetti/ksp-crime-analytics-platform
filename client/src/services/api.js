@@ -34,14 +34,20 @@ export class ApiError extends Error {
  * @param {string} employeeId - Employee ID from authenticated session
  * @param {string} sessionId - Current session ID
  * @param {AbortSignal} [signal] - Optional AbortSignal for request cancellation (managed by caller)
+ * @param {string} [authToken] - Optional Catalyst auth token for Authorization header
  * @returns {Promise<object>} The pipeline response data
  * @throws {ApiError} On backend error response or HTTP error
  * @throws {AbortError} On request timeout/abort (name === 'AbortError')
  */
-export async function queryPipeline(query, employeeId, sessionId, signal) {
+export async function queryPipeline(query, employeeId, sessionId, signal, authToken) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) {
+    headers['Authorization'] = `Zoho-Oauthtoken ${authToken}`;
+  }
+
   const response = await fetch(PIPELINE_ENDPOINT, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
       query,
       employee_id: employeeId,

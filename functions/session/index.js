@@ -147,6 +147,15 @@ async function getOrCreateSession(app, employeeId, sessionId) {
 	return session;
 }
 
+async function requireAuth(app) {
+	try {
+		const user = await app.userManagement().getCurrentUser();
+		return user;
+	} catch {
+		return null;
+	}
+}
+
 module.exports = async (req, res) => {
 	let app;
 	try {
@@ -154,6 +163,11 @@ module.exports = async (req, res) => {
 	} catch {
 		sendError(res, 500, 'INIT_FAILED', 'Failed to initialize Catalyst SDK');
 		return;
+	}
+
+	const authUser = await requireAuth(app);
+	if (!authUser) {
+		console.warn('Session: unauthenticated request (dev mode or missing session)');
 	}
 
 	const { path, params } = parseUrl(req.url);

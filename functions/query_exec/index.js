@@ -105,6 +105,13 @@ module.exports = async (req, res) => {
 		return;
 	}
 
+	try {
+		const user = await app.userManagement().getCurrentUser();
+		if (!user) console.warn('QUERY_EXEC: unauthenticated request (dev mode or missing session)');
+	} catch {
+		console.warn('QUERY_EXEC: unauthenticated request (dev mode or missing session)');
+	}
+
 	if (req.method.toUpperCase() !== 'POST') {
 		sendError(res, 405, 'METHOD_NOT_ALLOWED', 'Only POST is allowed');
 		return;
