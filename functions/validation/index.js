@@ -6,7 +6,7 @@ const catalyst = require('zcatalyst-sdk-node');
 
 const expressApp = express();
 expressApp.use(helmet());
-expressApp.use(express.json({ limit: '1mb' }));
+expressApp.use(express.json({ limit: '10mb' }));
 
 function getAppInstance(req) {
   try { return catalyst.initialize(req); }
@@ -20,7 +20,7 @@ expressApp.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       'GET /': 'Health check',
-      'POST /validate': 'Validate ground truth data'
+      'POST /validate': 'Validate ground truth data against PersonMaster resolution output'
     }
   });
 });
@@ -33,17 +33,17 @@ expressApp.post('/validate', async (req, res) => {
     return res.status(500).json({ status: 'error', error_code: 'INIT_FAILED', message: 'Failed to initialize Catalyst' });
   }
 
-  if (!req.body || !req.body.data) {
-    return res.status(400).json({ status: 'error', error_code: 'VALIDATION_ERROR', message: 'data field is required' });
-  }
-
   try {
     var { validateAgainstGroundTruth } = require('./groundTruthValidator');
     var opts = {};
-    if (req.body.data.type === 'full') opts.type = 'full';
-    if (req.body.data.ground_truth_path) opts.ground_truth_path = req.body.data.ground_truth_path;
-    if (req.body.data.ground_truth_csv) opts.ground_truth_csv = req.body.data.ground_truth_csv;
-    if (req.body.ground_truth_csv) opts.ground_truth_csv = req.body.ground_truth_csv;
+    if (req.body && req.body.data) {
+      if (req.body.data.type === 'full') opts.type = 'full';
+      if (req.body.data.ground_truth_path) opts.ground_truth_path = req.body.data.ground_truth_path;
+      if (req.body.data.ground_truth_csv) opts.ground_truth_csv = req.body.data.ground_truth_csv;
+    }
+    if (req.body && req.body.ground_truth_csv) {
+      opts.ground_truth_csv = req.body.ground_truth_csv;
+    }
     var result = await validateAgainstGroundTruth(catApp, opts);
     res.json({ status: 'ok', data: result });
   } catch (err) {

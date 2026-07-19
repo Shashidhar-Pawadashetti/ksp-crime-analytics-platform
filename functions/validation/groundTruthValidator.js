@@ -12,6 +12,7 @@ function parseCSV(text) {
   var rows = [];
   for (var i = 1; i < lines.length; i++) {
     var values = parseCSVLine(lines[i]);
+    if (values.length < headers.length) continue;
     var row = {};
     for (var j = 0; j < headers.length; j++) {
       row[headers[j]] = values[j] || '';
@@ -78,12 +79,12 @@ async function loadAllDocuments(appInstance) {
       },
       limit: 1000
     };
-    if (nextToken) {
-      queryParams.next_token = nextToken;
-    }
+    if (nextToken) queryParams.next_token = nextToken;
+
     var result = await table.queryTable(queryParams);
     var docs = parseResponse(result);
     allDocs = allDocs.concat(docs);
+
     try {
       nextToken = result.getNextToken();
     } catch (e) {
@@ -101,13 +102,66 @@ function extractAccusedId(rowId) {
   return match ? parseInt(match[1], 10) : null;
 }
 
+function computePairwiseMetrics(accusedToGT, accusedToPM, allAccusedIds) {
+  var tp = 0, fp = 0, fn = 0, tn = 0;
+
+  for (var i = 0; i < allAccusedIds.length; i++) {
+    var idA = allAccusedIds[i];
+    for (var j = i + 1; j < allAccusedIds.length; j++) {
+      var idB = allAccusedIds[j];
+      var sameGT = accusedToGT[idA] === accusedToGT[idB];
+      var samePred = accusedToPM[idA] === accusedToPM[idB];
+
+      if (sameGT && samePred) tp++;
+      else if (sameGT && !samePred) fn++;
+      else if (!sameGT && samePred) fp++;
+      else tn++;
+    }
+  }
+
+  return { tp: tp, fp: fp, fn: fn, tn: tn };
+}
+
+function computeClusterPurity(accusedToGT, accusedToPM, allAccusedIds) {
+  var personClusters = {};
+  for (var i = 0; i < allAccusedIds.length; i++) {
+    var id = allAccusedIds[i];
+    var pid = accusedToPM[id];
+    if (!personClusters[pid]) personClusters[pid] = [];
+    personClusters[pid].push(id);
+  }
+
+  var purities = [];
+  var pids = Object.keys(personClusters);
+  for (var pi = 0; pi < pids.length; pi++) {
+    var members = personClusters[pids[pi]];
+    var profileFreq = {};
+    for (var mi = 0; mi < members.length; mi++) {
+      var bp = accusedToGT[members[mi]];
+      if (bp != null) profileFreq[bp] = (profileFreq[bp] || 0) + 1;
+    }
+    var maxCount = 0;
+    var bpKeys = Object.keys(profileFreq);
+    for (var bi = 0; bi < bpKeys.length; bi++) {
+      if (profileFreq[bpKeys[bi]] > maxCount) maxCount = profileFreq[bpKeys[bi]];
+    }
+    purities.push(members.length > 0 ? maxCount / members.length : 0);
+  }
+
+  return {
+    cluster_purities: purities,
+    average_purity: purities.length > 0
+      ? purities.reduce(function (a, b) { return a + b; }, 0) / purities.length
+      : 0
+  };
+}
+
 async function validateAgainstGroundTruth(appInstance, options) {
   var opts = options || {};
   var csvText = null;
 
   if (opts.ground_truth_csv) {
     csvText = opts.ground_truth_csv;
-    console.log('[gtValidator] Using CSV from request body');
   } else {
     var csvPath = opts.ground_truth_path ||
       path.join(__dirname, '..', '..', 'data_pipeline', 'data', 'ground_truth_identities.csv');
@@ -118,138 +172,180 @@ async function validateAgainstGroundTruth(appInstance, options) {
       return {
         status: 'not_available',
         message: 'Ground truth file not found. Pass ground_truth_csv in request body or place file at: data_pipeline/data/ground_truth_identities.csv',
-        metrics: null
+        scope: 'ACCUSED_SEEDED_IDENTITIES_ONLY',
+        ground_truth_records: 0,
+        mapped_records: 0,
+        mapped_accused_ids: [],
+        unmapped_accused_ids: [],
+        coverage: 0,
+        ground_truth_identity_count: 0,
+        predicted_cluster_count: 0,
+        pairwise: { tp: 0, fp: 0, fn: 0, tn: 0 },
+        precision: 0,
+        recall: 0,
+        f1_score: 0,
+        cluster_purity: 0,
+        limitations: [
+          'Ground truth covers seeded recurring Accused identities only.',
+          'Victim and Complainant cross-role entity resolution is not evaluated.'
+        ]
       };
     }
     csvText = fs.readFileSync(csvPath, 'utf-8');
   }
+
   var parsed = parseCSV(csvText);
   if (parsed.rows.length === 0) {
-    return { status: 'error', message: 'Ground truth CSV is empty', metrics: null };
-  }
-  console.log('[gtValidator] Loaded ' + parsed.rows.length + ' ground truth records');
-
-  var gtMap = {};
-  parsed.rows.forEach(function (row) {
-    var id = parseInt(row.AccusedMasterID, 10);
-    var profileId = parseInt(row.BaseProfileID, 10);
-    if (!isNaN(id) && !isNaN(profileId)) {
-      gtMap[id] = profileId;
-    }
-  });
-  console.log('[gtValidator] Mapped ' + Object.keys(gtMap).length + ' accused IDs to base profiles');
-
-  var documents = await loadAllDocuments(appInstance);
-  console.log('[gtValidator] Loaded ' + documents.length + ' PersonMaster documents');
-
-  var personToProfiles = {};
-
-  documents.forEach(function (doc) {
-    var pid = doc.person_id;
-    if (!pid) return;
-    var profileSet = {};
-
-    (doc.source_records || []).forEach(function (sr) {
-      if (sr.table !== 'Accused') return;
-      var accusedId = extractAccusedId(sr.row_id);
-      if (accusedId == null || !gtMap[accusedId]) return;
-      profileSet[gtMap[accusedId]] = true;
-    });
-
-    var profiles = Object.keys(profileSet).map(Number);
-    if (profiles.length > 0) {
-      personToProfiles[pid] = profiles;
-    }
-  });
-
-  var personIds = Object.keys(personToProfiles);
-  console.log('[gtValidator] PersonMaster docs with ground truth: ' + personIds.length);
-
-  if (personIds.length === 0) {
     return {
-      status: 'ok',
-      message: 'No PersonMaster documents matched ground truth records. Ensure resolution has been run.',
-      metrics: { total_documents: documents.length, matched_documents: 0 }
+      status: 'error',
+      message: 'Ground truth CSV is empty',
+      scope: 'ACCUSED_SEEDED_IDENTITIES_ONLY',
+      ground_truth_records: 0,
+      mapped_records: 0,
+      mapped_accused_ids: [],
+      unmapped_accused_ids: [],
+      coverage: 0,
+      ground_truth_identity_count: 0,
+      predicted_cluster_count: 0,
+      pairwise: { tp: 0, fp: 0, fn: 0, tn: 0 },
+      precision: 0,
+      recall: 0,
+      f1_score: 0,
+      cluster_purity: 0,
+      limitations: [
+        'Ground truth covers seeded recurring Accused identities only.',
+        'Victim and Complainant cross-role entity resolution is not evaluated.'
+      ]
     };
   }
 
-  var tp = 0, fp = 0, fn = 0;
-  var clusterPurities = [];
-  var mergedClusters = 0;
-  var profileToClusters = {};
+  /* Build ground truth map: accusedMasterId -> baseProfileId */
+  var accusedToGT = {};
+  var uniqueBaseProfiles = {};
+  parsed.rows.forEach(function (row) {
+    var accusedId = parseInt(row.AccusedMasterID, 10);
+    var profileId = parseInt(row.BaseProfileID, 10);
+    if (!isNaN(accusedId) && !isNaN(profileId)) {
+      accusedToGT[accusedId] = profileId;
+      uniqueBaseProfiles[profileId] = true;
+    }
+  });
+  var groundTruthIdentityCount = Object.keys(uniqueBaseProfiles).length;
 
-  personIds.forEach(function (pid) {
-    var profiles = personToProfiles[pid];
-    var uniqueProfiles = {};
-    profiles.forEach(function (p) { uniqueProfiles[p] = (uniqueProfiles[p] || 0) + 1; });
-    var pList = Object.keys(uniqueProfiles).map(Number);
-    var maxCount = 0;
-    pList.forEach(function (p) { if (uniqueProfiles[p] > maxCount) maxCount = uniqueProfiles[p]; });
-    clusterPurities.push(maxCount / profiles.length);
+  /* Load PersonMaster documents */
+  var documents = await loadAllDocuments(appInstance);
 
-    if (pList.length > 1) mergedClusters++;
-
-    profiles.forEach(function (p) {
-      if (!profileToClusters[p]) profileToClusters[p] = [];
-      profileToClusters[p].push(pid);
+  /* Build PersonMaster map: accusedMasterId -> person_id */
+  var accusedToPM = {};
+  documents.forEach(function (doc) {
+    var pid = doc.person_id;
+    if (!pid) return;
+    (doc.source_records || []).forEach(function (sr) {
+      if (sr.table !== 'Accused') return;
+      var accusedId = extractAccusedId(sr.row_id);
+      if (accusedId != null && accusedToGT[accusedId] != null) {
+        accusedToPM[accusedId] = pid;
+      }
     });
   });
 
-  for (var pi = 0; pi < personIds.length; pi++) {
-    var p1Profiles = personToProfiles[personIds[pi]];
-    for (var pj = pi + 1; pj < personIds.length; pj++) {
-      var p2Profiles = personToProfiles[personIds[pj]];
-      var shareProfile = false;
-      for (var gi = 0; gi < p1Profiles.length && !shareProfile; gi++) {
-        for (var gj = 0; gj < p2Profiles.length && !shareProfile; gj++) {
-          if (p1Profiles[gi] === p2Profiles[gj]) shareProfile = true;
-        }
-      }
-      if (shareProfile) {
-        var sameDoc = personIds[pi] === personIds[pj];
-        if (sameDoc) {
-          tp++;
-        } else {
-          fn++;
-        }
-      } else {
-        fp++;
-      }
-    }
+  var mappedAccusedIds = Object.keys(accusedToPM).map(Number).sort(function (a, b) { return a - b; });
+  var mappedRecords = mappedAccusedIds.length;
+  var totalRecords = Object.keys(accusedToGT).length;
+  var unmappedRecords = totalRecords - mappedRecords;
+
+  /* Find unmapped accused IDs */
+  var allGtIds = Object.keys(accusedToGT).map(Number);
+  var mappedSet = {};
+  mappedAccusedIds.forEach(function (id) { mappedSet[id] = true; });
+  var unmappedAccusedIds = allGtIds.filter(function (id) { return !mappedSet[id]; });
+
+  var coverage = totalRecords > 0 ? mappedRecords / totalRecords : 0;
+
+  if (mappedRecords < 2) {
+    return {
+      status: 'ok',
+      scope: 'ACCUSED_SEEDED_IDENTITIES_ONLY',
+      ground_truth_records: totalRecords,
+      mapped_records: mappedRecords,
+      unmapped_records: unmappedRecords,
+      mapped_accused_ids: mappedAccusedIds,
+      unmapped_accused_ids: unmappedAccusedIds,
+      coverage: Math.round(coverage * 10000) / 10000,
+      ground_truth_identity_count: groundTruthIdentityCount,
+      predicted_cluster_count: Object.keys(getUniqueValues(accusedToPM)).length,
+      pairwise: { tp: 0, fp: 0, fn: 0, tn: 0 },
+      precision: 0,
+      recall: 0,
+      f1_score: 0,
+      cluster_purity: 0,
+      message: 'Need at least 2 mapped accused records for pairwise metrics.',
+      limitations: [
+        'Ground truth covers seeded recurring Accused identities only.',
+        'Victim and Complainant cross-role entity resolution is not evaluated.'
+      ]
+    };
   }
 
-  var splitClusters = 0;
-  Object.keys(profileToClusters).forEach(function (profileId) {
-    if (profileToClusters[profileId].length > 1) splitClusters++;
-  });
+  var pairwise = computePairwiseMetrics(accusedToGT, accusedToPM, mappedAccusedIds);
 
-  var precision = tp + fp > 0 ? tp / (tp + fp) : 0;
-  var recall = tp + fn > 0 ? tp / (tp + fn) : 0;
-  var f1 = precision + recall > 0 ? 2 * precision * recall / (precision + recall) : 0;
-  var avgPurity = clusterPurities.length > 0
-    ? clusterPurities.reduce(function (a, b) { return a + b; }, 0) / clusterPurities.length
-    : 0;
+  var precision = pairwise.tp + pairwise.fp > 0
+    ? pairwise.tp / (pairwise.tp + pairwise.fp) : 0;
+  var recall = pairwise.tp + pairwise.fn > 0
+    ? pairwise.tp / (pairwise.tp + pairwise.fn) : 0;
+  var f1 = precision + recall > 0
+    ? 2 * precision * recall / (precision + recall) : 0;
+
+  var purityResult = computeClusterPurity(accusedToGT, accusedToPM, mappedAccusedIds);
+
+  var predictedClusterSet = {};
+  mappedAccusedIds.forEach(function (id) { predictedClusterSet[accusedToPM[id]] = true; });
 
   return {
     status: 'ok',
-    message: 'Ground truth validation complete',
-    metrics: {
-      total_documents: documents.length,
-      matched_documents: personIds.length,
-      ground_truth_records: parsed.rows.length,
-      unique_base_profiles: Object.keys(profileToClusters).length,
-      true_positives: tp,
-      false_positives: fp,
-      false_negatives: fn,
-      precision: Math.round(precision * 10000) / 10000,
-      recall: Math.round(recall * 10000) / 10000,
-      f1_score: Math.round(f1 * 10000) / 10000,
-      avg_cluster_purity: Math.round(avgPurity * 10000) / 10000,
-      merged_clusters: mergedClusters,
-      split_profiles: splitClusters,
-      total_clusters: personIds.length
-    }
+    scope: 'ACCUSED_SEEDED_IDENTITIES_ONLY',
+    ground_truth_records: totalRecords,
+    mapped_records: mappedRecords,
+    unmapped_records: unmappedRecords,
+    mapped_accused_ids: mappedAccusedIds,
+    unmapped_accused_ids: unmappedAccusedIds,
+    coverage: round4(coverage),
+    ground_truth_identity_count: groundTruthIdentityCount,
+    predicted_cluster_count: Object.keys(predictedClusterSet).length,
+    pairwise: {
+      true_positives: pairwise.tp,
+      false_positives: pairwise.fp,
+      false_negatives: pairwise.fn,
+      true_negatives: pairwise.tn
+    },
+    precision: round4(precision),
+    recall: round4(recall),
+    f1_score: round4(f1),
+    cluster_purity: round4(purityResult.average_purity),
+    limitations: [
+      'Ground truth covers seeded recurring Accused identities only.',
+      'Victim and Complainant cross-role entity resolution is not evaluated.'
+    ]
   };
 }
 
-module.exports = { validateAgainstGroundTruth: validateAgainstGroundTruth };
+function getUniqueValues(map) {
+  var vals = {};
+  var keys = Object.keys(map);
+  for (var i = 0; i < keys.length; i++) {
+    vals[map[keys[i]]] = true;
+  }
+  return vals;
+}
+
+function round4(n) {
+  return Math.round(n * 10000) / 10000;
+}
+
+module.exports = {
+  validateAgainstGroundTruth: validateAgainstGroundTruth,
+  computePairwiseMetrics: computePairwiseMetrics,
+  computeClusterPurity: computeClusterPurity,
+  extractAccusedId: extractAccusedId,
+  parseCSV: parseCSV
+};
