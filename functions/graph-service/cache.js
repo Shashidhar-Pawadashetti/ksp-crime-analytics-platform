@@ -10,9 +10,10 @@ function GraphCache(loader) {
   this._degreeIndex = {};
   this._loadedAt = null;
   this._loaded = false;
+  this._loading = null;
 }
 
-GraphCache.prototype._buildIndexes = function() {
+GraphCache.prototype._buildIndexes = function () {
   this._nodeIndex = {};
   for (var ni = 0; ni < this._nodes.length; ni++) {
     this._nodeIndex[this._nodes[ni].person_id] = this._nodes[ni];
@@ -38,22 +39,29 @@ GraphCache.prototype._buildIndexes = function() {
   }
 };
 
-GraphCache.prototype.load = function() {
+GraphCache.prototype.load = async function () {
   if (this._loaded) return;
-  var data = this._loader();
-  this._nodes = data.nodes;
-  this._edges = data.edges;
-  this._buildIndexes();
-  this._loadedAt = Date.now();
-  this._loaded = true;
+  if (this._loading) return this._loading;
+
+  this._loading = (async function () {
+    var data = await this._loader();
+    this._nodes = data.nodes;
+    this._edges = data.edges;
+    this._buildIndexes();
+    this._loadedAt = Date.now();
+    this._loaded = true;
+    this._loading = null;
+  }).call(this);
+
+  return this._loading;
 };
 
-GraphCache.prototype.reload = function() {
+GraphCache.prototype.reload = async function () {
   this.clear();
-  this.load();
+  return this.load();
 };
 
-GraphCache.prototype.clear = function() {
+GraphCache.prototype.clear = function () {
   this._nodes = null;
   this._edges = null;
   this._nodeIndex = {};
@@ -62,48 +70,49 @@ GraphCache.prototype.clear = function() {
   this._degreeIndex = {};
   this._loadedAt = null;
   this._loaded = false;
+  this._loading = null;
 };
 
-GraphCache.prototype.isLoaded = function() {
+GraphCache.prototype.isLoaded = function () {
   return this._loaded;
 };
 
-GraphCache.prototype.getLoadedAt = function() {
+GraphCache.prototype.getLoadedAt = function () {
   return this._loadedAt;
 };
 
-GraphCache.prototype.getNodes = function() {
-  this.load();
+GraphCache.prototype.getNodes = function () {
+  if (!this._loaded) return [];
   return this._nodes;
 };
 
-GraphCache.prototype.getEdges = function() {
-  this.load();
+GraphCache.prototype.getEdges = function () {
+  if (!this._loaded) return [];
   return this._edges;
 };
 
-GraphCache.prototype.getNode = function(personId) {
-  this.load();
+GraphCache.prototype.getNode = function (personId) {
+  if (!this._loaded) return null;
   return this._nodeIndex[personId] || null;
 };
 
-GraphCache.prototype.getEdge = function(edgeId) {
-  this.load();
+GraphCache.prototype.getEdge = function (edgeId) {
+  if (!this._loaded) return null;
   return this._edgeIndex[edgeId] || null;
 };
 
-GraphCache.prototype.getEdgesForNode = function(personId) {
-  this.load();
+GraphCache.prototype.getEdgesForNode = function (personId) {
+  if (!this._loaded) return [];
   return this._edgesByNode[personId] || [];
 };
 
-GraphCache.prototype.getDegree = function(personId) {
-  this.load();
+GraphCache.prototype.getDegree = function (personId) {
+  if (!this._loaded) return 0;
   return this._degreeIndex[personId] || 0;
 };
 
-GraphCache.prototype.nodeExists = function(personId) {
-  this.load();
+GraphCache.prototype.nodeExists = function (personId) {
+  if (!this._loaded) return false;
   return !!this._nodeIndex[personId];
 };
 

@@ -13,10 +13,17 @@
       "sync-incremental",
       "sync-full",
       "graph-traversal",
-      "personmaster-api"
+      "personmaster-api",
+      "pm-migration",
+      "sync-full-job"
     ],
     "ignore": [],
     "source": "functions"
+  },
+  "job_scheduling": {
+    "targets": [
+      "full-reconciliation"
+    ]
   },
   "slate": [
     {

@@ -2,7 +2,15 @@
 
 const catalyst = require('zcatalyst-sdk-node');
 
-const FORBIDDEN_KEYWORDS = ['DROP', 'DELETE', 'INSERT', 'UPDATE', 'TRUNCATE', 'ALTER', 'CREATE', 'EXEC', 'EXECUTE'];
+const ALLOWED_ZCQL_TABLES = {
+	CaseMaster: true, Accused: true, Victim: true, ComplainantDetails: true,
+	CrimeHead: true, CrimeSubHead: true, Unit: true, District: true,
+	State: true, Employee: true, CaseStatusMaster: true, CaseCategory: true,
+	GravityOffence: true, Court: true, Rank: true, Designation: true,
+	UnitType: true, ReligionMaster: true, CasteMaster: true, OccupationMaster: true,
+	Act: true, Section: true, ActSectionAssociation: true, CrimeHeadActSection: true,
+	ChargesheetDetails: true, ArrestSurrender: true
+};
 
 function sendJson(res, status, data) {
 	res.writeHead(status, { 'Content-Type': 'application/json' });
@@ -33,15 +41,35 @@ function getBody(req) {
 }
 
 function validateSql(sql) {
-	const upper = sql.toUpperCase();
-	for (const kw of FORBIDDEN_KEYWORDS) {
-		const re = new RegExp(`\\b${kw}\\b`);
-		if (re.test(upper)) {
-			throw new Error(`UNSAFE_SQL: ${kw} not allowed`);
+	const FORBIDDEN = ['DROP', 'DELETE', 'INSERT', 'UPDATE', 'TRUNCATE', 'ALTER', 'CREATE', 'EXEC', 'EXECUTE', 'MERGE', 'REPLACE', 'GRANT', 'REVOKE', 'CALL', 'LOAD', 'RENAME'];
+
+	var upper = sql.toUpperCase();
+	var noStrings = upper.replace(/'[^']*'/g, '');
+	noStrings = noStrings.replace(/--.*$/gm, '');
+
+	if (!/^\s*SELECT\b/.test(noStrings)) {
+		throw new Error('UNSAFE_SQL: Only SELECT queries are allowed');
+	}
+
+	if ((noStrings.match(/;/g) || []).length > 0) {
+		throw new Error('UNSAFE_SQL: Multiple statements detected');
+	}
+
+	for (var i = 0; i < FORBIDDEN.length; i++) {
+		if (new RegExp('\\b' + FORBIDDEN[i] + '\\b').test(noStrings)) {
+			throw new Error('UNSAFE_SQL: ' + FORBIDDEN[i] + ' not allowed');
 		}
 	}
-	if (!/^\s*SELECT\b/i.test(sql)) {
-		throw new Error('UNSAFE_SQL: Only SELECT queries are allowed');
+
+	var tableRefs = noStrings.match(/(?:FROM|JOIN)\s+(\w+)/g) || [];
+	for (var ti = 0; ti < tableRefs.length; ti++) {
+		var parts = tableRefs[ti].split(/\s+/);
+		var tableName = parts[1];
+		if (tableName && tableName !== 'FROM' && tableName !== 'JOIN' && tableName.length > 3) {
+			if (!ALLOWED_ZCQL_TABLES[tableName]) {
+				throw new Error('UNSAFE_SQL: Table "' + tableName + '" is not in the allowed whitelist');
+			}
+		}
 	}
 }
 

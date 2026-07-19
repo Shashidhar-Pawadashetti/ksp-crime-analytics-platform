@@ -1,0 +1,52 @@
+{
+  "calibration_timestamp": "2026-07-06T11:32:05.532Z",
+  "single_strategy": {
+    "name": "first_token_phonetic",
+    "candidate_pairs": 163506,
+    "ground_truth_pairs_found": 31,
+    "coverage_pct": 1.6,
+    "best": {
+      "threshold": 0.69,
+      "tp": 3,
+      "fp": 4289,
+      "fn": 28,
+      "precision": 0.0007,
+      "recall": 0.0968,
+      "f1": 0.0014
+    }
+  },
+  "multi_strategy": {
+    "strategies": [
+      "first_token_phonetic",
+      "last_token_phonetic",
+      "first_initial_surname",
+      "surname_age_band"
+    ],
+    "candidate_pairs": 461991,
+    "pairs_by_strategy": {
+      "first_token_phonetic": 163506,
+      "last_token_phonetic": 301750,
+      "first_initial_surname": 23318,
+      "surname_age_band": 30413
+    },
+    "ground_truth_pairs_found": 77,
+    "coverage_pct": 4,
+    "best": {
+      "threshold": 0.69,
+      "tp": 3,
+      "fp": 8503,
+      "fn": 74,
+      "precision": 0.0004,
+      "recall": 0.039,
+      "f1": 0.0007
+    }
+  },
+  "improvement": {
+    "candidate_pairs_multiplier": "2.8",
+    "additional_gt_pairs_found": 46,
+    "coverage_pp_gain": "2.4",
+    "f1_gain": "-0.0007"
+  },
+  "current_threshold": 0.78,
+  "recommendation": "Multi-strategy blocking significantly increases ground-truth coverage. Re-evaluate threshold after selecting final blocking strategy."
+}
