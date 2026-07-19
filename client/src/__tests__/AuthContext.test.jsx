@@ -62,6 +62,7 @@ describe('AuthContext', () => {
     test('SESSION_RESTORED restores from saved data', () => {
       const payload = {
         employee: { employee_id: 'E001', name: 'Restored Officer' },
+        sessionToken: 'tok_restored',
         sessionId: 'sess_restored'
       };
       const state = authReducer(initialState, {
@@ -71,9 +72,8 @@ describe('AuthContext', () => {
       expect(state.isAuthenticated).toBe(true);
       expect(state.isLoading).toBe(false);
       expect(state.employee).toEqual(payload.employee);
+      expect(state.sessionToken).toBe('tok_restored');
       expect(state.sessionId).toBe('sess_restored');
-      // sessionToken should not be set by SESSION_RESTORED
-      expect(state.sessionToken).toBeNull();
       expect(state.error).toBeNull();
     });
 

@@ -6,6 +6,7 @@ import ErrorMessage from '../components/Chat/ErrorMessage';
 
 const mockAuth = {
   employee: { employee_id: 'E001' },
+  sessionToken: null,
   sessionId: 'sess_abc',
   isAuthenticated: true,
   isLoading: false,
@@ -16,6 +17,7 @@ const mockAuth = {
 
 function renderErrorMessage(chatOverrides = {}) {
   const defaultChat = {
+    sessionId: 'sess_abc',
     error: { message: 'Server error', errorCode: 'PIPELINE_ERROR', fallback: 'Please try again.', query: 'FIRs?' },
     dispatch: vi.fn(),
     sendMessage: vi.fn(),
@@ -48,7 +50,7 @@ describe('ErrorMessage', () => {
     renderErrorMessage({ dispatch, sendMessage });
     fireEvent.click(screen.getByText('Retry'));
     expect(dispatch).toHaveBeenCalledWith({ type: 'CLEAR_ERROR' });
-    expect(sendMessage).toHaveBeenCalledWith('FIRs?', 'E001', 'sess_abc');
+    expect(sendMessage).toHaveBeenCalledWith('FIRs?', 'E001', 'sess_abc', null);
   });
 
   test('returns null when no error', () => {
