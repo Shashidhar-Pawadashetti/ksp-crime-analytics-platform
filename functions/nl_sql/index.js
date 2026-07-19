@@ -280,13 +280,14 @@ Rules:
 17. HAVING clause supported with GROUP BY
 18. Operator IS works like =, use IS NULL / IS NOT NULL for null checks
 19. No column aliases — never use AS in SELECT (ZCQL silently ignores them, which breaks ORDER BY)
+20. District name matching: use LIKE for partial matching (e.g., d.DistrictName LIKE '*Bengaluru*' matches 'Bengaluru Urban') — never exact equality on district names since users type partial names
 
 Examples:
 Query: "show FIRs for theft in Bengaluru last month"
-SQL PATH 1 (direct via CrimeMajorHeadID — for crime GROUP queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName = 'Bengaluru' AND cm.CrimeRegisteredDate >= '2025-06-01' AND cm.CrimeRegisteredDate < '2025-07-01' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
+SQL PATH 1 (direct via CrimeMajorHeadID — for crime GROUP queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName LIKE '*Bengaluru*' AND cm.CrimeRegisteredDate >= '2025-06-01' AND cm.CrimeRegisteredDate < '2025-07-01' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
 
 Query: "count of cases in Bengaluru Urban"
-SQL: SELECT COUNT(cm.CaseMasterID) FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE d.DistrictName = 'Bengaluru Urban'
+SQL: SELECT COUNT(cm.CaseMasterID) FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE d.DistrictName LIKE '*Bengaluru*'
 
 Query: "list accused in case 2024-00412"
 SQL: SELECT a.AccusedMasterID, a.AccusedName, a.AgeYear, a.GenderID FROM Accused a INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID WHERE cm.CrimeNo = '2024-00412'

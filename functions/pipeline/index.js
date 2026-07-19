@@ -11,15 +11,17 @@ const CACHE_SEGMENT = 'session';
 const GENDER_MAP = { '1': 'Male', '2': 'Female', '3': 'Other' };
 const SESSION_TTL_HOURS = 1;
 
-const ALLOWED_ZCQL_TABLES = {
-	CaseMaster: true, Accused: true, Victim: true, ComplainantDetails: true,
-	CrimeHead: true, CrimeSubHead: true, Unit: true, District: true,
-	State: true, Employee: true, CaseStatusMaster: true, CaseCategory: true,
-	GravityOffence: true, Court: true, Rank: true, Designation: true,
-	UnitType: true, ReligionMaster: true, CasteMaster: true, OccupationMaster: true,
-	Act: true, Section: true, ActSectionAssociation: true, CrimeHeadActSection: true,
-	ChargesheetDetails: true, ArrestSurrender: true
-};
+const ALLOWED_ZCQL_TABLES = {};
+const ALLOWED_TABLE_NAMES = [
+	'CaseMaster', 'Accused', 'Victim', 'ComplainantDetails',
+	'CrimeHead', 'CrimeSubHead', 'Unit', 'District',
+	'State', 'Employee', 'CaseStatusMaster', 'CaseCategory',
+	'GravityOffence', 'Court', 'Rank', 'Designation',
+	'UnitType', 'ReligionMaster', 'CasteMaster', 'OccupationMaster',
+	'Act', 'Section', 'ActSectionAssociation', 'CrimeHeadActSection',
+	'ChargesheetDetails', 'ArrestSurrender'
+];
+ALLOWED_TABLE_NAMES.forEach(function(t) { ALLOWED_ZCQL_TABLES[t.toUpperCase()] = true; });
 
 const STRUCTURED_PATTERNS = /\b(how many|count|total|list\s+\w+|show\s+(me|all|the|FIR)|find\s+\w+|get\s+(me|all|the)|cases?\s+(in|registered|filed|reported)|FIR\s+details?|accused\s+details?|victim\s+details?|officer\s+|section\s+\w+|IPC|CrPC|charge\s+sheet)\b/i;
 const NARRATIVE_PATTERNS = /\b(describe|what\s+happened|tell\s+me\s+about|modus\s+operandi|summary\s+of|overview\s+of|details?\s+about\s+case|brief\s+facts|incident\s+details?|sequence\s+of\s+events)\b/i;
@@ -390,36 +392,56 @@ Respond ONLY with JSON: {"intent": "...", "confidence": 0.0-1.0}`;
 	}
 }
 
-async function translateToSQL(query) {
-	const prompt = `You are a ZCQL V2 generator for the KSP crime database.
+async function translateToZCQL(query, turns) {
+	var previousQuery = null;
+	var previousSQL = null;
+	if (turns && turns.length > 0) {
+		for (var ti = turns.length - 1; ti >= 0; ti--) {
+			var t = turns[ti];
+			if (t.role === 'user' && !previousQuery) {
+				previousQuery = String(t.content || '');
+			}
+			if (t.role === 'assistant' && t.query_context && !previousSQL) {
+				previousSQL = String(t.query_context || '');
+			}
+		}
+	}
+
+	var contextInjection = '';
+	if (previousQuery && previousSQL) {
+		contextInjection = '\n\nCONTEXT — The user\'s new query "' + query + '" is a FOLLOW-UP to their previous query "' + previousQuery.substring(0, 80) + '". The previous query used filters from: ' + previousSQL.substring(0, 120) + '. You MUST apply the same filters to the new query unless the user explicitly changes them. For example, if previous was "list theft cases" and new is "how many in Bengaluru", the new query means "how many theft cases in Bengaluru" — carry forward the crime type filter.';
+	}
+
+	const prompt = `You are a ZCQL V2 generator for the KSP crime database. This is NOT standard SQL — Catalyst ZCQL V2 has different syntax rules that MUST be followed.
 
 ${SCHEMA_DESCRIPTION}
 
-Rules:
+ZCQL V2 Rules (MANDATORY — standard SQL rules do NOT apply):
 1. Return ONLY JSON: {"sql": "SELECT ...", "explanation": "..."}
 2. SELECT only — never DDL/DML
-3. INNER JOIN ... ON through FK chains via ROWID (every table used MUST be joined)
+3. INNER JOIN ... ON through FK chains via ROWID (every table used MUST be joined, comma joins are NOT supported)
 4. Never SELECT * — name columns explicitly (max 20)
-5. Always qualify columns with table alias
-6. Text search: LIKE '*text*' — dates: 'YYYY-MM-DD'
-7. GenderID: 1=Male, 2=Female, 3=Other
-8. COUNT(alias.Col) not COUNT(*); GROUP BY/ORDER BY/HAVING supported
-9. String values in single quotes; IS for null checks
+5. Always qualify columns with table alias (e.g., cm.CaseMasterID)
+6. LIKE wildcard: * not % (e.g., LIKE '*theft*' NOT LIKE '%theft%')
+7. COUNT(alias.Col) not COUNT(*) (e.g., COUNT(cm.CaseMasterID) NOT COUNT(*))
+8. No column aliases — never use AS in SELECT (e.g., COUNT(cm.CaseMasterID) is fine, COUNT(cm.CaseMasterID) AS cnt is WRONG)
+9. String values in single quotes; IS for null checks (IS NULL / IS NOT NULL)
 10. Use ONLY columns listed in the schema above. NEVER invent column names.
-11. Every table alias (cm, cs, ch, u, d, a, v, etc.) MUST appear in a JOIN clause before being used in WHERE/SELECT
-12. No column aliases — never use AS in SELECT (ZCQL silently ignores them, which breaks ORDER BY)
+11. Every table alias MUST appear in a JOIN clause before being used in WHERE/SELECT
+12. GenderID: 1=Male, 2=Female, 3=Other
+13. GROUP BY/ORDER BY/HAVING supported
+14. LIMIT syntax: LIMIT count (not LIMIT count OFFSET offset)
+15. No semicolon at end
+16. Dates: 'YYYY-MM-DD' format in single quotes
+17. District name matching: use LIKE for partial matching (e.g., d.DistrictName LIKE '*Bengaluru*' matches 'Bengaluru Urban') — never exact equality on district names since users type partial names
 
 Template:
 Query: "list FIRs for theft in Bengaluru Urban"
-SQL PATH 1 (direct via CrimeMajorHeadID — for crime GROUP queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName = 'Bengaluru Urban' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
-SQL PATH 2 (via CrimeMinorHeadID → CrimeSubHead — for crime SUB-TYPE queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, cs.CrimeHeadName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.ROWID INNER JOIN CrimeHead ch ON cs.CrimeHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE cs.CrimeHeadName LIKE '*theft*' AND d.DistrictName = 'Bengaluru Urban' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
+SQL PATH 1 (direct via CrimeMajorHeadID — for crime GROUP queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, ch.CrimeGroupName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE ch.CrimeGroupName LIKE '*theft*' AND d.DistrictName LIKE '*Bengaluru*' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
+SQL PATH 2 (via CrimeMinorHeadID → CrimeSubHead — for crime SUB-TYPE queries): SELECT cm.CaseMasterID, cm.CrimeNo, cm.CrimeRegisteredDate, cs.CrimeHeadName, d.DistrictName FROM CaseMaster cm INNER JOIN CrimeSubHead cs ON cm.CrimeMinorHeadID = cs.ROWID INNER JOIN CrimeHead ch ON cs.CrimeHeadID = ch.ROWID INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE cs.CrimeHeadName LIKE '*theft*' AND d.DistrictName LIKE '*Bengaluru*' ORDER BY cm.CrimeRegisteredDate DESC LIMIT 50
 PREFER Path 1 unless query explicitly asks for sub-head names.
 
-Query: "${query}"
-
-Respond ONLY with JSON.
-
-Query: "${query}"
+Query: "${query}"${contextInjection}
 
 Respond ONLY with JSON.`;
 
@@ -465,11 +487,11 @@ function validateSQL(sql) {
 	}
 }
 
-function cleanSQL(sql) {
+function cleanZCQL(sql) {
 	return sql.replace(/\bAS\s+\w+\b/gi, '');
 }
 
-async function executeSQL(app, sql) {
+async function executeZCQL(app, sql) {
 	validateSQL(sql);
 	return await app.zcql().executeZCQLQuery(sql);
 }
@@ -566,9 +588,9 @@ async function searchPersons(app, keywords) {
 	if (keywords.length === 0) return [];
 
 	const queries = [
-		{ sql: (kw) => `SELECT CaseMasterID, AccusedName AS person_name, 'ACCUSED' AS role FROM Accused WHERE AccusedName LIKE '*${kw}*' LIMIT 15`, role: 'ACCUSED' },
-		{ sql: (kw) => `SELECT CaseMasterID, VictimName AS person_name, 'VICTIM' AS role FROM Victim WHERE VictimName LIKE '*${kw}*' LIMIT 15`, role: 'VICTIM' },
-		{ sql: (kw) => `SELECT CaseMasterID, ComplainantName AS person_name, 'COMPLAINANT' AS role FROM ComplainantDetails WHERE ComplainantName LIKE '*${kw}*' LIMIT 15`, role: 'COMPLAINANT' },
+		{ sql: (kw) => `SELECT CaseMasterID, AccusedName FROM Accused WHERE AccusedName LIKE '*${kw}*' LIMIT 15`, role: 'ACCUSED' },
+		{ sql: (kw) => `SELECT CaseMasterID, VictimName FROM Victim WHERE VictimName LIKE '*${kw}*' LIMIT 15`, role: 'VICTIM' },
+		{ sql: (kw) => `SELECT CaseMasterID, ComplainantName FROM ComplainantDetails WHERE ComplainantName LIKE '*${kw}*' LIMIT 15`, role: 'COMPLAINANT' },
 	];
 
 	const caseRowIds = new Set();
@@ -766,11 +788,11 @@ async function queryRAGFallback(query) {
 	});
 }
 
-function formatSQLResult(intent, result, sql) {
-	const rows = result.rows || result;
+function formatZCQLResult(intent, result, sql) {
+	const raw = result.rows || result;
+	const flat = zcqlRows(raw);
 	const isAgg = sql && /\b(COUNT|SUM|AVG|MIN|MAX)\s*\(/i.test(sql);
-	if (isAgg && rows.length === 1) {
-		const flat = zcqlRows(rows);
+	if (isAgg && flat.length === 1) {
 		const values = Object.values(flat[0]);
 		const aggValue = values[0];
 		return {
@@ -780,11 +802,10 @@ function formatSQLResult(intent, result, sql) {
 			source_refs: []
 		};
 	}
-	const count = rows.length;
 	return {
 		intent,
-		answer: `Found ${count} record(s).`,
-		data: rows,
+		answer: `Found ${flat.length} record(s).`,
+		data: flat,
 		source_refs: []
 	};
 }
@@ -976,7 +997,7 @@ async function handleRisk(app, query) {
 	const accusedRows = zcqlRows(await app.zcql().executeZCQLQuery(
 		`SELECT a.ROWID, a.AccusedName, a.CaseMasterID, cm.CrimeRegisteredDate, ch.CrimeGroupName
 FROM Accused a INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID
-WHERE LOWER(a.AccusedName) LIKE '*${name.toLowerCase()}*' LIMIT 100`
+WHERE a.AccusedName LIKE '*${name}*' LIMIT 100`
 	).catch(() => []));
 
 	if (accusedRows.length === 0) {
@@ -999,19 +1020,21 @@ WHERE LOWER(a.AccusedName) LIKE '*${name.toLowerCase()}*' LIMIT 100`
 	return { intent: 'risk', answer, risk_score: score, factors, severity, source_refs: [] };
 }
 
-async function translateAnalyticalSQL(query) {
-	const prompt = `Generate a ZCQL V2 aggregation query for the KSP crime database.
+async function translateAnalyticalZCQL(query) {
+	const prompt = `Generate a ZCQL V2 aggregation query for the KSP crime database. This is NOT standard SQL — Catalyst ZCQL V2 has different syntax rules.
 
 ${SCHEMA_DESCRIPTION}
 
-Rules:
-- GROUP BY + COUNT
-- No AS aliases (never use AS — ZCQL ignores them, which breaks ORDER BY)
-- LIKE wildcard: * not %
-- Single quotes for strings
-- Max 4 JOINs, 1 condition per JOIN
+ZCQL V2 Rules (MANDATORY):
+- GROUP BY + COUNT for aggregation
+- LIKE wildcard: * not % (NOT the SQL % wildcard)
 - COUNT(alias.col) not COUNT(*)
+- No AS aliases in SELECT (ZCQL ignores AS)
+- Single quotes for strings, never double quotes
+- Max 4 JOINs, 1 condition per JOIN
+- Every table alias MUST be joined before use
 - Use ONLY columns from schema
+- No semicolon at end
 - Return ONLY JSON: {"sql": "SELECT ...", "explanation": "what this computes"}
 
 Example:
@@ -1035,12 +1058,12 @@ Respond ONLY with JSON.`;
 
 async function handleAnalytical(app, query) {
 	try {
-		const translation = await translateAnalyticalSQL(query);
+		const translation = await translateAnalyticalZCQL(query);
 		let rows;
 		let lastError;
 		for (let attempt = 0; attempt < 2; attempt++) {
 			try {
-				const cleanedSQL = cleanSQL(translation.sql);
+				const cleanedSQL = cleanZCQL(translation.sql);
 				validateSQL(cleanedSQL);
 				rows = await app.zcql().executeZCQLQuery(cleanedSQL);
 				break;
@@ -1096,7 +1119,7 @@ async function handleAnalyticalFallback(app, query) {
 
 	const whereClauses = [];
 	if (location) {
-		whereClauses.push(`LOWER(d.DistrictName) LIKE '*${location.toLowerCase()}*'`);
+		whereClauses.push(`d.DistrictName LIKE '*${location}*'`);
 	}
 	if (period) {
 		whereClauses.push(`cm.CrimeRegisteredDate >= '${period.since}'`);
@@ -1156,7 +1179,7 @@ GROUP BY d.DistrictName ORDER BY COUNT(cm.CaseMasterID) DESC LIMIT 10`
 
 async function getOrCreateSession(app, employeeId, sessionId) {
 	const seg = app.cache().segment(CACHE_SEGMENT);
-	const cacheKey = `session:${employeeId}:${sessionId}`;
+	const cacheKey = 's:' + sessionId;
 
 	let raw;
 	try {
@@ -1170,7 +1193,7 @@ async function getOrCreateSession(app, employeeId, sessionId) {
 
 	const session = {
 		session_id: sessionId,
-		employee_id: Number(employeeId),
+		employee_id: employeeId,
 		rank_hierarchy: null,
 		unit_hierarchy: null,
 		unit_id: null,
@@ -1179,11 +1202,15 @@ async function getOrCreateSession(app, employeeId, sessionId) {
 	};
 
 	try {
+		const empIdNum = Number(employeeId);
+		const empIdSafe = isNaN(empIdNum) ? "'" + String(employeeId).replace(/'/g, "''") + "'" : String(empIdNum);
 		const empRow = extractRow(await queryFirst(app,
-			`SELECT EmployeeID, RankID, UnitID, DistrictID FROM Employee WHERE EmployeeID = ${Number(employeeId)}`
+			'SELECT EmployeeID, RankID, UnitID, DistrictID FROM Employee WHERE EmployeeID = ' + empIdSafe
 		));
 
-		if (empRow) {
+		if (!empRow) {
+			console.warn('Employee not found for employee_id: ' + employeeId + ' — proceeding without RBAC scope');
+		} else {
 			if (empRow.RankID) {
 				const rankRow = extractRow(await queryFirst(app,
 					`SELECT Hierarchy FROM Rank WHERE ROWID = ${String(empRow.RankID)}`
@@ -1220,7 +1247,8 @@ async function getOrCreateSession(app, employeeId, sessionId) {
 				}
 			}
 		}
-	} catch {
+	} catch (err) {
+		throw err;
 	}
 
 	await seg.put(cacheKey, JSON.stringify(session), SESSION_TTL_HOURS);
@@ -1229,7 +1257,7 @@ async function getOrCreateSession(app, employeeId, sessionId) {
 
 async function appendTurn(app, employeeId, sessionId, turn) {
 	const seg = app.cache().segment(CACHE_SEGMENT);
-	const cacheKey = `session:${employeeId}:${sessionId}`;
+	const cacheKey = 's:' + sessionId;
 	let raw;
 	try {
 		raw = await seg.getValue(cacheKey);
@@ -1326,12 +1354,12 @@ module.exports = async (req, res) => {
 		let result;
 		switch (kwResult.intent) {
 			case 'structured': {
-		const translation = await translateAnalyticalSQL(query);
+		const translation = await translateToZCQL(query, session.turns);
 				let rows;
 				let lastError;
 				for (let attempt = 0; attempt < 2; attempt++) {
 					try {
-						rows = await executeSQL(app, translation.sql);
+						rows = await executeZCQL(app, translation.sql);
 						break;
 					} catch (err) {
 						lastError = err.message;
@@ -1347,8 +1375,9 @@ module.exports = async (req, res) => {
 					}
 				}
 				if (!rows) throw new Error(lastError || 'SQL execution failed');
-				result = formatSQLResult('structured', rows, translation.sql);
+				result = formatZCQLResult('structured', rows, translation.sql);
 				result.explanation = translation.explanation;
+				result.sql = translation.sql;
 				break;
 			}
 			case 'narrative': {
@@ -1401,7 +1430,8 @@ module.exports = async (req, res) => {
 			role: 'assistant',
 			content: result.answer || result.message || '',
 			intent: kwResult.intent,
-			source_refs: result.source_refs || []
+			source_refs: result.source_refs || [],
+			query_context: (result.sql || '') + ' — ' + (result.explanation || '')
 		});
 
 		sendJson(res, 200, {
