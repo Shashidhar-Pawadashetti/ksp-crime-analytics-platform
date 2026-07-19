@@ -7,7 +7,7 @@ app.use(helmet());
 app.use(express.json({ limit: '5mb' }));
 
 var PM_TABLE = 'PersonMaster';
-var BATCH_SIZE = 75;
+var BATCH_SIZE = 10;
 
 function getAppInstance(req) {
   try { return catalyst.initialize(req); }
@@ -167,16 +167,29 @@ async function updateDocument(appInstance, doc) {
   var noSql = appInstance.nosql();
   var table = await noSql.getTable(PM_TABLE);
 
-  var updateBody = {
-    keys: NoSQLItem.from({ type: 'PM', person_id: doc.person_id }),
-    update_attributes: [{
-      operation_type: NoSQLUpdateOperationType.PUT,
-      update_value: NoSQLMarshall.make(doc),
-      attribute_path: []
-    }]
+  var insertBody = {
+    item: NoSQLItem.from(doc)
   };
 
-  await table.updateItems(updateBody);
+  try {
+    await table.insertItems(insertBody);
+    return;
+  } catch (insertErr) {
+    console.log('[pm-migration] Document ' + doc.person_id + ' exists, updating...');
+    try {
+      var updateBody = {
+        keys: NoSQLItem.from({ type: 'PM', person_id: doc.person_id }),
+        update_attributes: [{
+          operation_type: require('zcatalyst-sdk-node/lib/no-sql').NoSQLEnum.NoSQLUpdateOperationType.PUT,
+          update_value: require('zcatalyst-sdk-node/lib/no-sql').NoSQLMarshall.make(doc),
+          attribute_path: []
+        }]
+      };
+      await table.updateItems(updateBody);
+    } catch (updateErr) {
+      throw new Error('Update failed for ' + doc.person_id + ': ' + updateErr.message);
+    }
+  }
 }
 
 app.post('/migrate', async function (req, res) {
@@ -198,7 +211,10 @@ app.post('/migrate', async function (req, res) {
 
     for (var di = 0; di < documents.length; di += BATCH_SIZE) {
       var batch = documents.slice(di, di + BATCH_SIZE);
-      var batchPromises = batch.map(async function (doc) {
+      var batchResults = [];
+
+      for (var bi = 0; bi < batch.length; bi++) {
+        var doc = batch[bi];
         try {
           var currentVersion = String(doc.schema_version || 1);
           var needsMigration = false;
@@ -221,16 +237,14 @@ app.post('/migrate', async function (req, res) {
 
           if (needsMigration) {
             await updateDocument(appInstance, migratedDoc);
-            return { status: 'migrated', person_id: doc.person_id };
+            batchResults.push({ status: 'migrated', person_id: doc.person_id });
           } else {
-            return { status: 'skipped', person_id: doc.person_id };
+            batchResults.push({ status: 'skipped', person_id: doc.person_id });
           }
         } catch (err) {
-          return { status: 'error', person_id: doc.person_id, error: err.message };
+          batchResults.push({ status: 'error', person_id: doc.person_id, error: err.message });
         }
-      });
-
-      var batchResults = await Promise.all(batchPromises);
+      }
       batchResults.forEach(function (r) {
         if (r.status === 'migrated') migratedCount++;
         else if (r.status === 'skipped') skippedCount++;

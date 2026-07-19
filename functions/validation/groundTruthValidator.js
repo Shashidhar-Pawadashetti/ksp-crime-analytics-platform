@@ -103,20 +103,26 @@ function extractAccusedId(rowId) {
 
 async function validateAgainstGroundTruth(appInstance, options) {
   var opts = options || {};
-  var csvPath = opts.ground_truth_path ||
-    path.join(__dirname, '..', '..', 'data_pipeline', 'data', 'ground_truth_identities.csv');
-  if (!fs.existsSync(csvPath)) {
-    csvPath = path.join(__dirname, 'data', 'ground_truth_identities.csv');
-  }
-  if (!fs.existsSync(csvPath)) {
-    return {
-      status: 'not_available',
-      message: 'Ground truth file not found. Expected at: ' + opts.ground_truth_path || 'data_pipeline/data/ground_truth_identities.csv',
-      metrics: null
-    };
-  }
+  var csvText = null;
 
-  var csvText = fs.readFileSync(csvPath, 'utf-8');
+  if (opts.ground_truth_csv) {
+    csvText = opts.ground_truth_csv;
+    console.log('[gtValidator] Using CSV from request body');
+  } else {
+    var csvPath = opts.ground_truth_path ||
+      path.join(__dirname, '..', '..', 'data_pipeline', 'data', 'ground_truth_identities.csv');
+    if (!fs.existsSync(csvPath)) {
+      csvPath = path.join(__dirname, 'data', 'ground_truth_identities.csv');
+    }
+    if (!fs.existsSync(csvPath)) {
+      return {
+        status: 'not_available',
+        message: 'Ground truth file not found. Pass ground_truth_csv in request body or place file at: data_pipeline/data/ground_truth_identities.csv',
+        metrics: null
+      };
+    }
+    csvText = fs.readFileSync(csvPath, 'utf-8');
+  }
   var parsed = parseCSV(csvText);
   if (parsed.rows.length === 0) {
     return { status: 'error', message: 'Ground truth CSV is empty', metrics: null };

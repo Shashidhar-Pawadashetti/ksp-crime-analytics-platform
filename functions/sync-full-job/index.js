@@ -2,7 +2,6 @@
 var express = require('express');
 var helmet = require('helmet');
 var catalyst = require('zcatalyst-sdk-node');
-var https = require('https');
 var app = express();
 app.use(helmet());
 app.use(express.json({ limit: '5mb' }));
@@ -12,58 +11,25 @@ function getAppInstance(req) {
   catch (e) { return null; }
 }
 
-function callSyncFullEndpoint() {
-  return new Promise(function (resolve, reject) {
-    var postData = JSON.stringify({});
-    var options = {
-      hostname: 'datathon2026-60073929329.development.catalystserverless.in',
-      path: '/server/sync-full/',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      },
-      timeout: 180000
-    };
-
-    var req = https.request(options, function (res) {
-      var body = '';
-      res.on('data', function (chunk) { body += chunk; });
-      res.on('end', function () {
-        try {
-          resolve(JSON.parse(body));
-        } catch (e) {
-          reject(new Error('Failed to parse response: ' + body.slice(0, 200)));
-        }
-      });
-    });
-
-    req.on('error', function (err) {
-      reject(new Error('HTTP request failed: ' + err.message));
-    });
-
-    req.on('timeout', function () {
-      req.destroy();
-      reject(new Error('Request timed out after 180s'));
-    });
-
-    req.write(postData);
-    req.end();
-  });
-}
-
 app.post('/trigger', async function (req, res) {
   var appInstance = getAppInstance(req);
   if (!appInstance) { res.status(500).json({ status: 'error', error_code: 'INIT_FAILED' }); return; }
 
   try {
-    console.log('[sync-full-job] Triggering full reconciliation...');
-    var result = await callSyncFullEndpoint();
-    console.log('[sync-full-job] Sync-full completed: ' + JSON.stringify(result).substring(0, 200));
+    console.log('[sync-full-job] Recording trigger event to cache...');
+    var cache = appInstance.cache();
+    var triggerEvent = {
+      type: 'full_sync_trigger',
+      triggered_at: new Date().toISOString(),
+      run_id: 'FULL-NIGHTLY-' + Date.now().toString(36).toUpperCase(),
+      status: 'pending'
+    };
+    await cache.put('sync_full_trigger', JSON.stringify(triggerEvent), { ttl: 3600 });
+    console.log('[sync-full-job] Trigger recorded: ' + triggerEvent.run_id);
     res.status(200).json({
       status: 'ok',
-      data: result,
-      message: 'Full reconciliation triggered and completed'
+      data: triggerEvent,
+      message: 'Trigger recorded — cron handler will process shortly'
     });
   } catch (err) {
     console.error('[sync-full-job] Failed: ' + err.message);
