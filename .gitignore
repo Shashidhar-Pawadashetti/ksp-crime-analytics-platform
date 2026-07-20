@@ -31,4 +31,5 @@ functions/sync-full/output/
 functions/personmaster-builder/output/
 
 # Production bundle artifacts (keep dist/ for deployed functions, ignore local build output)
-*.local.jsonfunctions/personmaster-writer/entity-matching-engine/output/candidate_matches.json
+*.local.json
+functions/personmaster-writer/entity-matching-engine/output/candidate_matches.json
