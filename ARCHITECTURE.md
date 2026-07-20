@@ -164,6 +164,7 @@ PersonMaster documents (NoSQL / flat files)
 | `test/` | Health check | — |
 | `personmaster-builder/` | Build PersonMaster clusters from entity matches | entity-matching-engine |
 | `personmaster-writer/` | Write PersonMaster to Catalyst NoSQL | personmaster-builder |
+| `personmaster-api/` | Public REST API for person search, repeat offenders, network traversal | graph-traversal |
 | `personmaster-api/` | STUB — no REST endpoints implemented | — |
 | `sync-full/` | Full end-to-end pipeline (one-time/recurring) | personmaster-builder, personmaster-writer |
 | `sync-incremental/` | Real-time signal-based incremental sync | entity-matching-engine, graph-traversal |
