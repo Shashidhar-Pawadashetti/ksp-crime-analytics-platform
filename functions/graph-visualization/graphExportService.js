@@ -1,151 +1,39 @@
 'use strict';
 
-var https = require('https');
+var { getInstance: getTraversal } = require('../graph-traversal/index');
+var { getInstance: getGraphService } = require('../graph-service/index');
 var { toCytoscape } = require('./cytoscapeFormatter');
 
-var BASE_HOST = 'datathon2026-60073929329.development.catalystserverless.in';
-
-function httpGet(path) {
-  return new Promise(function(resolve, reject) {
-    var options = {
-      hostname: BASE_HOST,
-      path: '/server' + path,
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      timeout: 15000
-    };
-    var req = https.request(options, function(res) {
-      var data = '';
-      res.on('data', function(chunk) { data += chunk; });
-      res.on('end', function() {
-        try { resolve(JSON.parse(data)); }
-        catch (e) { reject(new Error('Invalid JSON response from ' + path)); }
-      });
-    });
-    req.on('error', reject);
-    req.on('timeout', function() { req.destroy(); reject(new Error('Timeout for ' + path)); });
-    req.end();
-  });
+function GraphExportService() {
+  this._traversal = getTraversal();
+  this._graphService = getGraphService();
 }
 
-function httpPost(path, body) {
-  return new Promise(function(resolve, reject) {
-    var bodyStr = JSON.stringify(body);
-    var options = {
-      hostname: BASE_HOST,
-      path: '/server' + path,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(bodyStr)
-      },
-      timeout: 15000
-    };
-    var req = https.request(options, function(res) {
-      var data = '';
-      res.on('data', function(chunk) { data += chunk; });
-      res.on('end', function() {
-        try { resolve(JSON.parse(data)); }
-        catch (e) { reject(new Error('Invalid JSON response from ' + path)); }
-      });
-    });
-    req.on('error', reject);
-    req.on('timeout', function() { req.destroy(); reject(new Error('Timeout for ' + path)); });
-    req.write(bodyStr);
-    req.end();
-  });
-}
-
-function GraphExportService() {}
-
-GraphExportService.prototype._personExists = async function(personId) {
-  try {
-    var result = await httpGet('/graph-service/person/' + encodeURIComponent(personId) + '/exists');
-    if (result.status === 'ok' && result.data) {
-      return result.data.exists === true;
-    }
-    return false;
-  } catch (e) {
-    return false;
-  }
-};
-
-GraphExportService.prototype._traverse = async function(personId, options) {
+GraphExportService.prototype._getTraversalResult = function(personId, options) {
   var maxHops = (options && options.max_hops !== undefined) ? options.max_hops : 2;
-  var maxNodes = 50;
-
-  var result = await httpPost('/graph-traversal/traverse', {
-    person_id: personId,
-    hops: maxHops,
-    max_nodes: maxNodes
-  });
-
-  if (result.status !== 'ok' || !result.data) {
-    return { error: ['Traversal failed'] };
-  }
-
-  var data = result.data;
-
-  var traversalResult = {
-    nodes: (data.nodes || []).map(function(n) {
-      return {
-        person_id: n.person_id,
-        canonical_name: n.label || n.person_id,
-        roles_summary: n.roles_summary || {},
-        degree: 0,
-        hop_distance: 0
-      };
-    }),
-    statistics: {
-      nodes_visited: (data.nodes || []).length,
-      edges_traversed: (data.edges || []).length + ((data.unconfirmed_edges || []).length),
-      elapsed_ms: 0
-    }
-  };
-
   var includeUnconfirmed = options && options.include_unconfirmed === true;
-  var allEdges = data.edges || [];
-  if (includeUnconfirmed && data.unconfirmed_edges) {
-    allEdges = allEdges.concat(data.unconfirmed_edges);
-  }
-
   var edgeTypeFilter = options && options.edge_type_filter;
-  if (edgeTypeFilter && edgeTypeFilter.length > 0) {
-    allEdges = allEdges.filter(function(e) {
-      return edgeTypeFilter.indexOf(e.type) !== -1;
-    });
-  }
 
-  traversalResult.edges = allEdges.map(function(e) {
-    return {
-      edge_id: e.edge_id || (e.from + '-' + e.to + '-' + (e.type || 'unknown')),
-      source: e.from,
-      target: e.to,
-      edge_type: e.type || 'UNKNOWN',
-      weight: e.confirmed !== false ? 1 : 0.5,
-      occurrence_count: (e.case_ids || []).length || 1
-    };
-  });
-
-  return traversalResult;
-};
-
-GraphExportService.prototype._getTraversalResult = async function(personId, options) {
-  var exists = await this._personExists(personId);
-  if (!exists) {
+  if (!this._graphService.personExists(personId)) {
     return { error: ['Person ' + personId + ' not found'] };
   }
-  return await this._traverse(personId, options);
+
+  return this._traversal.traverse(personId, {
+    max_hops: maxHops,
+    include_unconfirmed: includeUnconfirmed,
+    edge_type_filter: edgeTypeFilter
+  });
 };
 
-GraphExportService.prototype.toCytoscape = async function(personId, options) {
-  var result = await this._getTraversalResult(personId, options);
+GraphExportService.prototype.toCytoscape = function(personId, options) {
+  var result = this._getTraversalResult(personId, options);
   if (result.error) return result;
+
   return toCytoscape(result);
 };
 
-GraphExportService.prototype.toCompact = async function(personId, options) {
-  var result = await this._getTraversalResult(personId, options);
+GraphExportService.prototype.toCompact = function(personId, options) {
+  var result = this._getTraversalResult(personId, options);
   if (result.error) return result;
 
   var compactNodes = [];
@@ -178,8 +66,8 @@ GraphExportService.prototype.toCompact = async function(personId, options) {
   };
 };
 
-GraphExportService.prototype.toDebug = async function(personId, options) {
-  var result = await this._getTraversalResult(personId, options);
+GraphExportService.prototype.toDebug = function(personId, options) {
+  var result = this._getTraversalResult(personId, options);
   if (result.error) return result;
 
   var nodeSet = {};
@@ -194,6 +82,7 @@ GraphExportService.prototype.toDebug = async function(personId, options) {
   for (var ei = 0; ei < result.edges.length; ei++) {
     var e = result.edges[ei];
     edgeSet[e.edge_id] = e;
+
     if (!nodeSet[e.source]) missingSource.push(e.edge_id);
     if (!nodeSet[e.target]) missingTarget.push(e.edge_id);
   }

@@ -1,8 +1,8 @@
 'use strict';
 
 var { GraphExportService } = require('./graphExportService');
-var responseFormatter = require('./responseFormatter');
-var validators = require('./validators');
+var responseFormatter = require('../network-analysis/responseFormatter');
+var validators = require('../network-analysis/validators');
 
 var exportService = new GraphExportService();
 
@@ -39,7 +39,7 @@ function matchRoute(pathname) {
   return null;
 }
 
-async function handleGraph(req, res, params, query) {
+function handleGraph(req, res, params, query) {
   var errors = validators.validatePersonId(params.personId);
   if (errors.length > 0) return responseFormatter.validationError(errors);
 
@@ -64,20 +64,16 @@ async function handleGraph(req, res, params, query) {
   };
 
   var result;
-  try {
-    switch (format) {
-      case 'cytoscape':
-        result = await exportService.toCytoscape(params.personId, options);
-        break;
-      case 'compact':
-        result = await exportService.toCompact(params.personId, options);
-        break;
-      case 'debug':
-        result = await exportService.toDebug(params.personId, options);
-        break;
-    }
-  } catch (e) {
-    return responseFormatter.serverError(e.message);
+  switch (format) {
+    case 'cytoscape':
+      result = exportService.toCytoscape(params.personId, options);
+      break;
+    case 'compact':
+      result = exportService.toCompact(params.personId, options);
+      break;
+    case 'debug':
+      result = exportService.toDebug(params.personId, options);
+      break;
   }
 
   if (!result) {
@@ -114,7 +110,7 @@ var routeHandlers = {
   'home': handleHome
 };
 
-async function route(req) {
+function route(req) {
   var parsed = parsePath(req.url);
   var match = matchRoute(parsed.pathname);
 
@@ -128,7 +124,7 @@ async function route(req) {
   }
 
   req.query = parsed.query;
-  return await handler(req, null, match.params, parsed.query);
+  return handler(req, null, match.params, parsed.query);
 }
 
 module.exports = { route: route, matchRoute: matchRoute, parsePath: parsePath };

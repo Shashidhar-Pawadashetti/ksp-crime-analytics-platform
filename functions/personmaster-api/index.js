@@ -73,11 +73,11 @@ function parseResponse(result) {
 }
 
 /**
- * LLD §7 — GET /search
+ * LLD §7 — GET /personmaster/search
  *
  * IMPORTANT: This must be defined BEFORE the /:person_id wildcard route.
  */
-app.get('/search', async function (req, res) {
+app.get('/personmaster/search', async function (req, res) {
   var appInstance = getAppInstance(req);
   if (!appInstance) {
     res.status(500).json({ status: 'error', error_code: 'INIT_FAILED', message: 'Failed to initialize Catalyst app' });
@@ -161,11 +161,11 @@ app.get('/search', async function (req, res) {
 });
 
 /**
- * LLD §7 — GET /repeat-offenders
+ * LLD §7 — GET /personmaster/repeat-offenders
  *
  * IMPORTANT: This must be defined BEFORE the /:person_id wildcard route.
  */
-app.get('/repeat-offenders', async function (req, res) {
+app.get('/personmaster/repeat-offenders', async function (req, res) {
   var appInstance = getAppInstance(req);
   if (!appInstance) {
     res.status(500).json({ status: 'error', error_code: 'INIT_FAILED', message: 'Failed to initialize Catalyst app' });
@@ -224,12 +224,12 @@ app.get('/repeat-offenders', async function (req, res) {
 });
 
 /**
- * LLD §7 — GET /:person_id
+ * LLD §7 — GET /personmaster/:person_id
  *
  * WARNING: This wildcard route must be defined AFTER specific routes
  * (/search, /repeat-offenders) to avoid them being captured by :person_id.
  */
-app.get('/:person_id', async function (req, res) {
+app.get('/personmaster/:person_id', async function (req, res) {
   var appInstance = getAppInstance(req);
   if (!appInstance) {
     res.status(500).json({ status: 'error', error_code: 'INIT_FAILED', message: 'Failed to initialize Catalyst app' });
@@ -252,12 +252,12 @@ app.get('/:person_id', async function (req, res) {
 });
 
 /**
- * LLD §7 — GET /:person_id/network
+ * LLD §7 — GET /personmaster/:person_id/network
  *
  * IMPORTANT: Routes specific sub-paths like /network must be defined
  * AFTER the /:person_id wildcard route since it uses app.get (not a Router).
  */
-app.get('/:person_id/network', async function (req, res) {
+app.get('/personmaster/:person_id/network', async function (req, res) {
   var appInstance = getAppInstance(req);
   if (!appInstance) {
     res.status(500).json({ status: 'error', error_code: 'INIT_FAILED', message: 'Failed to initialize Catalyst app' });

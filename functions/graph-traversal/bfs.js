@@ -45,20 +45,11 @@ async function traverseGraph(appInstance, rootPersonId, maxHops, maxNodes, calle
       });
 
       if (!result) return null;
-      var responseData;
-      try {
-        responseData = result.getResponseData();
-      } catch (e) {
-        responseData = result.data || [];
-      }
-      if (!Array.isArray(responseData)) return null;
-      for (var di = 0; di < responseData.length; di++) {
-        var entry = responseData[di];
-        if (entry && entry.item && typeof entry.item.to === 'function') {
-          var doc = entry.item.to();
-          if (doc && doc.person_id) return doc;
-        }
-      }
+      var data = result.getData ? result.getData() : (result.data || []);
+      if (!data || data.length === 0) return null;
+      var first = data[0];
+      if (typeof first === 'object' && first.person_id) return first;
+      if (first.data && typeof first.data === 'object') return first.data;
       return null;
     } catch (err) {
       console.error('[bfs] Error loading ' + personId + ': ' + err.message);

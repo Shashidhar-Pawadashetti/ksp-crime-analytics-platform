@@ -533,11 +533,10 @@ async function persistClusters(appInstance, clusters, unconfirmedPairs, options)
   /* -- Edge generation & persistence -- */
   var confirmedEdgesWritten = 0;
   var unconfirmedEdgesWritten = 0;
-  var sharedLocationEdgesWritten = 0;
 
   try {
     if (documents.length > 0) {
-      var { generateConfirmedEdges, generateCandidateMatchEdges, generateSharedLocationEdges } = require('./edgeGenerator');
+      var { generateConfirmedEdges, generateCandidateMatchEdges } = require('./edgeGenerator');
       var { persistEdges } = require('./edgePersistence');
 
       /* Build source-to-person lookup */
@@ -553,27 +552,13 @@ async function persistClusters(appInstance, clusters, unconfirmedPairs, options)
       /* Generate confirmed edges (co-accused, accused-to-victim) */
       var confirmedResult = generateConfirmedEdges(documents);
 
-      /* Generate shared location edges and merge into confirmed */
-      var sharedLocationResult = generateSharedLocationEdges(documents);
-
-      var mergedEdgesByPerson = {};
-      function mergeEdgeDict(dest, src) {
-        Object.keys(src).forEach(function (pid) {
-          if (!dest[pid]) dest[pid] = [];
-          dest[pid] = dest[pid].concat(src[pid]);
-        });
-      }
-      mergeEdgeDict(mergedEdgesByPerson, confirmedResult.confirmed_edges_by_person);
-      mergeEdgeDict(mergedEdgesByPerson, sharedLocationResult.shared_location_edges_by_person);
-
-      /* Persist merged confirmed edges */
-      if (Object.keys(mergedEdgesByPerson).length > 0) {
-        var confirmPersist = await persistEdges(appInstance, mergedEdgesByPerson, {
+      /* Persist confirmed edges */
+      if (Object.keys(confirmedResult.confirmed_edges_by_person).length > 0) {
+        var confirmPersist = await persistEdges(appInstance, confirmedResult.confirmed_edges_by_person, {
           edgeField: 'confirmed_edges',
           runId: runId + '-confirmed'
         });
         confirmedEdgesWritten = confirmPersist.edges_written;
-        sharedLocationEdgesWritten = sharedLocationResult.all_shared_location_edges.length;
       }
 
       /* Generate and persist unconfirmed (candidate match) edges */
@@ -630,7 +615,6 @@ async function persistClusters(appInstance, clusters, unconfirmedPairs, options)
     singles: singles,
     confirmed_edges_written: confirmedEdgesWritten,
     unconfirmed_edges_written: unconfirmedEdgesWritten,
-    shared_location_edges_written: sharedLocationEdgesWritten,
     source_errors: loadErrors.length,
     elapsed_seconds: Number(elapsed),
     status: 'SUCCESS'

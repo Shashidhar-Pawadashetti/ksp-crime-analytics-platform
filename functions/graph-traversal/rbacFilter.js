@@ -45,7 +45,7 @@ function extractCallerScope(req) {
     role: null,
     unit_id: null,
     district_id: null,
-    state_wide: true
+    state_wide: false
   };
 
   if (req.headers['x-catalyst-auth']) {
