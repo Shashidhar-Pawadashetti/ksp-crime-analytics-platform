@@ -1,0 +1,10 @@
+{
+	"name": "graph-service-api",
+	"version": "1.0.0",
+	"private": true,
+	"description": "HTTP wrapper for graph-visualization library module",
+	"main": "index.js",
+	"dependencies": {
+		"zcatalyst-sdk-node": "latest"
+	}
+}
