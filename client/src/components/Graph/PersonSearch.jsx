@@ -47,7 +47,8 @@ export default function PersonSearch({ onSelect }) {
       const data = await fetchDashboard('person-search', { searchTerm });
       const persons = Array.isArray(data) ? data : [];
       setResults(persons);
-      setOpen(persons.length > 0);
+      // Open dropdown even for empty results (shows "no persons found" message)
+      setOpen(true);
     } catch (err) {
       setError('Search failed');
       setResults([]);
