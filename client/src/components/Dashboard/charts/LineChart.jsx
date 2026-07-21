@@ -117,8 +117,9 @@ export default function LineChart({ data, width, height, onElementClick }) {
       .attr('d', line);
 
     // Stroke reveal animation
-    if (!prefersReducedMotion.current) {
-      const totalLength = path.node().getTotalLength();
+    // Guard getTotalLength() — not available in jsdom test environments
+    if (!prefersReducedMotion.current && path.node() && typeof path.node().getTotalLength === 'function') {
+      var totalLength = path.node().getTotalLength();
       path
         .attr('stroke-dasharray', totalLength)
         .attr('stroke-dashoffset', totalLength)
