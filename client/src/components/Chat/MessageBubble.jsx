@@ -5,6 +5,8 @@
 // and timestamp. All content rendered via JSX text interpolation
 // (React auto-escapes by default, preventing XSS).
 
+import { useUI } from '../../hooks/useUI';
+import { useDashboardActions } from '../../hooks/useDashboard';
 import CitationLink from '../Citations/CitationLink';
 
 /**
@@ -96,6 +98,21 @@ function renderDataTable(data) {
  */
 function MessageBubble({ message }) {
   const isUser = message.role === 'user';
+  const { dispatch } = useUI();
+  const { setFilter } = useDashboardActions();
+
+  const handleViewInDashboard = () => {
+    const filters = {};
+    if (message.data?.location) {
+      filters.district = message.data.location;
+    }
+    if (message.data?.timePeriod) {
+      filters.startDate = message.data.timePeriod.since;
+      filters.endDate = message.data.timePeriod.until;
+    }
+    setFilter(filters);
+    dispatch({ type: 'SET_VIEW', payload: 'dashboard' });
+  };
 
   const intentLabel = message.intent
     ? INTENT_LABELS[message.intent] || message.intent
@@ -167,6 +184,18 @@ function MessageBubble({ message }) {
 
         {/* Data table (assistant only) */}
         {!isUser && renderDataTable(message.data)}
+
+        {/* "View in Dashboard" button (analytical only) */}
+        {!isUser && message.intent === 'analytical' && message.data && (
+          <button
+            onClick={handleViewInDashboard}
+            className="mt-2 rounded-md bg-cta px-3 py-1 text-xs text-white hover:opacity-90"
+            style={{ minWidth: '44px', minHeight: '44px' }}
+            aria-label="View in Dashboard"
+          >
+            View in Dashboard
+          </button>
+        )}
 
         {/* Risk score (assistant only) */}
         {!isUser && message.risk_score != null && (
