@@ -43,6 +43,19 @@
   100% { background-position: -200% 0; }
 }
 
+/* Map skeleton tile pulse */
+@keyframes map-tile-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Leaflet container sizing (full height/width within parent) */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
 @keyframes slide-in-right {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
