@@ -27,7 +27,7 @@ export const initialState = {
     riskRanked: { data: null, loading: false, error: null },
     seasonal: { data: null, loading: false, error: null },
   },
-  activeCharts: ['trend'],
+  activeCharts: ['trend', 'breakdown', 'location', 'seasonal'],
 };
 
 /**
