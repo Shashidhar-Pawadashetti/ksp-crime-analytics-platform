@@ -5,7 +5,7 @@
 // The frontend calls backend Catalyst functions directly via their function URLs
 // with CORS headers handling cross-origin requests (see docs/api-architecture-decision.md).
 
-import { PIPELINE_ENDPOINT, TIMEOUT_MS } from '../utils/constants';
+import { PIPELINE_ENDPOINT, DASHBOARD_ENDPOINT, GRAPH_API_ENDPOINT, TIMEOUT_MS } from '../utils/constants';
 
 /**
  * Custom error class for API errors from the pipeline backend.
@@ -61,6 +61,88 @@ export async function queryPipeline(query, employeeId, sessionId, signal, authTo
     throw new ApiError(
       errorBody.error_code || 'HTTP_ERROR',
       errorBody.message || `HTTP ${response.status}`,
+      errorBody.fallback_answer || null
+    );
+  }
+
+  const json = await response.json();
+
+  if (json.status === 'error') {
+    throw new ApiError(
+      json.error_code || 'SERVER_ERROR',
+      json.message || 'Unknown server error',
+      json.fallback_answer || null
+    );
+  }
+
+  return json.data;
+}
+
+/**
+ * Fetch chart data from the dashboard Catalyst function.
+ * POSTs to DASHBOARD_ENDPOINT with the endpoint name and filter parameters.
+ *
+ * @param {string} endpoint - The dashboard endpoint name (e.g. 'trend', 'breakdown')
+ * @param {object} [filters] - Optional filter parameters (district, crimeType, startDate, endDate)
+ * @param {AbortSignal} [signal] - Optional AbortSignal for request cancellation
+ * @returns {Promise<object[]>} The chart data as an array of flat objects
+ * @throws {ApiError} On backend error response or HTTP error
+ */
+export async function fetchDashboard(endpoint, filters, signal) {
+  const response = await fetch(DASHBOARD_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      endpoint: '/dashboard/' + endpoint,
+      filters: filters || {}
+    }),
+    signal
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new ApiError(
+      errorBody.error_code || 'HTTP_ERROR',
+      errorBody.message || 'HTTP ' + response.status,
+      errorBody.fallback_answer || null
+    );
+  }
+
+  const json = await response.json();
+
+  if (json.status === 'error') {
+    throw new ApiError(
+      json.error_code || 'SERVER_ERROR',
+      json.message || 'Unknown server error',
+      json.fallback_answer || null
+    );
+  }
+
+  return json.data;
+}
+
+/**
+ * Fetch entity relationship graph data from the graph-service-api function.
+ * GETs the graph for a person with Cytoscape.js format.
+ *
+ * @param {string} personId - The person's identifier for graph traversal
+ * @param {number} [hops=2] - Maximum number of hops for graph traversal (default 2)
+ * @param {AbortSignal} [signal] - Optional AbortSignal for request cancellation
+ * @returns {Promise<object>} The graph data with elements, style, and statistics
+ * @throws {ApiError} On backend error response or HTTP error
+ */
+export async function fetchGraph(personId, hops, signal) {
+  const maxHops = hops || 2;
+  const response = await fetch(
+    GRAPH_API_ENDPOINT + '/person/' + personId + '/graph?format=cytoscape&max_hops=' + maxHops,
+    { signal }
+  );
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new ApiError(
+      errorBody.error_code || 'HTTP_ERROR',
+      errorBody.message || 'HTTP ' + response.status,
       errorBody.fallback_answer || null
     );
   }

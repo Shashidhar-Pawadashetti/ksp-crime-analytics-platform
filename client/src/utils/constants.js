@@ -11,6 +11,12 @@ export const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 // Pipeline endpoint — the primary backend chat endpoint
 export const PIPELINE_ENDPOINT = `${API_BASE}/server/pipeline/query`;
 
+// Dashboard endpoint — chart data Catalyst function
+export const DASHBOARD_ENDPOINT = `${API_BASE}/server/dashboard/query`;
+
+// Graph API endpoint — entity relationship graph visualization
+export const GRAPH_API_ENDPOINT = `${API_BASE}/server/graph-service-api`;
+
 // Request timeout: 35s > 30s Catalyst hard timeout, allowing buffer for GLM response
 export const TIMEOUT_MS = 35000;
 

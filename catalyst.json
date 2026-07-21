@@ -15,7 +15,9 @@
       "graph-traversal",
       "personmaster-api",
       "pm-migration",
-      "sync-full-job"
+      "sync-full-job",
+      "dashboard",
+      "graph-service-api"
     ],
     "ignore": [],
     "source": "functions"
