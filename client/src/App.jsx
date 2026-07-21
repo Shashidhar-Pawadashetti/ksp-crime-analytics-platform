@@ -1,13 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { useAuth } from './hooks/useAuth'
 import { useUI } from './hooks/useUI'
 import Sidebar from './components/Layout/Sidebar'
 import ChatArea from './components/Chat/ChatArea'
 import EvidencePanel from './components/Citations/EvidencePanel'
+import DashboardView from './components/Dashboard/DashboardView'
+
+// Lazy-loaded stubs for views created in subsequent plans
+const GraphView = lazy(() => import('./components/Graph/GraphView'))
+const HotspotMapView = lazy(() => import('./components/Dashboard/hotspot/HotspotMapView'))
+
+function ViewFallback() {
+  return <div className="flex h-full items-center justify-center text-foreground/40 font-body">Loading view...</div>
+}
 
 function App() {
   const { isAuthenticated, isLoading, dispatch, employee, login } = useAuth()
-  const { evidencePanelOpen } = useUI()
+  const { evidencePanelOpen, activeView } = useUI()
   const skipAuth = import.meta.env.VITE_SKIP_AUTH === 'true'
 
   useEffect(() => {
@@ -16,7 +25,7 @@ function App() {
         type: 'LOGIN_SUCCESS',
         payload: {
           employee: { employee_id: 'DEV001', name: 'Dev User', rank: 'Developer', unit: 'Development' },
-          sessionToken: 'mock_token',
+          sessionToken: null,
           sessionId: 'mock_session_001'
         }
       })
@@ -38,7 +47,32 @@ function App() {
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         {canAccess ? (
-          <ChatArea />
+          <div className="h-full w-full">
+            {activeView === 'chat' && (
+              <div className="animate-[fade-in_200ms_ease-out] h-full">
+                <ChatArea />
+              </div>
+            )}
+            {activeView === 'dashboard' && (
+              <div className="animate-[fade-in_200ms_ease-out] h-full">
+                <DashboardView />
+              </div>
+            )}
+            {activeView === 'graph' && (
+              <div className="animate-[fade-in_200ms_ease-out] h-full">
+                <Suspense fallback={<ViewFallback />}>
+                  <GraphView />
+                </Suspense>
+              </div>
+            )}
+            {activeView === 'hotspots' && (
+              <div className="animate-[fade-in_200ms_ease-out] h-full">
+                <Suspense fallback={<ViewFallback />}>
+                  <HotspotMapView />
+                </Suspense>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
             <h1 className="font-heading text-[28px] font-semibold text-foreground">KSP Crime Analytics</h1>

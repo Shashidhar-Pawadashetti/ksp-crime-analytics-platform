@@ -3,11 +3,11 @@ import { useUI } from '../../hooks/useUI'
 import { Button } from '../../components/ui/button'
 import { Separator } from '../../components/ui/separator'
 import { Avatar, AvatarFallback } from '../../components/ui/avatar'
-import { LogOut, LogIn, Menu, X, MessageSquare, LayoutDashboard, Share2, Globe } from 'lucide-react'
+import { LogOut, LogIn, Menu, X, MessageSquare, LayoutDashboard, Share2, MapPin, Globe } from 'lucide-react'
 
 function Sidebar() {
   const { isAuthenticated, employee, login, logout } = useAuth()
-  const { sidebarOpen, dispatch } = useUI()
+  const { sidebarOpen, dispatch, activeView } = useUI()
 
   const displayName = employee?.firstName || employee?.name || employee?.employee_id || 'Unknown Officer'
   const initials = displayName
@@ -91,17 +91,26 @@ function Sidebar() {
               <NavItem
                 icon={<MessageSquare className="h-4 w-4" />}
                 label="Chat"
-                active={true}
+                active={activeView === 'chat'}
+                onClick={() => dispatch({ type: 'SET_VIEW', payload: 'chat' })}
               />
               <NavItem
                 icon={<LayoutDashboard className="h-4 w-4" />}
                 label="Dashboard"
-                badge="Coming in Phase 2"
+                active={activeView === 'dashboard'}
+                onClick={() => dispatch({ type: 'SET_VIEW', payload: 'dashboard' })}
               />
               <NavItem
                 icon={<Share2 className="h-4 w-4" />}
                 label="Network Graph"
-                badge="Coming in Phase 2"
+                active={activeView === 'graph'}
+                onClick={() => dispatch({ type: 'SET_VIEW', payload: 'graph' })}
+              />
+              <NavItem
+                icon={<MapPin className="h-4 w-4" />}
+                label="Hotspot Map"
+                active={activeView === 'hotspots'}
+                onClick={() => dispatch({ type: 'SET_VIEW', payload: 'hotspots' })}
               />
             </nav>
 
@@ -145,9 +154,9 @@ function Sidebar() {
 
 /**
  * Navigation item component.
- * @param {{ icon: import('react').ReactNode, label: string, active?: boolean, badge?: string }} props
+ * @param {{ icon: import('react').ReactNode, label: string, active?: boolean, badge?: string, onClick?: function }} props
  */
-function NavItem({ icon, label, active, badge }) {
+function NavItem({ icon, label, active, badge, onClick }) {
   return (
     <button
       className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
@@ -155,7 +164,7 @@ function NavItem({ icon, label, active, badge }) {
           ? 'border-l-2 border-accent bg-accent/10 text-accent font-medium'
           : 'text-foreground/60 hover:bg-border hover:text-foreground'
       }`}
-      disabled={!active}
+      onClick={onClick}
     >
       <span className="shrink-0">{icon}</span>
       <span className="flex-1 text-left">{label}</span>
