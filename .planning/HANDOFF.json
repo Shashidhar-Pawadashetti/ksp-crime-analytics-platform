@@ -1,52 +1,77 @@
 {
   "version": "1.1",
-  "timestamp": "2026-07-20T00:16:33+05:30",
+  "timestamp": "2026-07-23T19:34:00+05:30",
   "phase": "N/A",
-  "phase_name": "Phase 1 UAT",
+  "phase_name": "Phase 2 — Entity Resolution & Graph",
   "phase_dir": null,
   "plan": 0,
   "task": 0,
   "total_tasks": 0,
-  "status": "complete",
+  "status": "in_progress",
   "completed_tasks": [
-    {"id": 1, "name": "ZCQL audit and fixes across 9 function files", "status": "done", "commit": "d2cb849"},
-    {"id": 2, "name": "Follow-up context injection fix", "status": "done", "commit": "d2cb849"},
-    {"id": 3, "name": "District name LIKE matching", "status": "done", "commit": "d2cb849"},
-    {"id": 4, "name": "UAT verification — all 8 categories pass", "status": "done", "commit": "d2cb849"},
-    {"id": 5, "name": "UAT test queries doc", "status": "done", "commit": "d2cb849"},
-    {"id": 6, "name": "Push + deploy", "status": "done", "commit": "d2cb849"}
+    {"id": 1, "name": "graph-service-api: bundle 14 lib files, add express/helmet, fix async chain", "status": "done"},
+    {"id": 2, "name": "graph-service-api: validators accept numeric + PM_XXXXXX, resolveSourceRecord index unprefixed ROWIDs", "status": "done"},
+    {"id": 3, "name": "Dashboard: all 7 endpoints return data (trend, breakdown, location, riskRanked, seasonal, hotspots, person-search)", "status": "done"},
+    {"id": 4, "name": "Frontend: GridLayout → single-column flex-col, ChartCard min-h-[360px], DashboardView ResizeObserver", "status": "done"},
+    {"id": 5, "name": "All 178 frontend tests pass (28 files)", "status": "done"},
+    {"id": 6, "name": "personmaster-writer: bundle lib/entity-matching-engine/, update require paths", "status": "done"},
+    {"id": 7, "name": "sync-incremental: bundle lib/entity-matching-engine/ + lib/personmaster-writer/, update require paths in incrementalResolver.js + index.js", "status": "done"},
+    {"id": 8, "name": "Add package.json + catalyst-config.json to personmaster-writer, sync-incremental, pm-migration, sync-full-job", "status": "done"},
+    {"id": 9, "name": "Fix stub exports (exports.handler → module.exports) in pm-migration, sync-full-job", "status": "done"},
+    {"id": 10, "name": "All 17 Catalyst functions deployed and respond (sync-full-job returns 403 — cron function)", "status": "done"},
+    {"id": 11, "name": "Run personmaster-writer resolve: 679 docs updated, 1497 persons processed, 1405 clusters formed", "status": "done"},
+    {"id": 12, "name": "graph-service-api: fix _getSourceRecordIndex to index source_id (not just row_id)", "status": "done"},
+    {"id": 13, "name": "graph-service-api: add cache-info diagnostic endpoint", "status": "done"},
+    {"id": 14, "name": "graph-service-api: fix loadDoc to use getItems instead of fetchItem", "status": "done"}
   ],
   "remaining_tasks": [
-    {"id": 7, "name": "Browser page refresh verification", "status": "not_started"},
-    {"id": 8, "name": "sync-full to enable network queries", "status": "not_started"}
+    {"id": 15, "name": "Debug BFS traversal returns 0 nodes — loadDoc not finding PersonMaster documents", "status": "not_started"},
+    {"id": 16, "name": "Fix PersonMaster cache only loading 100 of 679+ nodes (pagination/exclusive_start_key issue)", "status": "not_started"},
+    {"id": 17, "name": "Edge generation: resolve produced 0 confirmed/unconfirmed edges — determine if data lacks co-accused or code bug", "status": "not_started"},
+    {"id": 18, "name": "Re-add QUICKML_TOKEN to pipeline, nl_sql, rag, classifier after each deploy", "status": "not_started"},
+    {"id": 19, "name": "Verify full-stack E2E flow: dashboard charts + person graph", "status": "not_started"}
   ],
   "blockers": [
-    {"description": "QUICKML_TOKEN wiped on every catalyst deploy", "type": "human_action", "workaround": "Re-add via Catalyst Console after each deploy"},
-    {"description": "Network queries require PersonMaster NoSQL (sync-full)", "type": "external", "workaround": "Run sync-full pipeline"}
+    {"description": "BFS traversal returns nodeCount=0 — loadDoc fails to find PersonMaster documents even though cache has them", "type": "technical", "workaround": "Check loadDoc getItems vs cache queryTable API differences"},
+    {"description": "Cache only loads 100 nodes (not 679+) — exclusive_start_key format may be wrong", "type": "technical", "workaround": "Check NoSQLMarshall.makeString vs NoSQLItem.from format mismatch"},
+    {"description": "0 edges generated — possibly missing co-accused data, or edge generation code silently fails", "type": "technical", "workaround": "Check Catalyst logs for edge error; verify data has co-accused via ZCQL"}
   ],
   "human_actions_pending": [
-    {"action": "Re-add QUICKML_TOKEN in Catalyst Console → pipeline & nl_sql", "context": "Wiped by last deploy", "blocking": true}
+    {"action": "Re-add QUICKML_TOKEN in Catalyst Console → pipeline, nl_sql, rag, classifier", "context": "Wiped by each catalyst deploy", "blocking": true}
   ],
   "decisions": [
-    {"decision": "Inject follow-up context directly adjacent to Query line in prompt", "rationale": "GLM ignores context blocks in separate sections", "phase": "1"},
-    {"decision": "Store query_context as sql + explanation", "rationale": "Follow-up needs actual WHERE clauses from previous SQL", "phase": "1"},
-    {"decision": "Use LIKE for district name matching", "rationale": "Users type partial names like 'Bengaluru' instead of 'Bengaluru Urban'", "phase": "1"}
+    {"decision": "Bundle cross-function deps into lib/ subdirectory instead of sharing via relative requires", "rationale": "Catalyst bundles each function independently — sibling directories not available at runtime", "phase": "2"},
+    {"decision": "Copy entity-matching-engine files rather than symlink", "rationale": "Catalyst zip deployment doesn't support symlinks", "phase": "2"},
+    {"decision": "Index source_records by both row_id and source_id", "rationale": "PersonMaster docs use source_id field but _getSourceRecordIndex only checked row_id", "phase": "2"},
+    {"decision": "Use getItems instead of fetchItem for loadDoc", "rationale": "fetchItem response format may differ from what Catalyst returns", "phase": "2"}
   ],
   "uncommitted_files": [
     "ONBOARDING.md",
-    "client/src/App.jsx",
+    "client/src/__tests__/ChatArea.test.jsx",
+    "client/src/__tests__/DashboardContext.test.jsx",
+    "client/src/components/Dashboard/ChartCard.jsx",
+    "client/src/components/Dashboard/DashboardView.jsx",
+    "client/src/components/Dashboard/GridLayout.jsx",
+    "client/src/components/Dashboard/charts/*",
+    "client/src/components/Dashboard/risk/RiskRankedView.jsx",
+    "client/src/components/Graph/PersonSearch.jsx",
     "client/src/contexts/AuthContext.jsx",
     "client/src/contexts/ChatContext.jsx",
+    "client/src/main.jsx",
+    "functions/dashboard/index.js",
+    "functions/dashboard/queries.js",
     "functions/entity-matching-engine/catalyst-config.json",
-    "functions/personmaster-writer/index.js",
-    "functions/personmaster-writer/resolution-audit-log.js",
+    "functions/graph-service-api/index.js",
+    "functions/graph-service-api/package.json",
+    "functions/graph-service-api/lib/*.js",
+    "functions/graph-service/graphService.js",
+    "functions/graph-visualization/graphExportService.js",
+    "functions/personmaster-writer/**",
     "functions/query_exec/index.js",
     "functions/rag/index.js",
     "functions/session/index.js",
-    "functions/sync-incremental/incrementalResolver.js",
-    "functions/sync-incremental/index.js",
-    "docs/UAT-TEST-QUERIES.md"
+    "functions/sync-incremental/**"
   ],
-  "next_action": "Review handoff, decide next work item: page refresh test, sync-full, or dashboard features.",
-  "context_notes": "Branch phase2-dashboard merged Phase 4 from main. Many uncommitted ZCQL fixes in entity resolution files from earlier work. Client-side localStorage persistence for page refresh is implemented but not browser-tested."
+  "next_action": "Debug BFS traversal: verify loadDoc API returns PersonMaster documents. Run /cache-info?dump=true to check cache state, then trace _getTraversalResult resolution chain. If loadDoc fails, try different NoSQL SDK API (getItems vs fetchItem vs queryTable).",
+  "context_notes": "Phase 2 work on branch phase2-dashboard (not pushed to origin). Heavily focused on fixing cross-function dependency bundling and runtime errors for the entity resolution + graph visualization subsystem. Core conversational AI functions (pipeline, classifier, nl_sql, rag, session, query_exec, test) work fine. Dashboard functions (7 endpoints) and graph-service-api (health, validation) work. Remaining issues: PersonMaster NoSQL caching only loads 100 nodes (pagination key format), BFS traversal loadDoc API not returning documents (returns nodeCount=0), and edge generation produced 0 edges (may be data-limited)."
 }
