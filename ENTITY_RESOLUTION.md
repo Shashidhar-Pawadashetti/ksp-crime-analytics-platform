@@ -192,6 +192,14 @@ This combined key is used as a blocking strategy input.
 
 ## Stage 3: Blocking
 
+**File:** `functions/entity-matching-engine/blocking.js` (125 lines)
+
+Blocking reduces the O(n^2) comparison space by grouping records that share
+a common key. The engine uses a single blocking strategy per the LLD specification.
+
+### LLD Strategy: lldPhoneticBlockKey (sole active strategy)
+
+Groups records whose first token (first name) produces the same phonetic key.
 **File:** `functions/entity-matching-engine/blocking.js` (160 lines)
 
 Blocking reduces the O(n^2) comparison space by grouping records that share
@@ -205,6 +213,11 @@ Groups records whose first name (first token) sounds similar.
 
 **Example:** `Ramesh Kumar` and `Ramesh K` both produce `R520 RMX`
 
+This single-strategy approach was adopted per the LLD specification after
+analysis showed it provides the best balance of recall vs. precision for
+the KSP dataset. The old multi-strategy approach (4 parallel strategies
+including lastTokenPhoneticKey, firstInitialSurnameKey, surnameAgeBandKey,
+and surnameDistrictKey) was removed during Phase 4 refactoring.
 ### Strategy 2: lastTokenPhoneticKey
 
 Groups records whose last name (last token) sounds similar.
@@ -249,6 +262,12 @@ The `generateUniquePairs` function:
 
 | Strategy | Blocks on | Catches |
 |----------|-----------|---------|
+| lldPhoneticBlockKey | First name sound | Name variations, typos in first name |
+
+### Supporting Function
+
+`generateUniquePairsWithStrategy(records, strategies)` allows callers to
+pass a custom strategy array (e.g., for calibration or testing purposes).
 | firstTokenPhoneticKey | First name sound | Name variations, typos in first name |
 | lastTokenPhoneticKey | Last name sound | Name variations in surname |
 | firstInitialSurnameKey | Initial + surname | Abbreviated first name |
@@ -552,6 +571,33 @@ tables (Accused, Victim, ComplainantDetails).
 ### Flow
 
 ```
+POST /detect  (change detection)
+  │
+  ▼
+index.js — detectChanges():
+  ┌─ Load existing PersonMaster documents from NoSQL
+  ├─ Build source-to-person index
+  ├─ Load current source records from Data Store (Accused, Victim, ComplainantDetails)
+  ├─ Build current records index
+  ├─ Compare checksums per PersonMaster document
+  │    └─ Changed vs unchanged vs orphaned records
+  └─ Detect new records (present in Data Store, not in PersonMaster)
+  │
+  ▼
+POST /reconcile  (detect + resolve in one call)
+  │
+  ▼
+index.js → incrementalResolver.js — incrementalResolve():
+  ┌─ Step 1: Load existing PersonMaster documents
+  ├─ Step 2: Build affected-case scope from changed persons
+  ├─ Step 3: Load affected source records (by case IDs)
+  ├─ Step 4: Normalise + phoneticize + entity matching
+  │    └─ Uses entity-matching-engine blocking.js, scorer.js, threshold.js
+  ├─ Step 5: Map clusters to PersonMaster docs (Union-Find DSU)
+  ├─ Step 6: Handle orphaned records (remove deleted sources, mark empty docs for deletion)
+  ├─ Step 7-8: Merge orphan-handled docs into rebuilt docs
+  ├─ Step 9: Regenerate edges via edgeGenerator + edgePersistence
+  └─ Step 10: Persist to Catalyst NoSQL (upsert full docs, edge-only updates for shared-case persons)
 Signal received (new/updated record)
   │
   ▼
