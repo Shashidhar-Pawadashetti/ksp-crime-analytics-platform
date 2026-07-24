@@ -5,15 +5,24 @@ import coseBilkent from 'cytoscape-cose-bilkent';
 import PersonSearch from './PersonSearch';
 import GraphLegend from './GraphLegend';
 import GraphSkeleton from './GraphSkeleton';
+import GraphInfoPanel from './GraphInfoPanel';
 import { fetchGraph } from '../../services/api';
 
 cytoscape.use(coseBilkent);
 
 var EDGE_TYPE_CONFIG = {
   CO_ACCUSED: { label: 'Co-Accused', color: '#E53935' },
-  ACCUSED_TO_VICTIM: { label: 'Accused → Victim', color: '#FF9800' },
+  ACCUSED_TO_VICTIM: { label: 'Accused \u2192 Victim', color: '#FF9800' },
   UNCONFIRMED_MATCH: { label: 'Unconfirmed', color: '#9E9E9E' },
   SHARED_LOCATION: { label: 'Shared Location', color: '#2196F3' },
+};
+
+var NODE_TYPE_CONFIG = {
+  ACCUSED: { label: 'Accused', color: '#E53935' },
+  VICTIM: { label: 'Victim', color: '#FF9800' },
+  COMPLAINANT: { label: 'Complainant', color: '#43A047' },
+  MIXED: { label: 'Mixed Role', color: '#7B1FA2' },
+  CASE: { label: 'Case', color: '#1E40AF' },
 };
 
 var DEFAULT_STYLESHEET = [
@@ -25,36 +34,121 @@ var DEFAULT_STYLESHEET = [
       'border-width': 2,
       label: 'data(label)',
       'font-family': 'Fira Code, monospace',
-      'font-size': '11px',
-      color: '#1E3A8A',
+      'font-size': '12px',
+      color: '#FFFFFF',
       'text-valign': 'bottom',
       'text-halign': 'center',
+      'text-margin-y': 6,
       'text-wrap': 'ellipsis',
-      'text-max-width': 80,
+      'text-max-width': 130,
+      'text-background-color': '#1F2937',
+      'text-background-opacity': 0.85,
+      'text-background-padding': 4,
+      'text-background-shape': 'roundrectangle',
+      'text-events': 'yes',
       width: 50,
-      height: 50
-    }
+      height: 50,
+      'z-index': 10,
+    },
   },
   {
     selector: 'node[degree]',
     style: {
       width: 'mapData(degree, 0, 10, 30, 80)',
-      height: 'mapData(degree, 0, 10, 30, 80)'
-    }
+      height: 'mapData(degree, 0, 10, 30, 80)',
+    },
   },
   {
-    selector: 'node[hop_distance]',
+    selector: 'node[hop_distance = 0]',
     style: {
-      opacity: 'mapData(hop_distance, 0, 2, 1, 0.55)',
-      'text-opacity': 'mapData(hop_distance, 0, 2, 1, 0.5)'
-    }
+      opacity: 1,
+      'text-opacity': 1,
+      'font-size': '15px',
+      'font-weight': 'bold',
+      'text-background-color': '#111827',
+      'text-background-opacity': 0.95,
+      'text-background-padding': 6,
+      width: 'mapData(degree, 0, 10, 50, 90)',
+      height: 'mapData(degree, 0, 10, 50, 90)',
+      'z-index': 50,
+    },
+  },
+  {
+    selector: 'node[hop_distance = 1]',
+    style: {
+      opacity: 1,
+      'text-opacity': 1,
+      'font-size': '12px',
+    },
+  },
+  {
+    selector: 'node[hop_distance >= 2]',
+    style: {
+      opacity: 0.5,
+      'text-opacity': 0,
+      'font-size': '11px',
+      'z-index': 5,
+    },
+  },
+  {
+    selector: 'node[degree >= 8]',
+    style: {
+      'font-size': '14px',
+      'font-weight': 'bold',
+      'text-background-color': '#111827',
+      'text-background-opacity': 0.9,
+    },
   },
   {
     selector: 'node:selected',
     style: {
       'border-color': '#D97706',
-      'border-width': 4
-    }
+      'border-width': 5,
+      'font-size': '16px',
+      'font-weight': 'bold',
+      color: '#FBBF24',
+      'text-background-color': '#1F2937',
+      'text-background-opacity': 0.98,
+      'text-background-padding': 8,
+      'text-margin-y': 8,
+      'z-index': 200,
+      'transition-property': 'border-color, border-width, font-size',
+      'transition-duration': '0.2s',
+    },
+  },
+  {
+    selector: 'node.focused-neighbor',
+    style: {
+      opacity: 1,
+      'text-opacity': 1,
+      'z-index': 30,
+    },
+  },
+  {
+    selector: 'node.faded-node',
+    style: {
+      opacity: 0.08,
+      'text-opacity': 0,
+      'z-index': 1,
+    },
+  },
+  {
+    selector: 'node.hop2-revealed',
+    style: {
+      'text-opacity': 1,
+      opacity: 0.7,
+      'z-index': 15,
+    },
+  },
+  {
+    selector: 'node:hover',
+    style: {
+      'border-color': '#60A5FA',
+      'border-width': 3,
+      'text-background-opacity': 0.95,
+      'transition-property': 'border-color, border-width',
+      'transition-duration': '0.15s',
+    },
   },
   {
     selector: 'edge',
@@ -63,28 +157,114 @@ var DEFAULT_STYLESHEET = [
       'target-arrow-shape': 'triangle',
       'arrow-scale': 0.6,
       label: 'data(label)',
-      'font-size': '9px',
-      color: '#6B7280',
+      'font-size': '10px',
+      color: '#D1D5DB',
+      'text-background-color': '#1F2937',
+      'text-background-opacity': 0.85,
+      'text-background-padding': 3,
+      'text-background-shape': 'roundrectangle',
       'text-rotation': 'autorotate',
-      opacity: 0.6,
-      'text-opacity': 0.5
-    }
+      'text-opacity': 0,
+      opacity: 0.5,
+      width: 1.5,
+      'z-index': 5,
+    },
+  },
+  {
+    selector: 'edge.focused-edge',
+    style: {
+      opacity: 0.9,
+      'text-opacity': 1,
+      width: 2.5,
+      'z-index': 40,
+    },
+  },
+  {
+    selector: 'edge.faded-edge',
+    style: {
+      opacity: 0.04,
+      'text-opacity': 0,
+      'z-index': 1,
+    },
+  },
+  {
+    selector: 'edge:hover',
+    style: {
+      opacity: 0.9,
+      'text-opacity': 1,
+      width: 3,
+      'z-index': 60,
+      'transition-property': 'opacity, width',
+      'transition-duration': '0.1s',
+    },
   },
   {
     selector: 'edge:selected',
     style: {
       opacity: 1,
-      'text-opacity': 1
-    }
-  }
+      'text-opacity': 1,
+      'font-size': '11px',
+      'z-index': 50,
+    },
+  },
 ];
 
-function getInitialEdgeFilters() {
-  var filters = {};
-  for (var key in EDGE_TYPE_CONFIG) {
-    filters[key] = true;
+var COLOR_TO_ROLE = {
+  '#E53935': 'ACCUSED',
+  '#FF9800': 'VICTIM',
+  '#43A047': 'COMPLAINANT',
+  '#7B1FA2': 'MIXED',
+};
+
+function deriveNodeRole(nodeData) {
+  var style = nodeData.node_style;
+  if (style && style.color && COLOR_TO_ROLE[style.color]) {
+    return COLOR_TO_ROLE[style.color];
   }
-  return filters;
+  var roles = nodeData.roles_summary || {};
+  var hasAccused = (roles.accused_count || 0) > 0;
+  var hasVictim = (roles.victim_count || 0) > 0;
+  var hasComplainant = (roles.complainant_count || 0) > 0;
+  var count = (hasAccused ? 1 : 0) + (hasVictim ? 1 : 0) + (hasComplainant ? 1 : 0);
+  if (count > 1) return 'MIXED';
+  if (hasAccused) return 'ACCUSED';
+  if (hasVictim) return 'VICTIM';
+  if (hasComplainant) return 'COMPLAINANT';
+  return 'CASE';
+}
+
+function getInitialFilters(config) {
+  var f = {};
+  for (var k in config) f[k] = true;
+  return f;
+}
+
+function computeEdgeBreakdown(cy, nodeId) {
+  if (!cy || !nodeId) return null;
+  var node = cy.getElementById(nodeId);
+  if (!node || node.length === 0) return null;
+  var edges = node.connectedEdges();
+  var breakdown = {};
+  edges.forEach(function (edge) {
+    var type = edge.data('edge_type');
+    if (type) breakdown[type] = (breakdown[type] || 0) + 1;
+  });
+  return breakdown;
+}
+
+function getPersonInfo(cy, node) {
+  if (!cy || !node) return null;
+  var roles = node.data('roles_summary') || {};
+  var neighborCount = node.connectedEdges().length;
+  var degree = node.data('degree') || 0;
+  var nodeId = node.data('id');
+  return {
+    label: node.data('label') || 'Unknown',
+    degree: degree,
+    neighborCount: neighborCount,
+    roles_summary: roles,
+    edgeBreakdown: computeEdgeBreakdown(cy, nodeId),
+  };
 }
 
 export default function GraphView() {
@@ -104,7 +284,7 @@ export default function GraphView() {
   var error = _useState4[0];
   var setError = _useState4[1];
 
-  var _useState5 = useState(2);
+  var _useState5 = useState(1);
   var maxHops = _useState5[0];
   var setMaxHops = _useState5[1];
 
@@ -112,13 +292,21 @@ export default function GraphView() {
   var searchPersonId = _useState6[0];
   var setSearchPersonId = _useState6[1];
 
-  var _useState7 = useState(getInitialEdgeFilters());
+  var _useState7 = useState(getInitialFilters(EDGE_TYPE_CONFIG));
   var edgeTypeFilter = _useState7[0];
   var setEdgeTypeFilter = _useState7[1];
 
+  var _useState8 = useState(getInitialFilters(NODE_TYPE_CONFIG));
+  var nodeTypeFilter = _useState8[0];
+  var setNodeTypeFilter = _useState8[1];
+
+  var _useState9 = useState(null);
+  var selectedPersonInfo = _useState9[0];
+  var setSelectedPersonInfo = _useState9[1];
+
   var cyRef = useRef(null);
 
-  var applyEdgeFilters = useCallback(function () {
+  var applyFilters = useCallback(function () {
     var cy = cyRef.current;
     if (!cy || cy.nodes().length === 0) return;
 
@@ -131,30 +319,59 @@ export default function GraphView() {
       }
     }
 
+    var isAnyNodeFilterOff = false;
+    for (var nt in nodeTypeFilter) {
+      if (!nodeTypeFilter[nt]) {
+        isAnyNodeFilterOff = true;
+        break;
+      }
+    }
+
+    if (isAnyNodeFilterOff) {
+      cy.nodes().forEach(function (node) {
+        var role = node.data('role') || node.data('node_role');
+        if (!role || !nodeTypeFilter[role]) {
+          node.hide();
+        }
+      });
+    }
+
     cy.nodes().forEach(function (node) {
-      if (node.connectedEdges(':visible').length === 0) {
+      if (node.connectedEdges(':visible').length === 0 && !node.selected()) {
         node.hide();
       }
     });
-  }, [edgeTypeFilter]);
+
+    if (cy.nodes(':visible').length === 0) {
+      cy.nodes().show();
+      cy.edges().show();
+    }
+  }, [edgeTypeFilter, nodeTypeFilter]);
 
   useEffect(function () {
     if (cyRef.current && elements.length > 0) {
-      applyEdgeFilters();
+      applyFilters();
     }
-  }, [elements, applyEdgeFilters]);
+  }, [elements, applyFilters]);
 
   var fetchGraphData = useCallback(async function (personId, hops) {
     setLoading(true);
     setError(null);
+    setSelectedPersonInfo(null);
 
     try {
       var data = await fetchGraph(personId, hops);
 
       var src = data.elements || { nodes: [], edges: [] };
+      var enrichedNodes = (src.nodes || []).map(function (n) {
+        if (n.data && !n.data.role) {
+          n.data.role = deriveNodeRole(n.data);
+        }
+        return n;
+      });
       var newElements = [
-        ...JSON.parse(JSON.stringify(src.nodes || [])),
-        ...JSON.parse(JSON.stringify(src.edges || []))
+        ...JSON.parse(JSON.stringify(enrichedNodes)),
+        ...JSON.parse(JSON.stringify(src.edges || [])),
       ];
 
       var backendStyles = Array.isArray(data.style) ? data.style : [];
@@ -177,8 +394,8 @@ export default function GraphView() {
 
   var handleSearch = useCallback(function (personId) {
     if (!personId) return;
-    fetchGraphData(personId, 2);
-    setMaxHops(2);
+    fetchGraphData(personId, 1);
+    setMaxHops(1);
   }, [fetchGraphData]);
 
   var handleExpand = useCallback(function () {
@@ -189,34 +406,58 @@ export default function GraphView() {
     }
   }, [maxHops, searchPersonId, fetchGraphData]);
 
+  function focusSubgraph(cy, target) {
+    cy.elements().removeClass('faded-node faded-edge focused-neighbor focused-edge');
+
+    var connectedEdges = target.connectedEdges(':visible');
+    var neighbors = connectedEdges.connectedNodes();
+
+    cy.elements().addClass('faded-node');
+    cy.edges().addClass('faded-edge');
+
+    target.removeClass('faded-node');
+    target.addClass('focused-neighbor');
+
+    neighbors.removeClass('faded-node');
+    neighbors.addClass('focused-neighbor');
+
+    connectedEdges.removeClass('faded-edge');
+    connectedEdges.addClass('focused-edge');
+
+    target.select();
+  }
+
+  function clearFocus(cy) {
+    cy.elements().removeClass('faded-node faded-edge focused-neighbor focused-edge');
+    cy.nodes(':visible').forEach(function (n) {
+      if (n.data('hop_distance') >= 2) {
+        n.removeClass('hop2-revealed');
+      }
+    });
+  }
+
   var handleNodeClick = useCallback(function (evt) {
     var cy = cyRef.current;
     if (!cy) return;
 
     var target = evt.target;
     if (target === cy || target.length === 0) {
-      cy.elements().style('opacity', '');
-      cy.elements().style('text-opacity', '');
+      clearFocus(cy);
+      setSelectedPersonInfo(null);
       return;
     }
 
-    var connectedEdges = target.connectedEdges(':visible');
-    var neighbors = connectedEdges.connectedNodes();
-    var subgraph = target.add(connectedEdges).add(neighbors);
+    focusSubgraph(cy, target);
 
-    cy.elements().style('opacity', 0.12);
-    cy.elements().style('text-opacity', 0);
-    subgraph.style('opacity', 1);
-    subgraph.style('text-opacity', 1);
-
-    target.select();
+    var info = getPersonInfo(cy, target);
+    setSelectedPersonInfo(info);
   }, []);
 
   var handleCanvasClick = useCallback(function () {
     var cy = cyRef.current;
     if (!cy) return;
-    cy.elements().style('opacity', '');
-    cy.elements().style('text-opacity', '');
+    clearFocus(cy);
+    setSelectedPersonInfo(null);
   }, []);
 
   var handleRetry = useCallback(function () {
@@ -234,6 +475,71 @@ export default function GraphView() {
     });
   }, []);
 
+  var toggleNodeType = useCallback(function (type) {
+    setNodeTypeFilter(function (prev) {
+      var next = {};
+      for (var k in prev) next[k] = prev[k];
+      next[type] = !prev[type];
+      return next;
+    });
+  }, []);
+
+  var handleCloseInfoPanel = useCallback(function () {
+    var cy = cyRef.current;
+    if (cy) clearFocus(cy);
+    setSelectedPersonInfo(null);
+  }, []);
+
+  var setupCy = useCallback(function (cy) {
+    cyRef.current = cy;
+
+    cy.on('tap', function (evt) {
+      if (evt.target === cy) {
+        handleCanvasClick();
+      }
+    });
+
+    cy.on('tap', 'node', function (evt) {
+      handleNodeClick(evt);
+    });
+
+    cy.on('mouseover', 'node', function (evt) {
+      var node = evt.target;
+      node.addClass('node-hover');
+      node.style('text-opacity', 1);
+      if (node.data('hop_distance') >= 2) {
+        node.addClass('hop2-revealed');
+      }
+    });
+
+    cy.on('mouseout', 'node', function (evt) {
+      var node = evt.target;
+      node.removeClass('node-hover');
+      if (node.data('hop_distance') >= 2 && !node.hasClass('focused-neighbor')) {
+        node.removeClass('hop2-revealed');
+      }
+    });
+
+    cy.on('mouseover', 'edge', function (evt) {
+      evt.target.addClass('focused-edge');
+    });
+
+    cy.on('mouseout', 'edge', function (evt) {
+      var edge = evt.target;
+      if (!edge.selected() && !edge.hasClass('focused-edge')) return;
+      if (!edge.selected()) {
+        edge.removeClass('focused-edge');
+      }
+    });
+
+    var zoomHandler = function () {
+    };
+    cy.on('zoom', zoomHandler);
+
+    cy.on('layoutstop', function () {
+    });
+  }, [handleNodeClick, handleCanvasClick]);
+
   var hasContent = elements.length > 0;
   var edgeCount = elements.filter(function (el) { return el.data && el.data.source; }).length;
   var layoutConfig = edgeCount === 0
@@ -244,11 +550,11 @@ export default function GraphView() {
         animationDuration: 500,
         fit: true,
         padding: 50,
-        nodeRepulsion: 4500,
-        idealEdgeLength: 150,
-        gravity: 0.25,
+        nodeRepulsion: 5000,
+        idealEdgeLength: 180,
+        gravity: 0.2,
         numIter: 1000,
-        edgeElasticity: 100
+        edgeElasticity: 120,
       };
 
   return (
@@ -261,7 +567,7 @@ export default function GraphView() {
             onClick={handleExpand}
             aria-label={'Expand to ' + (maxHops + 1) + ' hops'}
           >
-            Expand to {maxHops + 1} hops
+            Expand to {maxHops + 1} hop{maxHops + 1 > 1 ? 's' : ''}
           </button>
         )}
         {hasContent && (
@@ -346,33 +652,34 @@ export default function GraphView() {
         )}
 
         {hasContent && (
-          <CytoscapeComponent
-            elements={elements}
-            stylesheet={stylesheet}
-            layout={layoutConfig}
-            style={{ width: '100%', height: '100%' }}
-            cy={function (cy) {
-              cyRef.current = cy;
-              cy.on('tap', function (evt) {
-                if (evt.target === cy) {
-                  handleCanvasClick();
-                }
-              });
-              cy.on('tap', 'node', function (evt) {
-                handleNodeClick(evt);
-              });
-            }}
-            zoomingEnabled={true}
-            panningEnabled={true}
-            minZoom={0.3}
-            maxZoom={4}
-            userPanningEnabled={true}
-            userZoomingEnabled={true}
-            boxSelectionEnabled={false}
-          />
+          <div className="relative h-full">
+            <CytoscapeComponent
+              elements={elements}
+              stylesheet={stylesheet}
+              layout={layoutConfig}
+              style={{ width: '100%', height: '100%' }}
+              cy={setupCy}
+              zoomingEnabled={true}
+              panningEnabled={true}
+              minZoom={0.3}
+              maxZoom={4}
+              userPanningEnabled={true}
+              userZoomingEnabled={true}
+              boxSelectionEnabled={false}
+            />
+
+            {selectedPersonInfo && (
+              <GraphInfoPanel person={selectedPersonInfo} onClose={handleCloseInfoPanel} />
+            )}
+          </div>
         )}
 
-        <GraphLegend />
+        <GraphLegend
+          nodeFilters={nodeTypeFilter}
+          edgeFilters={edgeTypeFilter}
+          onToggleNode={toggleNodeType}
+          onToggleEdge={toggleEdgeType}
+        />
       </div>
     </div>
   );
