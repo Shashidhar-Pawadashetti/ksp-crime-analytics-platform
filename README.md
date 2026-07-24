@@ -97,48 +97,48 @@ The platform deploys as **16 Catalyst Functions** across 6 layers:
 
 ```
 ksp-crime-analytics-platform/
-\u251c\u2500\u2500 catalyst.json                # 16-function deployment manifest
-\u251c\u2500\u2500 AGENTS.md                    # AI agent onboarding
-\u251c\u2500\u2500 ONBOARDING.md                # Human team guide
-\u251c\u2500\u2500 README.md                   # This file
-\u2502
-\u251c\u2500\u2500 client/                      # React frontend (Vite + Tailwind)
-\u2502   \u251c\u2500\u2500 src/
-\u2502   \u2502   \u251c\u2500\u2500 components/       # React components by view
-\u2502   \u2502   \u2502   \u251c\u2500\u2500 Chat/          # Conversational AI chat interface
-\u2502   \u2502   \u2502   \u251c\u2500\u2500 Dashboard/     # Analytics dashboard (D3.js charts)
-\u2502   \u2502   \u2502   \u251c\u2500\u2500 Graph/          # Network graph visualization
-\u2502   \u2502   \u2502   \u251c\u2500\u2500 Layout/         # App shell (sidebar, header)
-\u2502   \u2502   \u2502   \u251c\u2500\u2500 Citations/      # Source citation display
-\u2502   \u2502   \u2502   \u2514\u2500\u2500 ui/             # shadcn/ui primitives
-\u2502   \u2502   \u251c\u2500\u2500 contexts/        # React context providers
-\u2502   \u2502   \u251c\u2500\u2500 hooks/           # Custom React hooks
-\u2502   \u2502   \u251c\u2500\u2500 services/        # API client functions
-\u2502   \u2502   \u251c\u2500\u2500 utils/           # Constants and helpers
-\u2502   \u2502   \u2514\u2500\u2500 __tests__/       # Vitest test suites (178 tests)
-\u2502   \u2514\u2500\u2500 package.json
-\u2502
-\u251c\u2500\u2500 functions/                    # 16 Catalyst Function directories
-\u2502   \u251c\u2500\u2500 classifier/            # Intent classification
-\u2502   \u251c\u2500\u2500 nl_sql/                # NL-to-ZCQL generation + execution
-\u2502   \u251c\u2500\u2500 rag/                   # BriefFacts search + narrative
-\u2502   \u251c\u2500\u2500 pipeline/              # Full orchestrator (inline handlers)
-\u2502   \u251c\u2500\u2500 session/               # Conversation memory (Cache CRUD)
-\u2502   \u251c\u2500\u2500 query_exec/            # Raw ZCQL executor with safety
-\u2502   \u251c\u2500\u2500 dashboard/             # Analytics aggregation queries
-\u2502   \u251c\u2500\u2500 test/                  # Health check
-\u2502   \u251c\u2500\u2500 entity-matching-engine/ # Person dedup library modules
-\u2502   \u251c\u2500\u2500 graph-service/         # Graph data structure (nodes, edges)
-\u2502   \u251c\u2500\u2500 graph-traversal/       # BFS traversal (max 3 hops)
-\u2502   \u251c\u2500\u2500 graph-visualization/   # Cytoscape.js export helpers
-\u2502   \u251c\u2500\u2500 graph-service-api/     # Graph REST API (Cytoscape format)
-\u2502   \u251c\u2500\u2500 network-analysis/      # Network analysis REST API
-\u2502   \u251c\u2500\u2500 personmaster-writer/   # PersonMaster NoSQL batch writer
-\u2502   \u251c\u2500\u2500 personmaster-api/      # PersonMaster HTTP endpoint
-\u2502   \u251c\u2500\u2500 sync-full/             # Full graph rebuild pipeline
-\u2502   \u2514\u2500\u2500 sync-incremental/      # Incremental entity signal processing
-\u2502
-\u2514\u2500\u2500 data_pipeline/               # Synthetic data generation (9 phases, 24+ tables)
+|-- catalyst.json                # 16-function deployment manifest
+|-- AGENTS.md                    # AI agent onboarding
+|-- ONBOARDING.md                # Human team guide
+|-- README.md                    # This file
+|
+|-- client/                      # React frontend (Vite + Tailwind)
+|   |-- src/
+|   |   |-- components/          # React components by view
+|   |   |   |-- Chat/            # Conversational AI chat interface
+|   |   |   |-- Dashboard/       # Analytics dashboard (D3.js charts)
+|   |   |   |-- Graph/           # Network graph visualization
+|   |   |   |-- Layout/          # App shell (sidebar, header)
+|   |   |   |-- Citations/       # Source citation display
+|   |   |   |-- ui/              # shadcn/ui primitives
+|   |   |-- contexts/            # React context providers
+|   |   |-- hooks/               # Custom React hooks
+|   |   |-- services/            # API client functions
+|   |   |-- utils/               # Constants and helpers
+|   |   |-- __tests__/           # Vitest test suites (178 tests)
+|   |-- package.json
+|
+|-- functions/                   # 16 Catalyst Function directories
+|   |-- classifier/              # Intent classification
+|   |-- nl_sql/                  # NL-to-ZCQL generation + execution
+|   |-- rag/                     # BriefFacts search + narrative
+|   |-- pipeline/                # Full orchestrator (inline handlers)
+|   |-- session/                 # Conversation memory (Cache CRUD)
+|   |-- query_exec/              # Raw ZCQL executor with safety
+|   |-- dashboard/               # Analytics aggregation queries
+|   |-- test/                    # Health check
+|   |-- entity-matching-engine/  # Person dedup library modules
+|   |-- graph-service/           # Graph data structure (nodes, edges)
+|   |-- graph-traversal/         # BFS traversal (max 3 hops)
+|   |-- graph-visualization/     # Cytoscape.js export helpers
+|   |-- graph-service-api/       # Graph REST API (Cytoscape format)
+|   |-- network-analysis/        # Network analysis REST API
+|   |-- personmaster-writer/     # PersonMaster NoSQL batch writer
+|   |-- personmaster-api/        # PersonMaster HTTP endpoint
+|   |-- sync-full/               # Full graph rebuild pipeline
+|   |-- sync-incremental/        # Incremental entity signal processing
+|
+|-- data_pipeline/               # Synthetic data generation (9 phases, 24+ tables)
 ```
 
 ## Quick Start

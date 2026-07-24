@@ -41,16 +41,16 @@
 
 ```
 User query (from frontend)
-  \u2193
-pipeline/query \u2192\u2192\u2192 classifier (keyword match \u2192 instant, GLM \u2192 fallback)
-  \u2193
-  \u251c\u2500 structured \u2192 GLM SQL gen \u2192 ZCQL execute \u2192 rows
-  \u251c\u2500 narrative  \u2192 BriefFacts LIKE search \u2192 GLM answer
-  \u251c\u2500 network    \u2192 Accused/Victim/Complainant search \u2192 graph
-  \u251c\u2500 risk       \u2192 Accused count \u2192 recidivism score
-  \u2514\u2500 analytical \u2192 3 aggregation queries \u2192 trends
-  \u2193
-Format JSON response \u2192 append turn to session (Cache, 1hr TTL)
+  |
+pipeline/query ---> classifier (keyword match -> instant, GLM -> fallback)
+  |
+  |-- structured -> GLM SQL gen -> ZCQL execute -> rows
+  |-- narrative  -> BriefFacts LIKE search -> GLM answer
+  |-- network    -> Accused/Victim/Complainant search -> graph
+  |-- risk       -> Accused count -> recidivism score
+  |-- analytical -> 3 aggregation queries -> trends
+  |
+Format JSON response -> append turn to session (Cache, 1hr TTL)
 ```
 
 ## Installation

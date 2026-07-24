@@ -19,51 +19,51 @@ A conversational AI platform that lets investigators, analysts, and policymakers
 
 ```
 ksp-crime-analytics-platform/
-├── catalyst.json              # Deployment targets (7 functions)
-├── AGENTS.md                  # THIS FILE — agent onboarding context
-├── CHANGELOG.md               # Version history
-├── ONBOARDING.md              # Human team onboarding guide
-├── TESTING.md                 # Postman test commands
-├── TODO.md                    # Task tracker (gitignored)
-├── README.md                  # Project overview
-├── .env                       # Local secrets (gitignored)
-├── .env.example               # Template for .env
-│
-├── functions/                 # 7 Catalyst Functions
-│   ├── classifier/            # Intent classifier (deployed, working)
-│   │   ├── index.js
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── nl_sql/                # NL-to-ZCQL (deployed, working)
-│   │   ├── index.js
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── rag/                   # RAG dispatcher (deployed, working)
-│   │   ├── index.js
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── pipeline/              # Orchestrator (deployed, working)
-│   │   ├── index.js
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── session/               # Session manager (deployed)
-│   │   ├── index.js
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   ├── query_exec/            # ZCQL executor (deployed)
-│   │   ├── index.js
-│   │   ├── catalyst-config.json
-│   │   └── package.json
-│   └── test/                  # Health check (deployed)
-│       ├── index.js
-│       ├── catalyst-config.json
-│       └── package.json
-│
-├── data_pipeline/             # Synthetic data generation & import
-│   └── ...
-├── docs/                      # Documentation
-│   └── production-auth.md
-└── knowlede.md                # Knowledge base
+|-- catalyst.json              # Deployment targets (7 functions)
+|-- AGENTS.md                  # THIS FILE -- agent onboarding context
+|-- CHANGELOG.md               # Version history
+|-- ONBOARDING.md              # Human team onboarding guide
+|-- TESTING.md                 # Postman test commands
+|-- TODO.md                    # Task tracker (gitignored)
+|-- README.md                  # Project overview
+|-- .env                       # Local secrets (gitignored)
+|-- .env.example               # Template for .env
+|
+|-- functions/                 # 7 Catalyst Functions
+|   |-- classifier/            # Intent classifier (deployed, working)
+|   |   |-- index.js
+|   |   |-- catalyst-config.json
+|   |   |-- package.json
+|   |-- nl_sql/                # NL-to-ZCQL (deployed, working)
+|   |   |-- index.js
+|   |   |-- catalyst-config.json
+|   |   |-- package.json
+|   |-- rag/                   # RAG dispatcher (deployed, working)
+|   |   |-- index.js
+|   |   |-- catalyst-config.json
+|   |   |-- package.json
+|   |-- pipeline/              # Orchestrator (deployed, working)
+|   |   |-- index.js
+|   |   |-- catalyst-config.json
+|   |   |-- package.json
+|   |-- session/               # Session manager (deployed)
+|   |   |-- index.js
+|   |   |-- catalyst-config.json
+|   |   |-- package.json
+|   |-- query_exec/            # ZCQL executor (deployed)
+|   |   |-- index.js
+|   |   |-- catalyst-config.json
+|   |   |-- package.json
+|   |-- test/                  # Health check (deployed)
+|   |   |-- index.js
+|   |   |-- catalyst-config.json
+|   |   |-- package.json
+|
+|-- data_pipeline/             # Synthetic data generation & import
+|   |-- ...
+|-- docs/                      # Documentation
+|   |-- production-auth.md
+|-- knowlede.md                # Knowledge base
 ```
 
 ---
@@ -74,20 +74,20 @@ All functions are **Node.js 24, AdvancedIO** deployed on Catalyst. They communic
 
 ```
 User query
-  │
-  ▼
-pipeline/query ───→ classifier (inline)
-                         │  keyword match → instant
-                         │  ambiguous     → GLM LLM
-                         ▼
-              ┌─ structured → GLM SQL gen → ZCQL execute → rows
-              ├─ narrative  → BriefFacts LIKE search → GLM answer
-              ├─ network    → Accused/Victim/Complainant search → graph
-              ├─ risk       → Accused count → recidivism score
-              └─ analytical → 3 aggregation queries → trends
-                         │
-                         ▼
-              Format JSON response → append turn to session (Cache, 1hr TTL)
+  |
+  v
+pipeline/query ---> classifier (inline)
+                         |  keyword match -> instant
+                         |  ambiguous     -> GLM LLM
+                         v
+              +-- structured -> GLM SQL gen -> ZCQL execute -> rows
+              +-- narrative  -> BriefFacts LIKE search -> GLM answer
+              +-- network    -> Accused/Victim/Complainant search -> graph
+              +-- risk       -> Accused count -> recidivism score
+              +-- analytical -> 3 aggregation queries -> trends
+                         |
+                         v
+              Format JSON response -> append turn to session (Cache, 1hr TTL)
 ```
 
 | # | Function | Role | Calls GLM? | Calls ZCQL? |
