@@ -29,18 +29,20 @@ export default function PieChart({ data, width, height, onElementClick }) {
 
   useEffect(() => {
     if (!data || data.length === 0) return;
+    const validData = data.filter(function (d) { return d != null && typeof d.value === 'number' && isFinite(d.value); });
+    if (validData.length === 0) return;
 
     const svg = d3.select(svgRef.current);
-    const margin = { top: 20, right: 20, bottom: 60, left: 20 };
-    const radius = Math.min(width, height) / 2 - margin.top;
-    const innerRadius = radius * 0.4; // Donut variant
+    const margin = { top: 10, right: 10, bottom: 15, left: 10 };
+    const radius = Math.min(width, height) * 0.42;
+    const innerRadius = radius * 0.35;
     const outerRadius = radius;
 
     // Clear previous render before re-render
     svg.selectAll('*').remove();
 
     const g = svg.append('g')
-      .attr('transform', 'translate(' + width / 2 + ',' + (height / 2 - 10) + ')');
+      .attr('transform', 'translate(' + width / 2 + ',' + (height * 0.45) + ')');
 
     // Pie generator
     const pie = d3.pie()
@@ -57,11 +59,11 @@ export default function PieChart({ data, width, height, onElementClick }) {
       .outerRadius(outerRadius + 5);
 
     // Total for percentage calculation
-    const total = d3.sum(data, function (d) { return d.value; });
+    const total = d3.sum(validData, function (d) { return d.value; });
 
     // Arcs
     g.selectAll('path')
-      .data(pie(data))
+      .data(pie(validData))
       .join('path')
       .attr('d', arc)
       .attr('fill', function (d, i) { return CATEGORICAL_COLORS[i % CATEGORICAL_COLORS.length]; })
@@ -109,42 +111,37 @@ export default function PieChart({ data, width, height, onElementClick }) {
         });
     }
 
-    // Legend: below the pie, compact 2-column layout
-    const legendG = svg.append('g')
-      .attr('transform', 'translate(' + 20 + ',' + (height - 45) + ')');
+    // Legend: compact inline below the pie
+    var legendBottom = height * 0.85;
+    var legendG = svg.append('g')
+      .attr('transform', 'translate(10,' + legendBottom + ')');
 
-    const legendItems = data.map(function (d, i) {
+    var legendItems = validData.map(function (d, i) {
       return {
         color: CATEGORICAL_COLORS[i % CATEGORICAL_COLORS.length],
-        label: d.label,
-        value: d.value
+        label: d.label.length > 14 ? d.label.slice(0, 14) + '...' : d.label
       };
     });
 
-    const legendItemHeight = 18;
-    const legendColWidth = Math.max(width / 2 - 30, 120);
-    const itemsPerCol = Math.ceil(legendItems.length / 2);
+    var availWidth = Math.max(100, width - 20);
+    var colCount = Math.min(legendItems.length, 3);
+    var colWidth = availWidth / colCount;
+    var perCol = Math.ceil(legendItems.length / colCount);
 
     legendItems.forEach(function (item, i) {
-      const col = Math.floor(i / itemsPerCol);
-      const row = i % itemsPerCol;
-      const x = col * legendColWidth;
-      const y = row * legendItemHeight;
-
-      // Color square
+      var col = Math.floor(i / perCol);
+      var row = i % perCol;
       legendG.append('rect')
-        .attr('x', x)
-        .attr('y', y)
-        .attr('width', 10)
-        .attr('height', 10)
+        .attr('x', col * colWidth)
+        .attr('y', row * 14)
+        .attr('width', 8)
+        .attr('height', 8)
         .attr('rx', 2)
         .attr('fill', item.color);
-
-      // Label
       legendG.append('text')
-        .attr('x', x + 14)
-        .attr('y', y + 9)
-        .attr('font-size', '11px')
+        .attr('x', col * colWidth + 12)
+        .attr('y', row * 14 + 7)
+        .attr('font-size', '10px')
         .attr('fill', '#1E3A8A')
         .style('font-family', 'Fira Sans, sans-serif')
         .text(item.label);

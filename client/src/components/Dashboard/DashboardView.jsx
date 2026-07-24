@@ -4,44 +4,35 @@
 // Mounts FilterBar, chart cards in responsive grid, SeasonalBadge annotations,
 // and RiskRankedView at bottom. Fetches data on filter changes.
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDashboard, useDashboardActions } from '../../hooks/useDashboard';
 import FilterBar from './FilterBar';
 import GridLayout from './GridLayout';
 import ChartCard from './ChartCard';
-import SeasonalBadge from './SeasonalBadge';
+import SummaryCards from './SummaryCards';
 import BarChart from './charts/BarChart';
 import LineChart from './charts/LineChart';
 import PieChart from './charts/PieChart';
-import AreaChart from './charts/AreaChart';
-import HeatmapChart from './charts/HeatmapChart';
+import HorizontalBarChart from './charts/HorizontalBarChart';
+import SeasonalPatterns from './charts/SeasonalPatterns';
 import RiskRankedView from './risk/RiskRankedView';
 
-/**
- * Map chart name to a display component.
- * Each chart follows the common Props interface: { data, width, height, onElementClick }.
- */
 const CHART_COMPONENTS = {
   bar: BarChart,
   line: LineChart,
   pie: PieChart,
-  area: AreaChart,
-  heatmap: HeatmapChart
+  horizontalBar: HorizontalBarChart,
+  seasonal: SeasonalPatterns
 };
 
-/**
- * Chart configuration: title and rendering component type per chart.
- */
+var FULL_WIDTH = ['trend', 'seasonal'];
+
 const chartConfig = {
   trend: { title: 'Crime Trend', chartType: 'line' },
   breakdown: { title: 'Crime Breakdown', chartType: 'pie' },
-  location: { title: 'Location Breakdown', chartType: 'area' },
-  seasonal: { title: 'Seasonal Patterns', chartType: 'heatmap' }
+  location: { title: 'Location Breakdown', chartType: 'horizontalBar' },
+  seasonal: { title: 'Seasonal Patterns', chartType: 'seasonal' }
 };
-
-/** Default chart dimensions. */
-const CHART_WIDTH = 500;
-const CHART_HEIGHT = 300;
 
 /**
  * Dashboard view — the main analytics view.
@@ -52,6 +43,27 @@ const CHART_HEIGHT = 300;
 export default function DashboardView() {
   const { filters, chartData, activeCharts } = useDashboard();
   const { fetchChart, setFilter } = useDashboardActions();
+  const chartAreaRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(800);
+
+  useEffect(function () {
+    var el = chartAreaRef.current;
+    if (!el) return;
+
+    function handleResize() {
+      setContainerWidth(el.clientWidth - 32);
+    }
+
+    handleResize();
+    var ro = new ResizeObserver(handleResize);
+    ro.observe(el);
+    return function () { ro.disconnect(); };
+  }, []);
+
+  var gap = 16;
+  var fullWidth = containerWidth;
+  var halfWidth = Math.max(200, (containerWidth - gap) / 2);
+  var chartHeight = Math.round(Math.min(containerWidth * 0.35, 300));
 
   function handleResetFilters() {
     setFilter({
@@ -63,14 +75,12 @@ export default function DashboardView() {
     });
   }
 
-  // Fetch active charts when filters change
   useEffect(function () {
     activeCharts.forEach(function (chartName) {
       fetchChart(chartName);
     });
   }, [filters]);
 
-  // Fetch risk-ranked data separately (always active)
   useEffect(function () {
     fetchChart('riskRanked');
   }, [filters]);
@@ -82,19 +92,24 @@ export default function DashboardView() {
         onFilterChange={setFilter}
         onReset={handleResetFilters}
       />
-      <div className="flex-1 overflow-y-auto">
+      <div ref={chartAreaRef} className="flex-1 overflow-y-auto">
+        <div className="px-4 pt-4 pb-2">
+          <SummaryCards chartData={chartData} />
+        </div>
         <GridLayout>
           {activeCharts.map(function (chartName) {
-            const config = chartConfig[chartName];
+            var config = chartConfig[chartName];
             if (!config) return null;
 
-            const chart = chartData[chartName];
+            var chart = chartData[chartName];
             if (!chart) return null;
 
-            const ChartComponent = CHART_COMPONENTS[config.chartType];
+            var ChartComponent = CHART_COMPONENTS[config.chartType];
             if (!ChartComponent) return null;
 
-            return (
+            var isFullWidth = FULL_WIDTH.indexOf(chartName) !== -1;
+            var isSeasonal = chartName === 'seasonal';
+            var card = (
               <ChartCard
                 key={chartName}
                 title={config.title}
@@ -102,38 +117,34 @@ export default function DashboardView() {
                 error={chart.error}
                 onRetry={function () { fetchChart(chartName); }}
               >
-                {/* Seasonal badge on trend and seasonal cards */}
-                {(chartName === 'trend' || chartName === 'seasonal') &&
-                  chartData.seasonal && chartData.seasonal.data && (
-                  <div className="mb-2">
-                    <SeasonalBadge
-                      peaks={chartData.seasonal.data.peaks || []}
-                      trend={chartData.seasonal.data.trend || 'stable'}
-                    />
-                  </div>
-                )}
 
                 {chart.data && chart.data.length > 0 ? (
                   <ChartComponent
                     data={chart.data}
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
+                    width={isFullWidth ? fullWidth : halfWidth}
+                    height={chartHeight}
                     onElementClick={function (d) { console.log('Chart element clicked:', d); }}
+                    {...(isSeasonal ? {
+                      peaks: (chartData.seasonal && chartData.seasonal.data && chartData.seasonal.data.peaks) || [],
+                      trend: (chartData.seasonal && chartData.seasonal.data && chartData.seasonal.data.trend) || null
+                    } : {})}
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-foreground/40 text-sm">
+                  <div className="flex h-full w-full items-center justify-center text-foreground/60 text-sm">
                     No data for selected filters
                   </div>
                 )}
               </ChartCard>
             );
-          })}
-        </GridLayout>
 
-        {/* Risk-ranked persons table at bottom */}
-        <div className="px-4 pb-6">
-          <RiskRankedView data={chartData.riskRanked ? chartData.riskRanked.data : null} />
-        </div>
+            return isFullWidth
+              ? <div key={chartName} className="md:col-span-2">{card}</div>
+              : card;
+          })}
+          <div key="riskTable" className="md:col-span-2">
+            <RiskRankedView data={chartData.riskRanked ? chartData.riskRanked.data : null} />
+          </div>
+        </GridLayout>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ export default function ChartCard({ title, loading, error, onRetry, children }) 
       <h3 className="font-heading text-base font-semibold text-foreground mb-3">
         {title}
       </h3>
-      <div className="flex-1 aspect-[3/2]">
+      <div className="flex-1 min-h-[280px]">
         {loading ? (
           <ChartSkeleton />
         ) : error ? (
