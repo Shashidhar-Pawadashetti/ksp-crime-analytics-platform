@@ -200,9 +200,9 @@ async function searchPersons(app, keywords) {
 	if (keywords.length === 0) return [];
 
 	const queries = [
-		(kw) => `SELECT CaseMasterID, AccusedName AS person_name FROM Accused WHERE AccusedName LIKE '*${kw}*' LIMIT 15`,
-		(kw) => `SELECT CaseMasterID, VictimName AS person_name FROM Victim WHERE VictimName LIKE '*${kw}*' LIMIT 15`,
-		(kw) => `SELECT CaseMasterID, ComplainantName AS person_name FROM ComplainantDetails WHERE ComplainantName LIKE '*${kw}*' LIMIT 15`,
+		(kw) => `SELECT CaseMasterID, AccusedName FROM Accused WHERE AccusedName LIKE '*${kw}*' LIMIT 15`,
+		(kw) => `SELECT CaseMasterID, VictimName FROM Victim WHERE VictimName LIKE '*${kw}*' LIMIT 15`,
+		(kw) => `SELECT CaseMasterID, ComplainantName FROM ComplainantDetails WHERE ComplainantName LIKE '*${kw}*' LIMIT 15`,
 	];
 
 	const caseRowIds = new Set();

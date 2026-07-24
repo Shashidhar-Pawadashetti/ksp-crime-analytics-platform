@@ -7,8 +7,10 @@
 //
 // Exports both the provider and the reducer for standalone testing (used in Plan 01-05).
 
-import { createContext, useReducer, useCallback } from 'react';
+import { createContext, useReducer, useCallback, useEffect } from 'react';
 import { queryPipeline } from '../services/api';
+
+const MESSAGES_KEY = 'ksp_chat_messages';
 
 /** @type {import('react').Context<*>} */
 export const ChatContext = createContext(null);
@@ -126,6 +128,9 @@ export function chatReducer(state, action) {
     case 'CLEAR_ERROR':
       return { ...state, error: null };
 
+    case 'RESTORE_MESSAGES':
+      return { ...state, messages: action.payload || [] };
+
     default:
       return state;
   }
@@ -141,6 +146,32 @@ export function chatReducer(state, action) {
  */
 export function ChatProvider({ children }) {
   const [state, dispatch] = useReducer(chatReducer, initialState);
+
+  // Restore messages from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(MESSAGES_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (Array.isArray(saved)) {
+          dispatch({ type: 'RESTORE_MESSAGES', payload: saved });
+        }
+      }
+    } catch {
+      // Corrupted data - ignore
+    }
+  }, []);
+
+  // Persist messages to localStorage whenever they change
+  useEffect(() => {
+    if (state.messages.length > 0) {
+      try {
+        localStorage.setItem(MESSAGES_KEY, JSON.stringify(state.messages));
+      } catch {
+        // Storage full or unavailable - ignore
+      }
+    }
+  }, [state.messages]);
 
   /**
    * Send a user message and get an assistant response.

@@ -2,7 +2,7 @@
 
 var styleHints = require('./styleHints');
 
-function formatNodes(traversalNodes) {
+function formatNodes(traversalNodes, degrees) {
   var nodes = [];
 
   for (var ni = 0; ni < traversalNodes.length; ni++) {
@@ -14,8 +14,9 @@ function formatNodes(traversalNodes) {
         id: n.person_id,
         label: n.canonical_name,
         roles_summary: n.roles_summary,
+        degree: degrees[n.person_id] || 0,
+        hop_distance: n.hop_distance !== undefined ? n.hop_distance : 0,
         node_style: {
-          size: nodeStyle.size,
           color: nodeStyle.color,
           borderColor: nodeStyle.borderColor,
           icon: nodeStyle.icon
@@ -39,7 +40,9 @@ function formatEdges(traversalEdges) {
         id: e.edge_id,
         source: e.source,
         target: e.target,
+        edge_type: e.edge_type,
         label: edgeStyle.label,
+        weight: e.weight || 1,
         edge_style: {
           color: edgeStyle.color,
           width: edgeStyle.width,
@@ -61,7 +64,7 @@ function buildStylesheet(nodes, edges) {
   for (var ni = 0; ni < nodes.length; ni++) {
     var nd = nodes[ni].data;
     var style = nd.node_style;
-    var roleKey = style.color + '-' + style.size;
+    var roleKey = style.color + '-' + style.icon;
     if (seenRoles[roleKey]) continue;
     seenRoles[roleKey] = true;
 
@@ -69,8 +72,6 @@ function buildStylesheet(nodes, edges) {
       selector: 'node#' + nd.id,
       css: {
         'background-color': style.color,
-        'width': style.size,
-        'height': style.size,
         'border-color': style.borderColor,
         'border-width': 2
       }
@@ -83,8 +84,6 @@ function buildStylesheet(nodes, edges) {
       selector: 'node',
       css: {
         'background-color': def.color,
-        'width': def.size,
-        'height': def.size,
         'border-color': def.borderColor,
         'border-width': 2
       }
@@ -128,7 +127,16 @@ function toCytoscape(traversalResult) {
     return traversalResult;
   }
 
-  var nodes = formatNodes(traversalResult.nodes);
+  var degrees = {};
+  for (var ei = 0; ei < traversalResult.edges.length; ei++) {
+    var e = traversalResult.edges[ei];
+    if (!degrees[e.source]) degrees[e.source] = 0;
+    degrees[e.source]++;
+    if (!degrees[e.target]) degrees[e.target] = 0;
+    degrees[e.target]++;
+  }
+
+  var nodes = formatNodes(traversalResult.nodes, degrees);
   var edges = formatEdges(traversalResult.edges);
   var stylesheet = buildStylesheet(nodes, edges);
 

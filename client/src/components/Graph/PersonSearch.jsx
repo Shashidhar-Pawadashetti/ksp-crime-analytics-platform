@@ -74,6 +74,7 @@ export default function PersonSearch({ onSelect }) {
     setQuery(person.label || person.name || '');
     setOpen(false);
     if (onSelect) {
+      if (!person.id && !person.personId) return;
       onSelect(person.id || person.personId);
     }
   };
@@ -121,7 +122,7 @@ export default function PersonSearch({ onSelect }) {
                   className="cursor-pointer px-3 py-2 font-body text-sm text-foreground/80 hover:bg-accent/10 hover:text-accent"
                   onMouseDown={() => handleSelect(person)}
                 >
-                  {person.label || person.name || 'Unknown'}
+                  {person.label || person.name || person.AccusedName || 'Unknown'}
                 </li>
               ))}
             </ul>

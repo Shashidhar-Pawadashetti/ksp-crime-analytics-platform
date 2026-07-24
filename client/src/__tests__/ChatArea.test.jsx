@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 import { AuthContext } from '../contexts/AuthContext';
 import { ChatContext } from '../contexts/ChatContext';
 import { UIContext } from '../contexts/UIContext';
+import { DashboardProvider } from '../contexts/DashboardContext';
 import ChatArea from '../components/Chat/ChatArea';
 
 const mockAuth = {
@@ -40,7 +41,9 @@ function renderChatArea(authOverrides = {}, chatOverrides = {}, uiOverrides = {}
     <AuthContext.Provider value={{ ...mockAuth, ...authOverrides }}>
       <ChatContext.Provider value={{ ...mockChat, ...chatOverrides }}>
         <UIContext.Provider value={{ ...mockUI, ...uiOverrides }}>
-          <ChatArea />
+          <DashboardProvider>
+            <ChatArea />
+          </DashboardProvider>
         </UIContext.Provider>
       </ChatContext.Provider>
     </AuthContext.Provider>

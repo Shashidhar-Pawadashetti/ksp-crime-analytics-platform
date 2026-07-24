@@ -60,21 +60,30 @@ function zcqlRows(rows) {
   });
 }
 
+function normalizeChartRows(rows, labelKey, valueKey) {
+  if (!rows || rows.length === 0) return [];
+  return rows.map(function (row) {
+    const label = row[labelKey] != null ? String(row[labelKey]) : '';
+    const value = row[valueKey] != null ? Number(row[valueKey]) : 0;
+    return { label: label, value: value };
+  });
+}
+
 const ENDPOINTS = {
   '/dashboard/trend': async function (app, body) {
     const sql = trendQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return zcqlRows(rows);
+    return normalizeChartRows(zcqlRows(rows), 'CrimeRegisteredDate', 'COUNT(CaseMasterID)');
   },
   '/dashboard/breakdown': async function (app, body) {
     const sql = breakdownQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return zcqlRows(rows);
+    return normalizeChartRows(zcqlRows(rows), 'CrimeGroupName', 'COUNT(CaseMasterID)');
   },
   '/dashboard/location': async function (app, body) {
     const sql = locationQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return zcqlRows(rows);
+    return normalizeChartRows(zcqlRows(rows), 'DistrictName', 'COUNT(CaseMasterID)');
   },
   '/dashboard/hotspots': async function (app, body) {
     const sql = hotspotsQuery(body.filters || {});
@@ -84,17 +93,47 @@ const ENDPOINTS = {
   '/dashboard/risk-ranked': async function (app, body) {
     const sql = riskRankedQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return zcqlRows(rows);
+    return normalizeChartRows(zcqlRows(rows), 'AccusedName', 'case_count');
+  },
+  '/dashboard/riskRanked': async function (app, body) {
+    const sql = riskRankedQuery(body.filters || {});
+    const rows = await app.zcql().executeZCQLQuery(sql);
+    return normalizeChartRows(zcqlRows(rows), 'AccusedName', 'case_count');
   },
   '/dashboard/seasonal': async function (app, body) {
     const sql = seasonalQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return zcqlRows(rows);
+    return normalizeChartRows(zcqlRows(rows), 'CrimeRegisteredDate', 'COUNT(CaseMasterID)');
   },
   '/dashboard/person-search': async function (app, body) {
-    const sql = personSearchQuery(body.searchTerm || '');
-    const rows = await app.zcql().executeZCQLQuery(sql);
-    return zcqlRows(rows);
+    const searchTerm = (body.filters && body.filters.searchTerm) || body.searchTerm || '';
+    if (!searchTerm || searchTerm.trim().length === 0) return [];
+    const sqls = personSearchQuery(searchTerm);
+    const allRows = [];
+    for (const sql of sqls) {
+      try {
+        const raw = await app.zcql().executeZCQLQuery(sql);
+        const rows = zcqlRows(raw);
+        for (const r of rows) {
+          const name = r.AccusedName || r.VictimName || r.ComplainantName || '';
+          const id = String(r.AccusedMasterID || r.VictimMasterID || r.ComplainantID || '');
+          if (name) allRows.push({ name: name, id: id });
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+    if (allRows.length === 0) return [];
+    const seen = new Set();
+    const unique = [];
+    for (const row of allRows) {
+      const key = row.name.toLowerCase();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        unique.push(row);
+      }
+    }
+    return unique.slice(0, 10);
   }
 };
 

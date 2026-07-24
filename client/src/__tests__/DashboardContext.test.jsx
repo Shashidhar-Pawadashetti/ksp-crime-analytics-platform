@@ -8,7 +8,7 @@ describe('DashboardContext', () => {
       expect(initialState.filters.crimeType).toBeNull();
       expect(initialState.filters.startDate).toBeNull();
       expect(initialState.filters.endDate).toBeNull();
-      expect(initialState.activeCharts).toEqual(['trend']);
+      expect(initialState.activeCharts).toEqual(['trend', 'breakdown', 'location', 'seasonal']);
     });
 
     test('initial state: all charts have null data, false loading, null error', () => {

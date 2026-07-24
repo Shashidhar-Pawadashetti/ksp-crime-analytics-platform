@@ -2,6 +2,8 @@ import { createContext, useReducer, useEffect, useCallback, useRef } from 'react
 import * as auth from '../services/auth';
 import * as session from '../services/session';
 
+const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === 'true';
+
 export const AuthContext = createContext(null);
 
 export const initialState = {
@@ -58,8 +60,10 @@ export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const signInRendered = useRef(false);
 
-  // Step 1: On mount — check for existing Catalyst session
+  // Step 1: On mount — check for existing Catalyst session (skipped if VITE_SKIP_AUTH=true)
   useEffect(() => {
+    if (SKIP_AUTH) return;
+
     let cancelled = false;
 
     async function initAuth() {
@@ -100,6 +104,7 @@ export function AuthProvider({ children }) {
 
   // Step 2: After confirming no session — render signIn iFrame and poll for completion
   useEffect(() => {
+    if (SKIP_AUTH) return;
     if (state.isLoading || state.isAuthenticated) return;
     if (signInRendered.current) return;
 

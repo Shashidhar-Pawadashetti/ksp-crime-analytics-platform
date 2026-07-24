@@ -46,7 +46,9 @@ function EmptyState() {
  * @returns {import('react').ReactElement}
  */
 export default function RiskRankedView({ data }) {
-  if (!data || data.length === 0) {
+  const validRows = data && data.filter(function (row) { return row && row.name; });
+
+  if (!validRows || validRows.length === 0) {
     return <EmptyState />;
   }
 
@@ -73,7 +75,7 @@ export default function RiskRankedView({ data }) {
             </tr>
           </thead>
           <tbody>
-            {data.map(function (row, i) {
+            {validRows.map(function (row, i) {
               return (
                 <tr key={i} className="border-t border-border even:bg-dominant">
                   <td className="max-w-[200px] truncate px-3 py-1.5 text-foreground/80">

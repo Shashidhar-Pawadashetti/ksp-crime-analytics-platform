@@ -15,7 +15,12 @@ GraphExportService.prototype._getTraversalResult = function(personId, options) {
   var edgeTypeFilter = options && options.edge_type_filter;
 
   if (!this._graphService.personExists(personId)) {
-    return { error: ['Person ' + personId + ' not found'] };
+    var resolvedId = this._graphService.resolveSourceRecord(personId);
+    if (resolvedId) {
+      personId = resolvedId;
+    } else {
+      return { error: ['Person ' + personId + ' not found'] };
+    }
   }
 
   return this._traversal.traverse(personId, {

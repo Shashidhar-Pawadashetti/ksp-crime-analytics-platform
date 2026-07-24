@@ -1,0 +1,131 @@
+{
+  "table": "CrimeHead",
+  "columns": [
+    "ROWID",
+    "CrimeHeadID",
+    "CrimeGroupName",
+    "Active"
+  ],
+  "rows": [
+    {
+      "ROWID": "47995000000334113",
+      "CrimeHeadID": "1",
+      "CrimeGroupName": "Murder",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334114",
+      "CrimeHeadID": "2",
+      "CrimeGroupName": "Attempt to Murder",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334115",
+      "CrimeHeadID": "3",
+      "CrimeGroupName": "Culpable Homicide",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334116",
+      "CrimeHeadID": "4",
+      "CrimeGroupName": "Rape",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334117",
+      "CrimeHeadID": "5",
+      "CrimeGroupName": "Kidnapping & Abduction",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334118",
+      "CrimeHeadID": "6",
+      "CrimeGroupName": "Robbery",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334119",
+      "CrimeHeadID": "7",
+      "CrimeGroupName": "Dacoity",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334120",
+      "CrimeHeadID": "8",
+      "CrimeGroupName": "Burglary",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334121",
+      "CrimeHeadID": "9",
+      "CrimeGroupName": "Theft",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334122",
+      "CrimeHeadID": "10",
+      "CrimeGroupName": "Riots",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334123",
+      "CrimeHeadID": "11",
+      "CrimeGroupName": "Cheating",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334124",
+      "CrimeHeadID": "12",
+      "CrimeGroupName": "Criminal Breach of Trust",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334125",
+      "CrimeHeadID": "13",
+      "CrimeGroupName": "Counterfeiting",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334126",
+      "CrimeHeadID": "14",
+      "CrimeGroupName": "Arson",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334127",
+      "CrimeHeadID": "15",
+      "CrimeGroupName": "Hurt / Grievous Hurt",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334128",
+      "CrimeHeadID": "16",
+      "CrimeGroupName": "Extortion",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334129",
+      "CrimeHeadID": "17",
+      "CrimeGroupName": "Criminal Trespass",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334130",
+      "CrimeHeadID": "18",
+      "CrimeGroupName": "Assault on Women",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334131",
+      "CrimeHeadID": "19",
+      "CrimeGroupName": "Dowry Death",
+      "Active": "true"
+    },
+    {
+      "ROWID": "47995000000334132",
+      "CrimeHeadID": "20",
+      "CrimeGroupName": "Cyber Crime",
+      "Active": "true"
+    }
+  ]
+}

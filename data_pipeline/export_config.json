@@ -1,0 +1,4 @@
+{
+"table_identifier": "CrimeHead",
+"select_columns": ["CrimeHeadID", "CrimeGroupName", "Active"]
+}

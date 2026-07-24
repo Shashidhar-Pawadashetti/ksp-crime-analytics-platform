@@ -1,7 +1,7 @@
 'use strict';
 
 const catalyst = require('zcatalyst-sdk-node');
-const { route: graphRoute } = require('../graph-visualization/routes');
+const { route: graphRoute } = require('./lib/routes');
 
 function sendJson(res, status, data) {
 	res.writeHead(status, {
@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
 
 	try {
 		// Call graph-visualization routes.js route() function with the raw req object
-		const result = graphRoute(req);
+		const result = await graphRoute(req);
 
 		const statusCode = result.statusCode || (result.body ? 200 : 500);
 		const body = result.body ? JSON.parse(result.body) : { status: 'error', message: 'No response' };

@@ -90,7 +90,7 @@ async function getOrCreateSession(app, employeeId, sessionId) {
 
 	const session = {
 		session_id: sessionId,
-		employee_id: Number(employeeId),
+		employee_id: employeeId,
 		rank_hierarchy: null,
 		unit_hierarchy: null,
 		unit_id: null,

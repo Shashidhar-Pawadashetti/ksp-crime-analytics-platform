@@ -186,7 +186,7 @@ function recordChecksum(rec) {
 
 async function loadPersonMasterDocuments(appInstance) {
   console.log('[sync] Loading existing PersonMaster documents...');
-  var sql = 'SELECT * FROM PersonMaster';
+  var sql = 'SELECT person_id, schema_version, name_variants, name_normalised, name_phonetic_key, age_estimate, age_range, gender, source_records, roles_summary, confirmed_edges, unconfirmed_edges, confidence_score, resolution_method, flags, meta FROM PersonMaster';
   var rows = await queryAllZCQL(appInstance, sql, 1000);
 
   var docs = [];
@@ -457,7 +457,7 @@ var incrementalResolve = null;
 
 function getIncrementalResolver() {
   if (!incrementalResolve) {
-    incrementalResolve = require('./incrementalResolver').incrementalResolve;
+    incrementalResolve = require('./lib/incrementalResolver').incrementalResolve;
   }
   return incrementalResolve;
 }

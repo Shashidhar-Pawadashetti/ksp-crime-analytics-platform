@@ -33,3 +33,22 @@ functions/personmaster-builder/output/
 
 # Production bundle artifacts (keep dist/ for deployed functions, ignore local build output)
 *.local.json
+
+# Build output
+client/dist/
+
+# Library build artifacts
+functions/*/lib/
+
+# Temporary branches not merged yet
+functions/pm-migration/
+functions/sync-full-job/
+
+# Large generated data exports
+Export_*.zip
+
+# Scratch notes
+AGENTIC_ARCHITECTURE.md
+ROOT_CAUSE.md
+TODO.md
+knowlede.md

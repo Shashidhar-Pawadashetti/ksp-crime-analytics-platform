@@ -76,11 +76,15 @@ function validateSql(sql) {
 function applyScope(sql, scope) {
 	if (!scope) return sql;
 
+	var upperSql = sql.toUpperCase();
+	var hasAliasCm = /\bCaseMaster\s+cm\b/i.test(sql) || /\bcm\.\w+/i.test(sql);
+	var hasAliasU = /\bUnit\s+u\b/i.test(sql) || /\bu\.\w+/i.test(sql);
+
 	const filters = [];
-	if (scope.district_filter) {
+	if (scope.district_filter && hasAliasU) {
 		filters.push(`u.DistrictID = ${Number(scope.district_filter)}`);
 	}
-	if (scope.unit_filter) {
+	if (scope.unit_filter && hasAliasCm) {
 		filters.push(`cm.PoliceStationID = ${Number(scope.unit_filter)}`);
 	}
 

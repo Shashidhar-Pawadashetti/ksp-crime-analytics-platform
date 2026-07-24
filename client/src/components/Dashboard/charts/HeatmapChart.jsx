@@ -26,6 +26,8 @@ export default function HeatmapChart({ data, width, height, onElementClick }) {
 
   useEffect(() => {
     if (!data || data.length === 0) return;
+    const validData = data.filter(function (d) { return d != null && typeof d.value === 'number' && isFinite(d.value); });
+    if (validData.length === 0) return;
 
     const svg = d3.select(svgRef.current);
     const margin = { top: 30, right: 20, bottom: 50, left: 100 };
@@ -39,12 +41,12 @@ export default function HeatmapChart({ data, width, height, onElementClick }) {
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
     // Determine if data has groups (categorical pairs)
-    const hasGroups = data.length > 0 && data[0].group !== undefined;
+    const hasGroups = validData.length > 0 && validData[0].group !== undefined;
 
     if (hasGroups) {
-      renderGroupedHeatmap(g, data, innerWidth, innerHeight, setTooltip, onElementClick, prefersReducedMotion);
+      renderGroupedHeatmap(g, validData, innerWidth, innerHeight, setTooltip, onElementClick, prefersReducedMotion);
     } else {
-      renderSimpleHeatmap(g, data, innerWidth, innerHeight, setTooltip, onElementClick, prefersReducedMotion);
+      renderSimpleHeatmap(g, validData, innerWidth, innerHeight, setTooltip, onElementClick, prefersReducedMotion);
     }
 
   }, [data, width, height, onElementClick]);

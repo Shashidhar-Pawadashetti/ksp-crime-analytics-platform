@@ -1,0 +1,34 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== District (31 records) ===
+
+  ROWID: 47995000000332119, DistrictID: 1, DistrictName: Bagalkot, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332120, DistrictID: 2, DistrictName: Belagavi, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332121, DistrictID: 3, DistrictName: Bellary, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332122, DistrictID: 4, DistrictName: Bengaluru Rural, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332123, DistrictID: 5, DistrictName: Bengaluru Urban, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332124, DistrictID: 6, DistrictName: Bidar, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332125, DistrictID: 7, DistrictName: Chamarajanagar, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332126, DistrictID: 8, DistrictName: Chikkaballapur, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332127, DistrictID: 9, DistrictName: Chikkamagaluru, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332128, DistrictID: 10, DistrictName: Chitradurga, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332129, DistrictID: 11, DistrictName: Dakshina Kannada, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332130, DistrictID: 12, DistrictName: Davanagere, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332131, DistrictID: 13, DistrictName: Dharwad, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332132, DistrictID: 14, DistrictName: Gadag, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332133, DistrictID: 15, DistrictName: Hassan, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332134, DistrictID: 16, DistrictName: Haveri, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332135, DistrictID: 17, DistrictName: Kalaburagi (Gulbarga), StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332136, DistrictID: 18, DistrictName: Kodagu, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332137, DistrictID: 19, DistrictName: Kolar, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332138, DistrictID: 20, DistrictName: Koppal, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332139, DistrictID: 21, DistrictName: Mandya, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332140, DistrictID: 22, DistrictName: Mysuru, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332141, DistrictID: 23, DistrictName: Raichur, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332142, DistrictID: 24, DistrictName: Ramanagara, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332143, DistrictID: 25, DistrictName: Shivamogga, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332144, DistrictID: 26, DistrictName: Tumakuru, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332145, DistrictID: 27, DistrictName: Udupi, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332146, DistrictID: 28, DistrictName: Uttara Kannada, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332147, DistrictID: 29, DistrictName: Vijayanagara, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332148, DistrictID: 30, DistrictName: Vijayapura, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332149, DistrictID: 31, DistrictName: Yadgir, StateID: 47995000000333047, Active: true

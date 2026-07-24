@@ -1,0 +1,15 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== Rank (12 records) ===
+
+  ROWID: 47995000000332221, RankID: 1, RankName: Police Constable, Hierarchy: 1, Active: true
+  ROWID: 47995000000332222, RankID: 2, RankName: Head Constable, Hierarchy: 2, Active: true
+  ROWID: 47995000000332223, RankID: 3, RankName: Assistant Sub-Inspector, Hierarchy: 3, Active: true
+  ROWID: 47995000000332224, RankID: 4, RankName: Sub-Inspector, Hierarchy: 4, Active: true
+  ROWID: 47995000000332225, RankID: 5, RankName: Inspector, Hierarchy: 5, Active: true
+  ROWID: 47995000000332226, RankID: 6, RankName: Deputy Superintendent of Police, Hierarchy: 6, Active: true
+  ROWID: 47995000000332227, RankID: 7, RankName: Superintendent of Police, Hierarchy: 7, Active: true
+  ROWID: 47995000000332228, RankID: 8, RankName: Deputy Commissioner of Police, Hierarchy: 8, Active: true
+  ROWID: 47995000000332229, RankID: 9, RankName: Additional Commissioner of Police, Hierarchy: 9, Active: true
+  ROWID: 47995000000332230, RankID: 10, RankName: Joint Commissioner of Police, Hierarchy: 10, Active: true
+  ROWID: 47995000000332231, RankID: 11, RankName: Commissioner of Police, Hierarchy: 11, Active: true
+  ROWID: 47995000000332232, RankID: 12, RankName: Director General of Police, Hierarchy: 12, Active: true

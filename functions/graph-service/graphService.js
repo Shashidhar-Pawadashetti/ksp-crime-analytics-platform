@@ -9,6 +9,7 @@ function GraphService(options) {
   this._cache = new GraphCache(function () {
     return repo.loadGraph();
   });
+  this._sourceRecordIndex = null;
 }
 
 GraphService.prototype._ensureLoaded = async function () {
@@ -105,6 +106,28 @@ GraphService.prototype.reload = async function () {
 
 GraphService.prototype.clearCache = function () {
   this._cache.clear();
+  this._sourceRecordIndex = null;
+};
+
+GraphService.prototype.resolveSourceRecord = function (rowId) {
+  var index = this._getSourceRecordIndex();
+  return index[rowId] || null;
+};
+
+GraphService.prototype._getSourceRecordIndex = function () {
+  if (this._sourceRecordIndex) return this._sourceRecordIndex;
+  this._sourceRecordIndex = {};
+  var nodes = this._cache.getNodes();
+  for (var ni = 0; ni < nodes.length; ni++) {
+    var records = nodes[ni].source_records || [];
+    for (var si = 0; si < records.length; si++) {
+      var sr = records[si];
+      if (sr && sr.row_id) {
+        this._sourceRecordIndex[sr.row_id] = nodes[ni].person_id;
+      }
+    }
+  }
+  return this._sourceRecordIndex;
 };
 
 GraphService.prototype.getCacheInfo = function () {

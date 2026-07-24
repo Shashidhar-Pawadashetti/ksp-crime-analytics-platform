@@ -24,6 +24,8 @@ export default function BarChart({ data, width, height, onBarClick }) {
 
   useEffect(() => {
     if (!data || data.length === 0) return;
+    const validData = data.filter(function (d) { return d != null && typeof d.value === 'number' && isFinite(d.value); });
+    if (validData.length === 0) return;
 
     const svg = d3.select(svgRef.current);
     const margin = { top: 20, right: 20, bottom: 40, left: 60 };
@@ -38,12 +40,12 @@ export default function BarChart({ data, width, height, onBarClick }) {
 
     // Scales
     const xScale = d3.scaleBand()
-      .domain(data.map(function (d) { return d.label; }))
+      .domain(validData.map(function (d) { return d.label; }))
       .range([0, innerWidth])
       .padding(0.2);
 
     const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, function (d) { return d.value; })])
+      .domain([0, d3.max(validData, function (d) { return d.value; })])
       .range([innerHeight, 0]);
 
     // Axes
@@ -58,7 +60,7 @@ export default function BarChart({ data, width, height, onBarClick }) {
 
     // Bars with enter animation
     const bars = g.selectAll('rect')
-      .data(data)
+      .data(validData)
       .join('rect')
       .attr('x', function (d) { return xScale(d.label); })
       .attr('width', xScale.bandwidth())

@@ -24,6 +24,8 @@ export default function AreaChart({ data, width, height, onElementClick }) {
 
   useEffect(() => {
     if (!data || data.length === 0) return;
+    const validData = data.filter(function (d) { return d != null && typeof d.value === 'number' && isFinite(d.value); });
+    if (validData.length === 0) return;
 
     const svg = d3.select(svgRef.current);
     const margin = { top: 20, right: 20, bottom: 40, left: 60 };
@@ -37,20 +39,20 @@ export default function AreaChart({ data, width, height, onElementClick }) {
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
     // Detect if data has Date labels
-    const isDateData = data.length > 0 && data[0].label instanceof Date;
+    const isDateData = validData.length > 0 && validData[0].label instanceof Date;
 
     // Scales
     const xScale = isDateData
       ? d3.scaleTime()
-          .domain(d3.extent(data, function (d) { return d.label; }))
+          .domain(d3.extent(validData, function (d) { return d.label; }))
           .range([0, innerWidth])
       : d3.scalePoint()
-          .domain(data.map(function (d) { return d.label; }))
+          .domain(validData.map(function (d) { return d.label; }))
           .range([0, innerWidth])
           .padding(0.5);
 
     const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, function (d) { return d.value; })])
+      .domain([0, d3.max(validData, function (d) { return d.value; })])
       .range([innerHeight, 0]);
 
     // Axes
@@ -102,14 +104,14 @@ export default function AreaChart({ data, width, height, onElementClick }) {
 
     // Area path
     const areaPath = g.append('path')
-      .datum(data)
+      .datum(validData)
       .attr('class', 'area-fill')
       .attr('fill', 'url(#area-fill-gradient-' + width + '-' + height + ')')
       .attr('d', area);
 
     // Line path
     const linePath = g.append('path')
-      .datum(data)
+      .datum(validData)
       .attr('class', 'area-line')
       .attr('fill', 'none')
       .attr('stroke', '#1E40AF')
@@ -156,7 +158,7 @@ export default function AreaChart({ data, width, height, onElementClick }) {
 
     // Data point circles
     g.selectAll('.data-point')
-      .data(data)
+      .data(validData)
       .join('circle')
       .attr('class', 'data-point')
       .attr('cx', function (d) { return xScale(d.label); })

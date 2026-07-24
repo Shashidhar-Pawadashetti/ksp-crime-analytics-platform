@@ -5,6 +5,8 @@
 	"description": "HTTP wrapper for graph-visualization library module",
 	"main": "index.js",
 	"dependencies": {
-		"zcatalyst-sdk-node": "latest"
+		"zcatalyst-sdk-node": "latest",
+		"express": "^4.22.2",
+		"helmet": "^7.2.0"
 	}
 }

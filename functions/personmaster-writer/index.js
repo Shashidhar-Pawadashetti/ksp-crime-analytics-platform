@@ -1,34 +1,15 @@
 'use strict';
 
-/*
- * personmaster-writer — PersonMaster Document Generation & Persistence
- *
- * Phase 4.2.1 of the KSP Crime Analytics Platform.
- *
- * Pipeline:
- *   Relational Data Store  →  Entity Matching Engine  →  Matched Groups
- *   → buildPersonMaster()  →  Catalyst NoSQL PersonMaster Collection
- *
- * NOTE on cross-function requires:
- *   This function imports the entity-matching-engine modules via relative path
- *   for local development. For Catalyst production deployment, these modules
- *   must be copied into this function's directory or bundled via the deploy
- *   step (e.g., by adding them to a build script).
- */
-
 var express = require('express');
 var helmet = require('helmet');
 var catalyst = require('zcatalyst-sdk-node');
 var { buildPersonMaster } = require('./documentBuilder');
 
-/* ------------------------------------------------------------------ */
-/*  Entity Matching Engine modules (local requires)                   */
-/* ------------------------------------------------------------------ */
-var { normaliseName } = require('./entity-matching-engine/normaliser');
-var { generatePhoneticKey } = require('./entity-matching-engine/phonetic');
-var { generateUniquePairs } = require('./entity-matching-engine/blocking');
-var { computeScore } = require('./entity-matching-engine/scorer');
-var { classify, CONFIRMED, UNCONFIRMED, THRESHOLD } = require('./entity-matching-engine/threshold');
+var { normaliseName } = require('./lib/entity-matching-engine/normaliser');
+var { generatePhoneticKey } = require('./lib/entity-matching-engine/phonetic');
+var { generateUniquePairs } = require('./lib/entity-matching-engine/blocking');
+var { computeScore } = require('./lib/entity-matching-engine/scorer');
+var { classify, CONFIRMED, UNCONFIRMED, THRESHOLD } = require('./lib/entity-matching-engine/threshold');
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                         */
@@ -821,13 +802,19 @@ app.get('/diagnose', async function (req, res) {
       results.datastore_insert_dateobj = { ok: false, error: e7.message, code: e7.code || e7.status || 'N/A', details: JSON.stringify(e7.cause || e7.details || e7.response || {}).substring(0, 500) };
     }
 
-    /* Test 8: ZCQL INSERT */
+    /* Test 8: DataStore INSERT (was ZCQL INSERT — ZCQL V2 is SELECT-only) */
     try {
-      var insertSQL = "INSERT INTO ResolutionAuditLog (RunID, RunType, TriggeredBy, Status) VALUES ('DIAG3-" + Date.now() + "', 'diagnose', 'diagnose', 'TEST')";
-      var zcqlResult = await appInstance.zcql().executeZCQLQuery(insertSQL);
-      results.zcql_insert = { ok: true, data: JSON.stringify(zcqlResult).substring(0, 200) };
+      var dsTable3 = appInstance.datastore().table('ResolutionAuditLog');
+      var testRow3 = {
+        RunID: 'DIAG3-' + Date.now(),
+        RunType: 'diagnose',
+        TriggeredBy: 'diagnose',
+        Status: 'TEST'
+      };
+      var dsResult3 = await dsTable3.insertRow(testRow3);
+      results.datastore_insert = { ok: true, rowid: (dsResult3 || {}).ROWID || 'unknown' };
     } catch (e8) {
-      results.zcql_insert = { ok: false, error: e8.message };
+      results.datastore_insert = { ok: false, error: e8.message };
     }
 
     /* Test 9: LIMIT 500 */
