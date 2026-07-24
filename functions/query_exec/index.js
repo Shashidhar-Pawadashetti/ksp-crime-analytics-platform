@@ -76,11 +76,15 @@ function validateSql(sql) {
 function applyScope(sql, scope) {
 	if (!scope) return sql;
 
+	var upperSql = sql.toUpperCase();
+	var hasAliasCm = /\bCaseMaster\s+cm\b/i.test(sql) || /\bcm\.\w+/i.test(sql);
+	var hasAliasU = /\bUnit\s+u\b/i.test(sql) || /\bu\.\w+/i.test(sql);
+
 	const filters = [];
-	if (scope.district_filter) {
+	if (scope.district_filter && hasAliasU) {
 		filters.push(`u.DistrictID = ${Number(scope.district_filter)}`);
 	}
-	if (scope.unit_filter) {
+	if (scope.unit_filter && hasAliasCm) {
 		filters.push(`cm.PoliceStationID = ${Number(scope.unit_filter)}`);
 	}
 
@@ -131,6 +135,13 @@ module.exports = async (req, res) => {
 	} catch {
 		sendError(res, 500, 'INIT_FAILED', 'Failed to initialize Catalyst SDK');
 		return;
+	}
+
+	try {
+		const user = await app.userManagement().getCurrentUser();
+		if (!user) console.warn('QUERY_EXEC: unauthenticated request (dev mode or missing session)');
+	} catch {
+		console.warn('QUERY_EXEC: unauthenticated request (dev mode or missing session)');
 	}
 
 	if (req.method.toUpperCase() !== 'POST') {

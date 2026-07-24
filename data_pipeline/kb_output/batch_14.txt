@@ -1,0 +1,5088 @@
+=== KSP CRIME DATABASE KNOWLEDGE BASE ===
+=== BATCH 14 (Cases 2601-2800) ===
+
+=== CASE 2601 ===
+CaseMasterID: 2601
+CrimeNo: 300300041202300008 | CaseNo: 202300008
+Station: Vijayapura District Police Office, Vijayapura
+District: Vijayapura
+Crime Type: Theft
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Vijayapura
+Registered: 2022-02-28 | Incident: 2022-02-21 12:00:00 to 2022-02-26 12:00:00
+IO: Ramachandra, Sub-Inspector, Joint Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 24, IEA 65B
+
+BRIEF FACTS:
+A motor vehicle theft was reported at Vijayapura City, Vijayapura. A motorcycle bearing local registration was stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Satish Reddy, Age 61, Male
+  VICTIM: Ayaan More, Age 59, Male
+  COMPLAINANT: Deepak Acharya, Age 53, Shopkeeper
+  Location: 16.8274, 75.7088
+===
+
+=== CASE 2602 ===
+CaseMasterID: 2602
+CrimeNo: 100200031202200004 | CaseNo: 202200004
+Station: Koppal District Police Office, Koppal
+District: Koppal
+Crime Type: Criminal Trespass
+Status: Convicted
+Court: Additional District and Sessions Court, Ballari
+Registered: 2021-06-28 | Incident: 2021-06-23 12:00:00 to 2021-06-25 12:00:00
+IO: Suresh, Sub-Inspector, Joint Commissioner of Police
+Sections: CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The accused trespassed into a government office at Koppal City, Koppal and threatened the officials.
+
+PERSONS INVOLVED:
+  ACCUSED: Manjunath Jadhav, Age 43, Male
+  ACCUSED: Shankar Singh, Age 37, Male
+  ACCUSED: Revathi Ganguly, Age 31, Female
+  ACCUSED: Tara Bhatt, Age 47, Female
+  ACCUSED: Kavyaa Bhattt, Age 26, Female
+  VICTIM: Hema Shinde, Age 51, Female
+  COMPLAINANT: Uma Bhat, Age 36, Shopkeeper
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2022-06-03 00:00:00
+  ARREST: 2021-08-16, arresting IO: Suresh, Sub-Inspector, Joint Commissioner of Police
+  ARREST: 2021-07-05, arresting IO: Suresh, Sub-Inspector, Joint Commissioner of Police
+  Location: 15.3545, 76.1487
+===
+
+=== CASE 2603 ===
+CaseMasterID: 2603
+CrimeNo: 300270109202500003 | CaseNo: 202500003
+Station: Udupi Town Police Station, Udupi
+District: Udupi
+Crime Type: Criminal Trespass
+Status: Under Investigation
+Court: District and Sessions Court, Udupi
+Registered: 2024-10-12 | Incident: 2024-10-07 12:00:00 to 2024-10-10 12:00:00
+IO: Arjun, Commissioner of Police, Additional Superintendent of Police
+Sections: CrPC 154, CrPC 157
+
+BRIEF FACTS:
+House trespass by night was reported at Udupi Town, Udupi.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Mallikarjun Patil, Age 21, Nurse
+  Location: 13.3466, 74.7435
+===
+
+=== CASE 2604 ===
+CaseMasterID: 2604
+CrimeNo: 200170103202100009 | CaseNo: 202100009
+Station: Kalaburagi Suburban Police Station, Kalaburagi (Gulbarga)
+District: Kalaburagi (Gulbarga)
+Crime Type: Criminal Trespass
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Kalaburagi
+Registered: 2020-12-26 | Incident: 2020-12-17 12:00:00 to 2020-12-22 12:00:00
+IO: Pavan, Head Constable, Additional Commissioner of Police
+Sections: CrPC 157, CrPC 161, IEA 24
+
+BRIEF FACTS:
+Criminal trespass by a public servant at Kalaburagi Suburban, Kalaburagi (Gulbarga) was reported.
+
+PERSONS INVOLVED:
+  ACCUSED: Nandini Singh, Age 64, Female
+  ACCUSED: Ishaan Iyengar, Age 43, Male
+  ACCUSED: Deepak Sen, Age 55, Male
+  ACCUSED: Vijay Menon, Age 42, Male
+  ACCUSED: Vihaan Nair, Age 35, Male
+  COMPLAINANT: Gowri Reddy, Age 51, Sweeper
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2021-03-30 00:00:00
+  ARREST: 2020-12-28, arresting IO: Pavan, Head Constable, Additional Commissioner of Police
+  ARREST: 2021-01-02, arresting IO: Pavan, Head Constable, Additional Commissioner of Police
+  Location: 17.3028, 76.8156
+===
+
+=== CASE 2605 ===
+CaseMasterID: 2605
+CrimeNo: 100020099202400007 | CaseNo: 202400007
+Station: Belagavi Camp Police Station, Belagavi
+District: Belagavi
+Crime Type: Criminal Breach of Trust
+Status: Trial in Progress
+Court: District and Sessions Court, Belagavi
+Registered: 2023-04-29 | Incident: 2023-04-24 12:00:00 to 2023-04-28 12:00:00
+IO: Vivaan, Head Constable, Deputy Superintendent of Police
+Sections: CrPC 154, IEA 24
+
+BRIEF FACTS:
+A bailee sold the bailed goods without consent near Belagavi City, Belagavi.
+
+PERSONS INVOLVED:
+  VICTIM: Usha Kamat, Age 27, Female
+  COMPLAINANT: Kiran Mahajan, Age 21, Driver
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2023-10-12 00:00:00
+  Location: 15.8454, 74.4971
+===
+
+=== CASE 2606 ===
+CaseMasterID: 2606
+CrimeNo: 300050074202100004 | CaseNo: 202100004
+Station: HAL Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Counterfeiting
+Status: Under Investigation
+Court: Family Court, Bengaluru
+Registered: 2020-03-16 | Incident: 2020-03-12 12:00:00 to 2020-03-14 12:00:00
+IO: Nikhil, Joint Commissioner of Police, Additional Superintendent of Police
+Sections: IPC 489A, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Counterfeit Indian currency with face value of Rs 2 lakhs was recovered at Rajajinagar, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Sita Gowda, Age 28, Female
+  VICTIM: Diya Murthy, Age 29, Female
+  COMPLAINANT: Ishita Pillai, Age 56, Driver
+  Location: 12.9516, 77.5655
+===
+
+=== CASE 2607 ===
+CaseMasterID: 2607
+CrimeNo: 300050061202200001 | CaseNo: 202200001
+Station: Basavanagudi Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Burglary
+Status: Charge Sheet Filed
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2021-06-13 | Incident: 2021-06-05 12:00:00 to 2021-06-09 12:00:00
+IO: Prakash, Additional Commissioner of Police, Commissioner of Police
+Sections: CrPC 154, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+A shop near Basavanagudi, Bengaluru Urban was burgled by breaking the lock.
+
+PERSONS INVOLVED:
+  ACCUSED: Shobha Hegde, Age 52, Female
+  ACCUSED: Rajesh Gupta, Age 44, Male
+  COMPLAINANT: Venkatesh Sen, Age 62, Milk Vendor
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2022-02-04 00:00:00
+  ARREST: 2021-06-27, arresting IO: Prakash, Additional Commissioner of Police, Commissioner of Police
+  Location: 12.9356, 77.5403
+===
+
+=== CASE 2608 ===
+CaseMasterID: 2608
+CrimeNo: 300050045202200002 | CaseNo: 202200002
+Station: Karnataka State Women Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Robbery
+Status: Charge Sheet Filed
+Court: Family Court, Bengaluru
+Registered: 2022-08-26 | Incident: 2022-08-20 12:00:00 to 2022-08-24 12:00:00
+IO: Myra, Inspector, Head Constable
+Sections: CrPC 154, CrPC 157, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Armed robbery was committed at a petrol bunk near Yeshwanthpur, Bengaluru Urban. The accused fled with cash amounting to Rs 2 lakhs.
+
+PERSONS INVOLVED:
+  ACCUSED: Madhury Thakuur, Age 33, Female
+  ACCUSED: Lakshmi Deshmukh, Age 63, Female
+  ACCUSED: Indira Sharma, Age 28, Female
+  COMPLAINANT: Mallikarjun Thakur, Age 50, Laborer
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2023-08-03 00:00:00
+  Location: 13.022, 77.5596
+===
+
+=== CASE 2609 ===
+CaseMasterID: 2609
+CrimeNo: 400130089202000004 | CaseNo: 202000004
+Station: Gokul Road Police Station, Dharwad
+District: Dharwad
+Crime Type: Dacoity
+Status: Acquitted
+Court: Family Court, Hubballi
+Registered: 2020-10-11 | Incident: 2020-10-05 12:00:00 to 2020-10-11 12:00:00
+IO: Karthik, Joint Commissioner of Police, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Highway dacoity committed on the bypass near Navanagar, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Pooja Mahajan, Age 60, Female
+  COMPLAINANT: Uma Thakur, Age 65, Painter
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2020-11-28 00:00:00
+  Location: 15.3872, 75.0782
+===
+
+=== CASE 2610 ===
+CaseMasterID: 2610
+CrimeNo: 200050063202100003 | CaseNo: 202100003
+Station: Ulsoor Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Counterfeiting
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Bengaluru
+Registered: 2020-11-04 | Incident: 2020-10-31 12:00:00 to 2020-11-01 12:00:00
+IO: Parashuram, Additional Commissioner of Police, Circle Inspector
+Sections: IPC 489A, CrPC 157, IEA 65B
+
+BRIEF FACTS:
+Forged documents including property deeds were seized from a gang operating near Jayanagar, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Gururaj Deshmukh, Age 33, Male
+  ACCUSED: Harish Bhat, Age 55, Male
+  COMPLAINANT: Aarav Banerjee, Age 40, Plumber
+
+PROCEEDINGS:
+  ARREST: 2020-11-06, arresting IO: Parashuram, Additional Commissioner of Police, Circle Inspector
+  Location: 12.9767, 77.5871
+===
+
+=== CASE 2611 ===
+CaseMasterID: 2611
+CrimeNo: 300220078202000006 | CaseNo: 202000006
+Station: KR Nagar Police Station, Mysuru
+District: Mysuru
+Crime Type: Hurt / Grievous Hurt
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Mysuru
+Registered: 2019-03-04 | Incident: 2019-02-27 12:00:00 to 2019-03-01 12:00:00
+IO: Bharat, Superintendent of Police, Investigating Officer
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused attacked the victim with a cycle chain at Mysuru South, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Ishaan Deshmukh, Age 40, Male
+  VICTIM: Shwetha Iyengar, Age 11, Female
+  COMPLAINANT: Ramachandra Sarkar, Age 45, Self Employed
+
+PROCEEDINGS:
+  ARREST: 2019-03-08, arresting IO: Bharat, Superintendent of Police, Investigating Officer
+  Location: 12.3263, 76.6261
+===
+
+=== CASE 2612 ===
+CaseMasterID: 2612
+CrimeNo: 100270038202400002 | CaseNo: 202400002
+Station: Udupi District Police Office, Udupi
+District: Udupi
+Crime Type: Cyber Crime
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Udupi
+Registered: 2024-03-14 | Incident: 2024-03-08 12:00:00 to 2024-03-11 12:00:00
+IO: Saanvi, Joint Commissioner of Police, Sub-Inspector
+Sections: IT Act 43, IT Act 66, CrPC 157, IEA 65B
+
+BRIEF FACTS:
+An email phishing scam was reported at Udupi Town, Udupi. The victim lost Rs 1.2 lakhs.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Mahesh Shinde, Age 30, Self Employed
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2024-09-28 00:00:00
+  Location: 13.3351, 74.7469
+===
+
+=== CASE 2613 ===
+CaseMasterID: 2613
+CrimeNo: 100300119202400007 | CaseNo: 202400007
+Station: Vijayapura City Police Station, Vijayapura
+District: Vijayapura
+Crime Type: Cheating
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Vijayapura
+Registered: 2023-07-30 | Incident: 2023-07-27 12:00:00 to 2023-07-28 12:00:00
+IO: Shobha, Additional Commissioner of Police, Investigating Officer
+Sections: CrPC 157, CrPC 161, CrPC 164, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused cheated the victim by selling a fake property at Vijayapura City, Vijayapura.
+
+PERSONS INVOLVED:
+  ACCUSED: Madhuri Mukherjee, Age 26, Female
+  ACCUSED: Nagaraj Patil, Age 26, Male
+  VICTIM: Nalini Trivedi, Age 37, Female
+  COMPLAINANT: Krishna Sen, Age 37, Shopkeeper
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2024-03-10 00:00:00
+  ARREST: 2023-07-30, arresting IO: Shobha, Additional Commissioner of Police, Investigating Officer
+  ARREST: 2023-08-05, arresting IO: Shobha, Additional Commissioner of Police, Investigating Officer
+  Location: 16.8298, 75.7117
+===
+
+=== CASE 2614 ===
+CaseMasterID: 2614
+CrimeNo: 400050076202000003 | CaseNo: 202000003
+Station: Bengaluru Cyber Crime Cell, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Rape
+Status: Charge Sheet Filed
+Court: Fast Track Court, Bengaluru
+Registered: 2019-08-24 | Incident: 2019-08-20 12:00:00 to 2019-08-22 12:00:00
+IO: Chandrashekar, Commissioner of Police, Police Constable
+Sections: IEA 24, CrPC 154, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+The accused repeatedly raped the survivor at Malleswaram, Bengaluru Urban over several months by promising marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Roopa Rajput, Age 39, Female
+  ACCUSED: Nandini Mahajan, Age 50, Female
+  VICTIM: Hemanth Sharma, Age 8, Male
+  COMPLAINANT: Rudra More, Age 62, Private Employee
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2020-01-31 00:00:00
+  Location: 12.9753, 77.5822
+===
+
+=== CASE 2615 ===
+CaseMasterID: 2615
+CrimeNo: 500260037202200006 | CaseNo: 202200006
+Station: Tumakuru District Police Office, Tumakuru
+District: Tumakuru
+Crime Type: Assault on Women
+Status: Under Investigation
+Court: District and Sessions Court, Tumakuru
+Registered: 2021-03-31 | Incident: 2021-03-26 12:00:00 to 2021-03-29 12:00:00
+IO: Ishaan, Deputy Superintendent of Police, Sub-Inspector
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Voyeurism was reported at Tumakuru City, Tumakuru. The accused was caught filming.
+
+PERSONS INVOLVED:
+  ACCUSED: Bheemesh Thakur, Age 57, Male
+  ACCUSED: Pavan Das, Age 59, Male
+  ACCUSED: Rohan Jadhav, Age 46, Male
+  COMPLAINANT: Manjunath Kulkarni, Age 27, Self Employed
+
+PROCEEDINGS:
+  ARREST: 2021-04-04, arresting IO: Ishaan, Deputy Superintendent of Police, Sub-Inspector
+  Location: 13.344, 77.11
+===
+
+=== CASE 2616 ===
+CaseMasterID: 2616
+CrimeNo: 300170007202500007 | CaseNo: 202500007
+Station: Kalaburagi City Police Commissionerate, Kalaburagi (Gulbarga)
+District: Kalaburagi (Gulbarga)
+Crime Type: Attempt to Murder
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Kalaburagi
+Registered: 2024-12-08 | Incident: 2024-12-01 12:00:00 to 2024-12-07 12:00:00
+IO: Devi, Additional Commissioner of Police, Additional Commissioner of Police
+Sections: CrPC 154, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused threw acid on the victim near Kalaburagi Suburban, Kalaburagi (Gulbarga) over a personal rivalry. The victim suffered severe burns.
+
+PERSONS INVOLVED:
+  ACCUSED: Tara Hegde, Age 60, Female
+  ACCUSED: Vinay Thakur, Age 38, Male
+  ACCUSED: Usha Nayak, Age 45, Female
+  ACCUSED: Kiran Patil, Age 47, Male
+  VICTIM: Deepak Pawar, Age 60, Male
+  VICTIM: Uma Ganguly, Age 52, Female
+  COMPLAINANT: Gururaj More, Age 55, Plumber
+
+PROCEEDINGS:
+  ARREST: 2024-12-12, arresting IO: Devi, Additional Commissioner of Police, Additional Commissioner of Police
+  ARREST: 2025-01-05, arresting IO: Devi, Additional Commissioner of Police, Additional Commissioner of Police
+  Location: 17.3071, 76.8215
+===
+
+=== CASE 2617 ===
+CaseMasterID: 2617
+CrimeNo: 200020098202000002 | CaseNo: 202000002
+Station: Belagavi City Police Station, Belagavi
+District: Belagavi
+Crime Type: Robbery
+Status: Under Investigation
+Court: Fast Track Court, Belagavi
+Registered: 2019-04-25 | Incident: 2019-04-21 12:00:00 to 2019-04-22 12:00:00
+IO: Vinay, Joint Commissioner of Police, Assistant Sub-Inspector
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused robbed a bank customer at Belagavi Camp, Belagavi after following him from the ATM.
+
+PERSONS INVOLVED:
+  ACCUSED: Deepika Das, Age 60, Female
+  ACCUSED: Prakash Rao, Age 38, Male
+  ACCUSED: Vihaan Kamat, Age 53, Male
+  VICTIM: Vinay Ganguly, Age 51, Male
+  VICTIM: Yamuna Iyengar, Age 42, Female
+  COMPLAINANT: Myra Pillai, Age 43, Private Employee
+
+PROCEEDINGS:
+  ARREST: 2019-04-30, arresting IO: Vinay, Joint Commissioner of Police, Assistant Sub-Inspector
+  Location: 15.847, 74.5127
+===
+
+=== CASE 2618 ===
+CaseMasterID: 2618
+CrimeNo: 500050001202300004 | CaseNo: 202300004
+Station: Karnataka State Police Headquarters, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Robbery
+Status: Charge Sheet Filed
+Court: Family Court, Bengaluru
+Registered: 2023-10-20 | Incident: 2023-10-11 12:00:00 to 2023-10-17 12:00:00
+IO: Diya, Deputy Superintendent of Police, Investigating Officer
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Robbery at a jewellery store at MG Road Bengaluru, Bengaluru Urban was committed by two masked persons. Ornaments worth Rs 10 lakhs were stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Vivaan Sarkar, Age 49, Male
+  VICTIM: Chandrika Sharma, Age 65, Female
+  VICTIM: Vivaan Sen, Age 17, Male
+  COMPLAINANT: Diya Menon, Age 42, Cook
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-03-20 00:00:00
+  Location: 12.9663, 77.6332
+===
+
+=== CASE 2619 ===
+CaseMasterID: 2619
+CrimeNo: 200050050202300006 | CaseNo: 202300006
+Station: Cubbon Park Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Criminal Trespass
+Status: Under Investigation
+Court: Family Court, Bengaluru
+Registered: 2022-09-24 | Incident: 2022-09-18 12:00:00 to 2022-09-21 12:00:00
+IO: Shreya, Joint Commissioner of Police, Director General of Police
+Sections: CrPC 157, CrPC 161, CrPC 164, IEA 24
+
+BRIEF FACTS:
+Lurking house trespass was committed at Jayanagar, Bengaluru Urban during the daytime.
+
+PERSONS INVOLVED:
+  ACCUSED: Venkatesh Acharya, Age 60, Male
+  VICTIM: Rahul Yadav, Age 26, Male
+  VICTIM: Pallavi Joshi, Age 37, Female
+  COMPLAINANT: Rani Shah, Age 37, Teacher
+
+PROCEEDINGS:
+  ARREST: 2022-10-13, arresting IO: Shreya, Joint Commissioner of Police, Director General of Police
+  Location: 12.9743, 77.5847
+===
+
+=== CASE 2620 ===
+CaseMasterID: 2620
+CrimeNo: 400020098202000003 | CaseNo: 202000003
+Station: Belagavi City Police Station, Belagavi
+District: Belagavi
+Crime Type: Cheating
+Status: Acquitted
+Court: Chief Judicial Magistrate Court, Belagavi
+Registered: 2020-07-07 | Incident: 2020-07-01 12:00:00 to 2020-07-06 12:00:00
+IO: Uma, Police Constable, Director General of Police
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused cheated the victim by selling a fake property at Belagavi City, Belagavi.
+
+PERSONS INVOLVED:
+  ACCUSED: Manish Gowda, Age 28, Male
+  COMPLAINANT: Suresh Menon, Age 60, Milk Vendor
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2020-10-19 00:00:00
+  ARREST: 2020-07-11, arresting IO: Uma, Police Constable, Director General of Police
+  Location: 15.8503, 74.503
+===
+
+=== CASE 2621 ===
+CaseMasterID: 2621
+CrimeNo: 200090111202400006 | CaseNo: 202400006
+Station: Chikkamagaluru Town Police Station, Chikkamagaluru
+District: Chikkamagaluru
+Crime Type: Robbery
+Status: Under Investigation
+Court: District and Sessions Court, Chikkamagaluru
+Registered: 2024-11-25 | Incident: 2024-11-20 12:00:00 to 2024-11-23 12:00:00
+IO: Neha, Head Constable, Station House Officer
+Sections: CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+A gang of three persons robbed commuters on the highway near Chikkamagaluru Town, Chikkamagaluru at knife point.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Akash Gowda, Age 58, Police Officer
+  Location: 13.308, 75.7812
+===
+
+=== CASE 2622 ===
+CaseMasterID: 2622
+CrimeNo: 300050016202100003 | CaseNo: 202100003
+Station: Bengaluru Urban District Police Office, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Riots
+Status: Under Investigation
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2020-05-25 | Incident: 2020-05-22 12:00:00 to 2020-05-24 12:00:00
+IO: Mohan, Director General of Police, Inspector of Police
+Sections: CrPC 161
+
+BRIEF FACTS:
+Unlawful assembly was formed at Indiranagar, Bengaluru Urban causing public nuisance.
+
+PERSONS INVOLVED:
+  ACCUSED: Neha Chowdhury, Age 37, Female
+  COMPLAINANT: Myra Hegde, Age 28, Housewife
+  Location: 12.9969, 77.6532
+===
+
+=== CASE 2623 ===
+CaseMasterID: 2623
+CrimeNo: 100130087202400005 | CaseNo: 202400005
+Station: Hubballi Urban Police Station, Dharwad
+District: Dharwad
+Crime Type: Culpable Homicide
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Dharwad at Hubballi
+Registered: 2024-12-29 | Incident: 2024-12-19 12:00:00 to 2024-12-25 12:00:00
+IO: Chandrashekar, Sub-Inspector, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The victim died due to medical negligence at a private clinic near Dharwad City Center, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Kaveeri Kumahr, Age 18, Female
+  ACCUSED: Hema Naik, Age 50, Female
+  COMPLAINANT: Rajesh Verma, Age 49, Student
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2025-02-11 00:00:00
+  Location: 15.4548, 75.0049
+===
+
+=== CASE 2624 ===
+CaseMasterID: 2624
+CrimeNo: 400280039202200004 | CaseNo: 202200004
+Station: Uttara Kannada District Police Office, Uttara Kannada
+District: Uttara Kannada
+Crime Type: Assault on Women
+Status: Under Investigation
+Court: District and Sessions Court, Belagavi
+Registered: 2021-08-22 | Incident: 2021-08-13 12:00:00 to 2021-08-18 12:00:00
+IO: Vihaan, Superintendent of Police, Joint Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Voyeurism was reported at Karwar Uttara Kannada, Uttara Kannada. The accused was caught filming.
+
+PERSONS INVOLVED:
+  ACCUSED: Hema Sen, Age 39, Female
+  ACCUSED: Radha Joshi, Age 49, Female
+  COMPLAINANT: Revathi Kamat, Age 44, Farmer
+  Location: 14.5201, 74.3164
+===
+
+=== CASE 2625 ===
+CaseMasterID: 2625
+CrimeNo: 400050068202300004 | CaseNo: 202300004
+Station: Peenya Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Murder
+Status: Trial in Progress
+Court: Chief Judicial Magistrate Court, Bengaluru
+Registered: 2022-12-31 | Incident: 2022-12-22 12:00:00 to 2022-12-28 12:00:00
+IO: Riya, Director General of Police, Inspector of Police
+Sections: IPC 302, CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused attacked the victim with a sharp weapon near Jayanagar, Bengaluru Urban over a property dispute. The victim succumbed to injuries on the way to the hospital.
+
+PERSONS INVOLVED:
+  ACCUSED: Aahnya Banerjee, Age 60, Female
+  VICTIM: Amit Acharya, Age 7, Male
+  COMPLAINANT: Chandrika More, Age 55, Housewife
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2023-10-04 00:00:00
+  Location: 12.9691, 77.5858
+===
+
+=== CASE 2626 ===
+CaseMasterID: 2626
+CrimeNo: 500020013202500006 | CaseNo: 202500006
+Station: Belagavi District Police Office, Belagavi
+District: Belagavi
+Crime Type: Dacoity
+Status: Under Investigation
+Court: Additional District and Sessions Court, Belagavi
+Registered: 2024-06-26 | Incident: 2024-06-22 12:00:00 to 2024-06-24 12:00:00
+IO: Parashuram, Assistant Sub-Inspector, Inspector of Police
+Sections: CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+A group of unknown miscreants committed dacoity at a temple near Belagavi City, Belagavi and looted the donation box.
+
+PERSONS INVOLVED:
+  ACCUSED: Padma Menon, Age 50, Female
+  COMPLAINANT: Siddalinga Joshi, Age 35, Government Employee
+  Location: 15.8428, 74.4911
+===
+
+=== CASE 2627 ===
+CaseMasterID: 2627
+CrimeNo: 200020112202400007 | CaseNo: 202400007
+Station: Chikkodi Police Station, Belagavi
+District: Belagavi
+Crime Type: Criminal Breach of Trust
+Status: Under Investigation
+Court: Additional District and Sessions Court, Belagavi
+Registered: 2024-07-26 | Incident: 2024-07-22 12:00:00 to 2024-07-25 12:00:00
+IO: Ajay, Joint Commissioner of Police, Director General of Police
+Sections: CrPC 161, IEA 65B
+
+BRIEF FACTS:
+A bailee sold the bailed goods without consent near Maruti Galli Belagavi, Belagavi.
+
+PERSONS INVOLVED:
+  ACCUSED: Aanya Murthy, Age 28, Female
+  ACCUSED: Myra Rajput, Age 61, Female
+  COMPLAINANT: Lakshmi Sarkar, Age 46, Private Employee
+
+PROCEEDINGS:
+  ARREST: 2024-07-29, arresting IO: Ajay, Joint Commissioner of Police, Director General of Police
+  Location: 15.8296, 74.4848
+===
+
+=== CASE 2628 ===
+CaseMasterID: 2628
+CrimeNo: 300020006202200003 | CaseNo: 202200003
+Station: Belagavi City Police Commissionerate, Belagavi
+District: Belagavi
+Crime Type: Theft
+Status: Under Investigation
+Court: District and Sessions Court, Belagavi
+Registered: 2022-04-03 | Incident: 2022-03-25 12:00:00 to 2022-03-31 12:00:00
+IO: Sharath, Superintendent of Police, Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Theft from a vehicle parked at Belagavi Camp, Belagavi was reported. A tool box and spare tyre were stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Hemanth Bhatt, Age 48, Male
+  COMPLAINANT: Kavitha Jadhav, Age 24, Student
+
+PROCEEDINGS:
+  ARREST: 2022-04-08, arresting IO: Sharath, Superintendent of Police, Superintendent of Police
+  Location: 15.8462, 74.5247
+===
+
+=== CASE 2629 ===
+CaseMasterID: 2629
+CrimeNo: 400130090202000005 | CaseNo: 202000005
+Station: Dharwad City Police Station, Dharwad
+District: Dharwad
+Crime Type: Culpable Homicide
+Status: Under Investigation
+Court: District and Sessions Court, Dharwad at Hubballi
+Registered: 2019-02-06 | Incident: 2019-02-01 12:00:00 to 2019-02-02 12:00:00
+IO: Raj, Deputy Superintendent of Police, Sub-Inspector
+Sections: CrPC 154, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+A road accident occurred at Hubballi City Center, Dharwad when the accused lost control of the vehicle and hit a pedestrian, causing death by negligence.
+
+PERSONS INVOLVED:
+  ACCUSED: Venkatesh Ganguly, Age 38, Male
+  ACCUSED: Saanvi Sarkar, Age 37, Female
+  ACCUSED: Saanvi Kamat, Age 34, Female
+  ACCUSED: Venkatesh Nayak, Age 27, Male
+  VICTIM: Bheemesh Sarkar, Age 50, Male
+  VICTIM: Ansh Verma, Age 30, Male
+  COMPLAINANT: Nandini Aiyappa, Age 25, Lawyer
+
+PROCEEDINGS:
+  ARREST: 2019-04-05, arresting IO: Raj, Deputy Superintendent of Police, Sub-Inspector
+  ARREST: 2019-02-06, arresting IO: Raj, Deputy Superintendent of Police, Sub-Inspector
+  ARREST: 2019-02-07, arresting IO: Raj, Deputy Superintendent of Police, Sub-Inspector
+  Location: 15.3629, 75.1189
+===
+
+=== CASE 2630 ===
+CaseMasterID: 2630
+CrimeNo: 300030014202300005 | CaseNo: 202300005
+Station: Bellary District Police Office, Bellary
+District: Bellary
+Crime Type: Criminal Trespass
+Status: Trial in Progress
+Court: Additional District and Sessions Court, Ballari
+Registered: 2023-04-08 | Incident: 2023-04-02 12:00:00 to 2023-04-07 12:00:00
+IO: Usha, Deputy Commissioner of Police, Assistant Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Lurking house trespass was committed at Ballari City, Bellary during the daytime.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Padma Trivedi, Age 38, Newspaper Vendor
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2023-06-06 00:00:00
+  Location: 15.1377, 76.9288
+===
+
+=== CASE 2631 ===
+CaseMasterID: 2631
+CrimeNo: 300130024202200008 | CaseNo: 202200008
+Station: Dharwad District Police Office, Dharwad
+District: Dharwad
+Crime Type: Hurt / Grievous Hurt
+Status: Charge Sheet Filed
+Court: Family Court, Hubballi
+Registered: 2022-04-01 | Incident: 2022-03-24 12:00:00 to 2022-03-28 12:00:00
+IO: Rohan, Head Constable, Director General of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 24, IEA 65B
+
+BRIEF FACTS:
+Hurt by rash driving occurred at Gokul Road Hubballi, Dharwad. A pedestrian was knocked down.
+
+PERSONS INVOLVED:
+  ACCUSED: Sita Bhat, Age 64, Female
+  VICTIM: Mala Sarkar, Age 82, Female
+  VICTIM: Yadunandan Shetty, Age 13, Male
+  COMPLAINANT: Nagaraj Rajput, Age 60, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2022-05-02 00:00:00
+  Location: 15.3522, 75.1511
+===
+
+=== CASE 2632 ===
+CaseMasterID: 2632
+CrimeNo: 300050043202500006 | CaseNo: 202500006
+Station: Karnataka State Traffic Police Unit, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cyber Crime
+Status: Trial in Progress
+Court: Family Court, Bengaluru
+Registered: 2024-07-10 | Incident: 2024-07-07 12:00:00 to 2024-07-07 12:00:00
+IO: Revathi, Joint Commissioner of Police, Assistant Sub-Inspector
+Sections: IT Act 43, IT Act 66, CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Data theft from a company server was detected at Koramangala, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Priya Shetty, Age 33, Female
+  ACCUSED: Vivaan Das, Age 26, Male
+  ACCUSED: Suresh Mallya, Age 54, Male
+  COMPLAINANT: Riya Gowda, Age 24, Plumber
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2024-12-27 00:00:00
+  ARREST: 2024-07-20, arresting IO: Revathi, Joint Commissioner of Police, Assistant Sub-Inspector
+  ARREST: 2024-07-17, arresting IO: Revathi, Joint Commissioner of Police, Assistant Sub-Inspector
+  Location: 12.9275, 77.6095
+===
+
+=== CASE 2633 ===
+CaseMasterID: 2633
+CrimeNo: 100170011202000005 | CaseNo: 202000005
+Station: Eastern Range Headquarters, Kalaburagi, Kalaburagi (Gulbarga)
+District: Kalaburagi (Gulbarga)
+Crime Type: Dacoity
+Status: Acquitted
+Court: Additional District and Sessions Court, Kalaburagi
+Registered: 2020-03-21 | Incident: 2020-03-12 12:00:00 to 2020-03-17 12:00:00
+IO: Manish, Deputy Commissioner of Police, Inspector of Police
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Armed dacoity was committed at a textile showroom at Kalaburagi City Center, Kalaburagi (Gulbarga) by a gang of five persons. Goods worth Rs 15 lakhs looted.
+
+PERSONS INVOLVED:
+  ACCUSED: Narasimha Gupta, Age 43, Male
+  ACCUSED: Krishna Rajput, Age 43, Male
+  ACCUSED: Arjun Sharma, Age 31, Male
+  COMPLAINANT: Rani Ghorpade, Age 52, Teacher
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2020-08-02 00:00:00
+  ARREST: 2020-06-08, arresting IO: Manish, Deputy Commissioner of Police, Inspector of Police
+  Location: 17.3359, 76.8321
+===
+
+=== CASE 2634 ===
+CaseMasterID: 2634
+CrimeNo: 500050075202300006 | CaseNo: 202300006
+Station: Bengaluru Traffic Police Unit, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Burglary
+Status: Charge Sheet Filed
+Court: Family Court, Bengaluru
+Registered: 2022-05-17 | Incident: 2022-05-09 12:00:00 to 2022-05-14 12:00:00
+IO: Deepak, Assistant Sub-Inspector, Station House Officer
+Sections: CrPC 154, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+The accused broke into a house at MG Road Bengaluru, Bengaluru Urban by cutting the grill.
+
+PERSONS INVOLVED:
+  ACCUSED: Amit Ghorpade, Age 36, Male
+  COMPLAINANT: Lalitha Bhatt, Age 28, Barber
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2022-09-08 00:00:00
+  Location: 12.9645, 77.639
+===
+
+=== CASE 2635 ===
+CaseMasterID: 2635
+CrimeNo: 400130090202100003 | CaseNo: 202100003
+Station: Dharwad City Police Station, Dharwad
+District: Dharwad
+Crime Type: Cheating
+Status: Under Investigation
+Court: District and Sessions Court, Dharwad at Hubballi
+Registered: 2021-10-10 | Incident: 2021-10-07 12:00:00 to 2021-10-09 12:00:00
+IO: Raj, Deputy Superintendent of Police, Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused cheated the victim by impersonating as a government official at Navanagar, Dharwad and extracted Rs 2 lakhs.
+
+PERSONS INVOLVED:
+  ACCUSED: Naveen Pawar, Age 24, Male
+  VICTIM: Kavitha Pillai, Age 68, Female
+  VICTIM: Ramachandra Shah, Age 73, Male
+  COMPLAINANT: Eashwar Nair, Age 26, Business Owner
+  Location: 15.3804, 75.0781
+===
+
+=== CASE 2636 ===
+CaseMasterID: 2636
+CrimeNo: 300050066202000009 | CaseNo: 202000009
+Station: Kengeri Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Robbery
+Status: Acquitted
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2020-10-27 | Incident: 2020-10-22 12:00:00 to 2020-10-25 12:00:00
+IO: Vijaya, Joint Commissioner of Police, Station House Officer
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+A gang of three persons robbed commuters on the highway near Rajajinagar, Bengaluru Urban at knife point.
+
+PERSONS INVOLVED:
+  ACCUSED: Shobha Rao, Age 64, Female
+  ACCUSED: Lakshmi Acharya, Age 48, Female
+  VICTIM: Bhagya Murthy, Age 39, Female
+  COMPLAINANT: Geeta Nayak, Age 46, Tailor
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2021-05-12 00:00:00
+  ARREST: 2020-11-01, arresting IO: Vijaya, Joint Commissioner of Police, Station House Officer
+  Location: 12.9475, 77.5689
+===
+
+=== CASE 2637 ===
+CaseMasterID: 2637
+CrimeNo: 100260115202100005 | CaseNo: 202100005
+Station: Tiptur Police Station, Tumakuru
+District: Tumakuru
+Crime Type: Cheating
+Status: Under Investigation
+Court: District and Sessions Court, Tumakuru
+Registered: 2020-02-20 | Incident: 2020-02-13 12:00:00 to 2020-02-18 12:00:00
+IO: Deepak, Assistant Sub-Inspector, Police Constable
+Sections: CrPC 154, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused cheated the victim by impersonating as a government official at Tumakuru City, Tumakuru and extracted Rs 2 lakhs.
+
+PERSONS INVOLVED:
+  ACCUSED: Uma Deshmukh, Age 63, Female
+  ACCUSED: Amit Kamat, Age 58, Male
+  COMPLAINANT: Lalitha Iyer, Age 58, Painter
+  Location: 13.3446, 77.1238
+===
+
+=== CASE 2638 ===
+CaseMasterID: 2638
+CrimeNo: 400220085202300007 | CaseNo: 202300007
+Station: Mysuru Cyber Crime Cell, Mysuru
+District: Mysuru
+Crime Type: Arson
+Status: Trial in Progress
+Court: Additional District and Sessions Court, Mysuru
+Registered: 2022-08-04 | Incident: 2022-07-30 12:00:00 to 2022-07-31 12:00:00
+IO: Prathibha, Joint Commissioner of Police, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+Mischief by explosive materials was reported at Kuvempunagar Mysuru, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Shaurya Iyer, Age 21, Male
+  ACCUSED: Aarav Pillai, Age 59, Male
+  COMPLAINANT: Rohan Thakur, Age 51, Shopkeeper
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2023-07-24 00:00:00
+  Location: 12.303, 76.612
+===
+
+=== CASE 2639 ===
+CaseMasterID: 2639
+CrimeNo: 400050065202300006 | CaseNo: 202300006
+Station: Whitefield Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Arson
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Bengaluru
+Registered: 2022-08-31 | Incident: 2022-08-24 12:00:00 to 2022-08-26 12:00:00
+IO: Aanya, Police Constable, Joint Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+The accused set fire to the thatched house of the victim at Jayanagar, Bengaluru Urban following a property dispute.
+
+PERSONS INVOLVED:
+  ACCUSED: Ishita Kamat, Age 29, Female
+  ACCUSED: Shobha Acharya, Age 62, Female
+  VICTIM: Amit Sharma, Age 73, Male
+  VICTIM: Uma Kulkarni, Age 46, Female
+  COMPLAINANT: Riya Iyer, Age 26, Tailor
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2022-12-24 00:00:00
+  Location: 12.9774, 77.5919
+===
+
+=== CASE 2640 ===
+CaseMasterID: 2640
+CrimeNo: 500130086202100002 | CaseNo: 202100002
+Station: Hubballi Rural Police Station, Dharwad
+District: Dharwad
+Crime Type: Dowry Death
+Status: Under Investigation
+Court: District and Sessions Court, Dharwad at Hubballi
+Registered: 2020-06-28 | Incident: 2020-06-19 12:00:00 to 2020-06-25 12:00:00
+IO: Dhruv, Director General of Police, Deputy Superintendent of Police
+Sections: IPC 498A, CrPC 157, CrPC 161, CrPC 164, IEA 24
+
+BRIEF FACTS:
+Dowry death by hanging was reported at Vidyanagar Hubballi, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Shankar Rajput, Age 26, Male
+  ACCUSED: Gowri Sharma, Age 31, Female
+  ACCUSED: Deepika Thakur, Age 58, Female
+  VICTIM: Kavya Sen, Age 12, Female
+  VICTIM: Ayaan Chauhan, Age 30, Male
+  VICTIM: Ansh Joshi, Age 43, Male
+  COMPLAINANT: Mallikarjun Bhat, Age 55, Plumber
+
+PROCEEDINGS:
+  ARREST: 2020-06-29, arresting IO: Dhruv, Director General of Police, Deputy Superintendent of Police
+  Location: 15.3786, 75.1169
+===
+
+=== CASE 2641 ===
+CaseMasterID: 2641
+CrimeNo: 100050061202100009 | CaseNo: 202100009
+Station: Basavanagudi Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Murder
+Status: Under Investigation
+Court: Fast Track Court, Bengaluru
+Registered: 2021-03-31 | Incident: 2021-03-21 12:00:00 to 2021-03-28 12:00:00
+IO: Ajay, Superintendent of Police, Head Constable
+Sections: IPC 302, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+The deceased was last seen with the accused at Yeshwanthpur, Bengaluru Urban. Later, the body was discovered in a secluded area with head injuries caused by a blunt object.
+
+PERSONS INVOLVED:
+  ACCUSED: Narasimha Rao, Age 56, Male
+  ACCUSED: Krishna Ganguly, Age 65, Male
+  VICTIM: Vinay Deshmukh, Age 71, Male
+  VICTIM: Ansh Kamat, Age 76, Male
+  COMPLAINANT: Savitri Mahajan, Age 30, Plumber
+
+PROCEEDINGS:
+  ARREST: 2021-04-03, arresting IO: Ajay, Superintendent of Police, Head Constable
+  ARREST: 2021-04-01, arresting IO: Ajay, Superintendent of Police, Head Constable
+  Location: 13.0188, 77.5559
+===
+
+=== CASE 2642 ===
+CaseMasterID: 2642
+CrimeNo: 500220077202500005 | CaseNo: 202500005
+Station: Nazarbad Police Station, Mysuru
+District: Mysuru
+Crime Type: Murder
+Status: Trial in Progress
+Court: Additional District and Sessions Court, Mysuru
+Registered: 2025-03-17 | Incident: 2025-03-08 12:00:00 to 2025-03-12 12:00:00
+IO: Mamatha, Commissioner of Police, Head Constable
+Sections: IPC 302, CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The deceased was last seen with the accused at Mysuru South, Mysuru. Later, the body was discovered in a secluded area with head injuries caused by a blunt object.
+
+PERSONS INVOLVED:
+  ACCUSED: Prakash Mukherjee, Age 29, Male
+  VICTIM: Siddharth Patil, Age 62, Male
+  VICTIM: Tara Sen, Age 67, Female
+  COMPLAINANT: Saanvi Das, Age 24, Lawyer
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2025-09-15 00:00:00
+  Location: 12.3183, 76.6238
+===
+
+=== CASE 2643 ===
+CaseMasterID: 2643
+CrimeNo: 500100122202500002 | CaseNo: 202500002
+Station: Chitradurga City Police Station, Chitradurga
+District: Chitradurga
+Crime Type: Dacoity
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Chitradurga
+Registered: 2025-05-03 | Incident: 2025-04-27 12:00:00 to 2025-05-01 12:00:00
+IO: Siddharth, Assistant Sub-Inspector, Superintendent of Police
+Sections: CrPC 154, CrPC 161, CrPC 164, IEA 24, IEA 65B
+
+BRIEF FACTS:
+Highway dacoity committed on the bypass near Chitradurga City, Chitradurga.
+
+PERSONS INVOLVED:
+  ACCUSED: Rajesh Yadav, Age 24, Male
+  COMPLAINANT: Yadunandan More, Age 28, Private Employee
+  Location: 14.2197, 76.3958
+===
+
+=== CASE 2644 ===
+CaseMasterID: 2644
+CrimeNo: 300220080202200004 | CaseNo: 202200004
+Station: Mysuru North Police Station, Mysuru
+District: Mysuru
+Crime Type: Criminal Breach of Trust
+Status: Charge Sheet Filed
+Court: Fast Track Court, Mysuru
+Registered: 2022-08-05 | Incident: 2022-07-29 12:00:00 to 2022-08-02 12:00:00
+IO: Sai, Joint Commissioner of Police, Additional Commissioner of Police
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused misappropriated funds collected from farmers near Mysuru North, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Aditi Iyengar, Age 59, Female
+  COMPLAINANT: Padma Gupta, Age 33, Shopkeeper
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2023-05-11 00:00:00
+  Location: 12.3368, 76.6546
+===
+
+=== CASE 2645 ===
+CaseMasterID: 2645
+CrimeNo: 500050059202200005 | CaseNo: 202200005
+Station: Koramangala Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Kidnapping & Abduction
+Status: Under Investigation
+Court: Additional Chief Judicial Magistrate Court, Bengaluru
+Registered: 2022-04-23 | Incident: 2022-04-22 12:00:00 to 2022-04-23 12:00:00
+IO: Eashwar, Joint Commissioner of Police, Assistant Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+A minor girl was kidnapped from near her school at Bengaluru City Center, Bengaluru Urban. The accused was traced and the child was recovered within 24 hours.
+
+PERSONS INVOLVED:
+  ACCUSED: Pooja Guppta, Age 59, Female
+  ACCUSED: Lakshmi Kulkarni, Age 19, Female
+  VICTIM: Vivaan Acharya, Age 38, Male
+  VICTIM: Basavaraj Ganguly, Age 54, Male
+  VICTIM: Pooja Mehta, Age 84, Female
+  COMPLAINANT: Chandrashekar Hegde, Age 29, Self Employed
+  Location: 12.973, 77.6019
+===
+
+=== CASE 2646 ===
+CaseMasterID: 2646
+CrimeNo: 200050071202100004 | CaseNo: 202100004
+Station: Byatarayanapura Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Theft
+Status: Charge Sheet Filed
+Court: Fast Track Court, Bengaluru
+Registered: 2021-11-05 | Incident: 2021-11-04 12:00:00 to 2021-11-04 12:00:00
+IO: Suresh, Police Constable, Joint Commissioner of Police
+Sections: CrPC 157, IEA 24
+
+BRIEF FACTS:
+Theft from a vehicle parked at Malleswaram, Bengaluru Urban was reported. A tool box and spare tyre were stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Ayaan Thakur, Age 59, Male
+  ACCUSED: Basavaraj Bhatt, Age 60, Male
+  VICTIM: Gowri Nair, Age 75, Female
+  COMPLAINANT: Mohan Kulkarni, Age 42, Self Employed
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2022-11-04 00:00:00
+  ARREST: 2022-01-16, arresting IO: Suresh, Police Constable, Joint Commissioner of Police
+  ARREST: 2022-01-29, arresting IO: Suresh, Police Constable, Joint Commissioner of Police
+  Location: 12.9856, 77.5844
+===
+
+=== CASE 2647 ===
+CaseMasterID: 2647
+CrimeNo: 100130004202100007 | CaseNo: 202100007
+Station: Hubballi-Dharwad Police Commissionerate, Dharwad
+District: Dharwad
+Crime Type: Criminal Trespass
+Status: Closed as Mistake of Fact
+Court: Additional District and Sessions Court, Dharwad
+Registered: 2020-07-06 | Incident: 2020-06-28 12:00:00 to 2020-07-02 12:00:00
+IO: Manish, Head Constable, Police Constable
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24
+
+BRIEF FACTS:
+House trespass by night was reported at Hubballi Railway Station, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Pooja Gowda, Age 30, Female
+  VICTIM: Akash Jadhav, Age 10, Male
+  COMPLAINANT: Chandrashekar Pawar, Age 33, Housewife
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-01-06 00:00:00
+  Location: 15.3512, 75.1322
+===
+
+=== CASE 2648 ===
+CaseMasterID: 2648
+CrimeNo: 200050054202000006 | CaseNo: 202000006
+Station: Malleswaram Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Riots
+Status: Under Investigation
+Court: Fast Track Court, Bengaluru
+Registered: 2019-01-22 | Incident: 2019-01-14 12:00:00 to 2019-01-19 12:00:00
+IO: Channabasava, Police Constable, Commissioner of Police
+Sections: CrPC 157
+
+BRIEF FACTS:
+Rioting occurred at Rajajinagar, Bengaluru Urban during a religious procession. Stones were pelted.
+
+PERSONS INVOLVED:
+  ACCUSED: Ravi Iyengar, Age 51, Male
+  ACCUSED: Eashwar Shinde, Age 56, Male
+  VICTIM: Priya Trivedi, Age 83, Female
+  VICTIM: Pranav Murthy, Age 56, Male
+  COMPLAINANT: Sharada Shetty, Age 20, Laborer
+  Location: 12.9438, 77.5755
+===
+
+=== CASE 2649 ===
+CaseMasterID: 2649
+CrimeNo: 300050055202400009 | CaseNo: 202400009
+Station: Yeshwanthpur Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Attempt to Murder
+Status: Charge Sheet Filed
+Court: Motor Accident Claims Tribunal, Bengaluru
+Registered: 2024-07-22 | Incident: 2024-07-18 12:00:00 to 2024-07-19 12:00:00
+IO: Achyuta, Commissioner of Police, Station House Officer
+Sections: CrPC 154, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+The accused threw acid on the victim near Yeshwanthpur, Bengaluru Urban over a personal rivalry. The victim suffered severe burns.
+
+PERSONS INVOLVED:
+  ACCUSED: Pavan Aiyappa, Age 50, Male
+  ACCUSED: Pooja Pillai, Age 27, Female
+  ACCUSED: Uma Reddy, Age 33, Female
+  VICTIM: Uma Shetty, Age 75, Female
+  COMPLAINANT: Rohan Bhat, Age 51, Milk Vendor
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2025-06-12 00:00:00
+  Location: 13.0225, 77.5609
+===
+
+=== CASE 2650 ===
+CaseMasterID: 2650
+CrimeNo: 300210032202000004 | CaseNo: 202000004
+Station: Mandya District Police Office, Mandya
+District: Mandya
+Crime Type: Extortion
+Status: Trial in Progress
+Court: District and Sessions Court, Mandya
+Registered: 2020-03-06 | Incident: 2020-02-29 12:00:00 to 2020-03-04 12:00:00
+IO: Sanjay, Inspector, Assistant Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24
+
+BRIEF FACTS:
+The accused, claiming to be a gangster, demanded ransom from a businessman at Mandya Town, Mandya.
+
+PERSONS INVOLVED:
+  ACCUSED: Lalitha Shinde, Age 23, Female
+  ACCUSED: Rahul Mehta, Age 48, Male
+  COMPLAINANT: Akash Chauhan, Age 49, Sweeper
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2020-05-06 00:00:00
+  ARREST: 2020-03-07, arresting IO: Sanjay, Inspector, Assistant Sub-Inspector
+  ARREST: 2020-03-06, arresting IO: Sanjay, Inspector, Assistant Sub-Inspector
+  Location: 12.517, 76.89
+===
+
+=== CASE 2651 ===
+CaseMasterID: 2651
+CrimeNo: 400050016202400003 | CaseNo: 202400003
+Station: Bengaluru Urban District Police Office, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Murder
+Status: Under Investigation
+Court: Family Court, Bengaluru
+Registered: 2023-02-25 | Incident: 2023-02-17 12:00:00 to 2023-02-23 12:00:00
+IO: Padma, Deputy Superintendent of Police, Commissioner of Police
+Sections: IPC 302, CrPC 154, CrPC 157, CrPC 164
+
+BRIEF FACTS:
+The accused attacked the victim with a sharp weapon near HSR Layout, Bengaluru Urban over a property dispute. The victim succumbed to injuries on the way to the hospital.
+
+PERSONS INVOLVED:
+  VICTIM: Roopa Banerjee, Age 79, Female
+  COMPLAINANT: Kaveri Iyer, Age 43, Auto Rickshaw Driver
+  Location: 12.9042, 77.6226
+===
+
+=== CASE 2652 ===
+CaseMasterID: 2652
+CrimeNo: 300050044202200004 | CaseNo: 202200004
+Station: Karnataka State Cyber Crime Cell, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Riots
+Status: Charge Sheet Filed
+Court: Fast Track Court, Bengaluru
+Registered: 2022-09-23 | Incident: 2022-09-15 12:00:00 to 2022-09-22 12:00:00
+IO: Kiran, Police Constable, Station House Officer
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+A factional fight at Basavanagudi, Bengaluru Urban resulted in damage to public property.
+
+PERSONS INVOLVED:
+  ACCUSED: Neha Rajput, Age 26, Female
+  ACCUSED: Rani Ghorpade, Age 61, Female
+  VICTIM: Satish Sarkar, Age 35, Male
+  COMPLAINANT: Aarav Kamat, Age 45, Newspaper Vendor
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2022-12-04 00:00:00
+  ARREST: 2022-11-15, arresting IO: Kiran, Police Constable, Station House Officer
+  ARREST: 2022-12-11, arresting IO: Kiran, Police Constable, Station House Officer
+  Location: 12.9418, 77.5435
+===
+
+=== CASE 2653 ===
+CaseMasterID: 2653
+CrimeNo: 500130086202200002 | CaseNo: 202200002
+Station: Hubballi Rural Police Station, Dharwad
+District: Dharwad
+Crime Type: Criminal Breach of Trust
+Status: Charge Sheet Filed
+Court: Additional District and Sessions Court, Dharwad
+Registered: 2021-07-07 | Incident: 2021-07-03 12:00:00 to 2021-07-03 12:00:00
+IO: Vinay, Superintendent of Police, Director General of Police
+Sections: CrPC 154, CrPC 157, CrPC 164
+
+BRIEF FACTS:
+A bailee sold the bailed goods without consent near Gokul Road Hubballi, Dharwad.
+
+PERSONS INVOLVED:
+  VICTIM: Vivaan Kulkarni, Age 60, Male
+  COMPLAINANT: Mohan Nayak, Age 54, Engineer
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2022-03-13 00:00:00
+  Location: 15.3495, 75.144
+===
+
+=== CASE 2654 ===
+CaseMasterID: 2654
+CrimeNo: 100290040202100005 | CaseNo: 202100005
+Station: Vijayanagara District Police Office, Vijayanagara
+District: Vijayanagara
+Crime Type: Hurt / Grievous Hurt
+Status: Trial in Progress
+Court: District and Sessions Court, Ballari
+Registered: 2020-06-06 | Incident: 2020-05-27 12:00:00 to 2020-06-02 12:00:00
+IO: Akash, Superintendent of Police, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Grievous hurt was caused by the accused using a sword at Vijayanagara City, Vijayanagara.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavya Hegde, Age 60, Female
+  ACCUSED: Aarav Chowdhury, Age 46, Male
+  COMPLAINANT: Yamuna Reddy, Age 48, Shopkeeper
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2021-03-15 00:00:00
+  ARREST: 2020-06-12, arresting IO: Akash, Superintendent of Police, Deputy Superintendent of Police
+  Location: 15.1836, 76.9097
+===
+
+=== CASE 2655 ===
+CaseMasterID: 2655
+CrimeNo: 200090020202000002 | CaseNo: 202000002
+Station: Chikkamagaluru District Police Office, Chikkamagaluru
+District: Chikkamagaluru
+Crime Type: Criminal Breach of Trust
+Status: Under Investigation
+Court: District and Sessions Court, Chikkamagaluru
+Registered: 2019-10-21 | Incident: 2019-10-15 12:00:00 to 2019-10-17 12:00:00
+IO: Bhavani, Commissioner of Police, Circle Inspector
+Sections: CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused, a bank employee, misappropriated fixed deposit amounts of senior citizens at Chikkamagaluru Town, Chikkamagaluru.
+
+PERSONS INVOLVED:
+  ACCUSED: Neha Naik, Age 56, Female
+  ACCUSED: Lakshmi Kulkarni, Age 57, Female
+  VICTIM: Eashwar Bose, Age 39, Male
+  VICTIM: Gowri Bhatt, Age 54, Female
+  COMPLAINANT: Indira Shah, Age 38, Plumber
+
+PROCEEDINGS:
+  ARREST: 2019-10-24, arresting IO: Bhavani, Commissioner of Police, Circle Inspector
+  ARREST: 2019-10-23, arresting IO: Bhavani, Commissioner of Police, Circle Inspector
+  Location: 13.3121, 75.7696
+===
+
+=== CASE 2656 ===
+CaseMasterID: 2656
+CrimeNo: 100020010202300004 | CaseNo: 202300004
+Station: Northern Range Headquarters, Belagavi, Belagavi
+District: Belagavi
+Crime Type: Assault on Women
+Status: Convicted
+Court: Fast Track Court, Belagavi
+Registered: 2022-11-18 | Incident: 2022-11-10 12:00:00 to 2022-11-16 12:00:00
+IO: Ibrahim, Director General of Police, Deputy Superintendent of Police
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused passed lewd comments at a woman near Maruti Galli Belagavi, Belagavi.
+
+PERSONS INVOLVED:
+  ACCUSED: Chandrashekar Hegde, Age 61, Male
+  VICTIM: Krishna Banerjee, Age 39, Male
+  VICTIM: Pooja More, Age 6, Female
+  VICTIM: Jagadish Bhatt, Age 41, Male
+  COMPLAINANT: Mala Pawar, Age 23, Carpenter
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2023-02-17 00:00:00
+  ARREST: 2022-11-22, arresting IO: Ibrahim, Director General of Police, Deputy Superintendent of Police
+  Location: 15.8254, 74.479
+===
+
+=== CASE 2657 ===
+CaseMasterID: 2657
+CrimeNo: 100050073202400005 | CaseNo: 202400005
+Station: JP Nagar Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cheating
+Status: Trial in Progress
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2023-10-29 | Incident: 2023-10-26 12:00:00 to 2023-10-26 12:00:00
+IO: Vijaya, Sub-Inspector, Inspector of Police
+Sections: CrPC 154, CrPC 157, IEA 24
+
+BRIEF FACTS:
+A Ponzi scheme was operated by the accused near Indiranagar, Bengaluru Urban. Hundreds of investors were cheated.
+
+PERSONS INVOLVED:
+  VICTIM: Pranav Shah, Age 27, Male
+  VICTIM: Shaurya Bhatt, Age 44, Male
+  COMPLAINANT: Yadunandan Nair, Age 39, Accountant
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-05-09 00:00:00
+  Location: 12.9924, 77.66
+===
+
+=== CASE 2658 ===
+CaseMasterID: 2658
+CrimeNo: 500130089202400003 | CaseNo: 202400003
+Station: Gokul Road Police Station, Dharwad
+District: Dharwad
+Crime Type: Extortion
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Dharwad
+Registered: 2024-08-14 | Incident: 2024-08-10 12:00:00 to 2024-08-11 12:00:00
+IO: Arun, Head Constable, Additional Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+The accused extorted money by threatening to kill the victim near Hubballi Railway Station, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Myra Acharya, Age 40, Female
+  ACCUSED: Nalini Jadhav, Age 28, Female
+  ACCUSED: Usha Chowdhury, Age 60, Female
+  COMPLAINANT: Siddharth Gupta, Age 37, Housewife
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2025-01-15 00:00:00
+  Location: 15.3539, 75.1343
+===
+
+=== CASE 2659 ===
+CaseMasterID: 2659
+CrimeNo: 500200031202100010 | CaseNo: 202100010
+Station: Koppal District Police Office, Koppal
+District: Koppal
+Crime Type: Attempt to Murder
+Status: Under Investigation
+Court: District and Sessions Court, Ballari
+Registered: 2021-08-30 | Incident: 2021-08-23 12:00:00 to 2021-08-28 12:00:00
+IO: Eshwari, Inspector, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, IEA 24
+
+BRIEF FACTS:
+The accused attempted to strangulate the victim at Koppal City, Koppal. Neighbors intervened and rescued the victim.
+
+PERSONS INVOLVED:
+  ACCUSED: Heemanth Rappput, Age 24, Male
+  ACCUSED: Savitri Bhat, Age 58, Female
+  ACCUSED: Saanvi More, Age 62, Female
+  VICTIM: Nandini Kamat, Age 36, Female
+  VICTIM: Ishita Jadhav, Age 68, Female
+  COMPLAINANT: Sita Verma, Age 65, Barber
+  Location: 15.3465, 76.1511
+===
+
+=== CASE 2660 ===
+CaseMasterID: 2660
+CrimeNo: 200220079202500003 | CaseNo: 202500003
+Station: Mysuru South Police Station, Mysuru
+District: Mysuru
+Crime Type: Extortion
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Mysuru
+Registered: 2025-04-26 | Incident: 2025-04-24 12:00:00 to 2025-04-24 12:00:00
+IO: Mohan, Inspector, Commissioner of Police
+Sections: CrPC 164
+
+BRIEF FACTS:
+A public servant demanded and accepted a bribe of Rs 50,000 at Mysuru City Center, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Tara Singh, Age 23, Female
+  ACCUSED: Basavaraj Shetty, Age 58, Male
+  VICTIM: Rudra Gowda, Age 55, Male
+  COMPLAINANT: Bhagya Mukherjee, Age 21, Student
+
+PROCEEDINGS:
+  ARREST: 2025-04-26, arresting IO: Mohan, Inspector, Commissioner of Police
+  Location: 12.3025, 76.6377
+===
+
+=== CASE 2661 ===
+CaseMasterID: 2661
+CrimeNo: 300050051202300005 | CaseNo: 202300005
+Station: High Grounds Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Dowry Death
+Status: Charge Sheet Filed
+Court: Motor Accident Claims Tribunal, Bengaluru
+Registered: 2022-09-25 | Incident: 2022-09-20 12:00:00 to 2022-09-22 12:00:00
+IO: Krishna, Deputy Superintendent of Police, Additional Commissioner of Police
+Sections: IPC 498A, CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Dowry death by burning occurred at Indiranagar, Bengaluru Urban. The victim was set on fire by her husband and in-laws.
+
+PERSONS INVOLVED:
+  ACCUSED: Gowri Patil, Age 18, Female
+  VICTIM: Tara Acharya, Age 9, Female
+  VICTIM: Kavya Nair, Age 63, Female
+  COMPLAINANT: Indira Patil, Age 47, Self Employed
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2023-05-09 00:00:00
+  Location: 12.9923, 77.657
+===
+
+=== CASE 2662 ===
+CaseMasterID: 2662
+CrimeNo: 100050002202400004 | CaseNo: 202400004
+Station: Bengaluru City Police Commissionerate, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Rape
+Status: Closed as Mistake of Fact
+Court: Principal Civil Judge (Senior Division) Court, Bengaluru
+Registered: 2023-01-10 | Incident: 2023-01-08 12:00:00 to 2023-01-09 12:00:00
+IO: Anil, Police Constable, Inspector of Police
+Sections: IEA 24, IEA 65B, CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The accused repeatedly raped the survivor at Jayanagar, Bengaluru Urban over several months by promising marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavitha Kumar, Age 29, Female
+  VICTIM: Ramachandra Shetty, Age 25, Male
+  VICTIM: Nalini Chauhan, Age 34, Female
+  VICTIM: Radha Rajput, Age 62, Female
+  COMPLAINANT: Rani Rao, Age 37, Student
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2023-08-14 00:00:00
+  Location: 12.9742, 77.5918
+===
+
+=== CASE 2663 ===
+CaseMasterID: 2663
+CrimeNo: 100050056202500006 | CaseNo: 202500006
+Station: Hebbal Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cheating
+Status: Charge Sheet Filed
+Court: Family Court, Bengaluru
+Registered: 2025-03-23 | Incident: 2025-03-14 12:00:00 to 2025-03-21 12:00:00
+IO: Hema, Superintendent of Police, Superintendent of Police
+Sections: CrPC 154, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused obtained a loan by submitting forged documents to a bank near Bengaluru City Center, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Siddharth Trivedi, Age 24, Male
+  ACCUSED: Krishna Shetty, Age 20, Male
+  VICTIM: Bheemesh Chauhan, Age 43, Male
+  COMPLAINANT: Usha Shah, Age 48, Housewife
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2025-05-29 00:00:00
+  ARREST: 2025-03-30, arresting IO: Hema, Superintendent of Police, Superintendent of Police
+  Location: 12.9703, 77.5938
+===
+
+=== CASE 2664 ===
+CaseMasterID: 2664
+CrimeNo: 100220079202500004 | CaseNo: 202500004
+Station: Mysuru South Police Station, Mysuru
+District: Mysuru
+Crime Type: Cheating
+Status: Acquitted
+Court: District and Sessions Court, Mysuru
+Registered: 2024-02-23 | Incident: 2024-02-17 12:00:00 to 2024-02-21 12:00:00
+IO: Siddalinga, Police Constable, Commissioner of Police
+Sections: CrPC 154, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+The accused obtained a loan by submitting forged documents to a bank near Mysuru North, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Indira Bhatt, Age 31, Female
+  ACCUSED: Rudra Singh, Age 22, Male
+  ACCUSED: Siddharth Banerjee, Age 24, Male
+  ACCUSED: Mala Murthy, Age 45, Female
+  VICTIM: Indira Mahajan, Age 18, Female
+  COMPLAINANT: Priya Bhatt, Age 20, Carpenter
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2024-06-15 00:00:00
+  Location: 12.3351, 76.6515
+===
+
+=== CASE 2665 ===
+CaseMasterID: 2665
+CrimeNo: 300110097202100001 | CaseNo: 202100001
+Station: Mangaluru Cyber Crime Cell, Dakshina Kannada
+District: Dakshina Kannada
+Crime Type: Criminal Breach of Trust
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Mangaluru
+Registered: 2021-02-04 | Incident: 2021-01-28 12:00:00 to 2021-01-31 12:00:00
+IO: Sandeep, Inspector, Superintendent of Police
+Sections: CrPC 154, CrPC 164
+
+BRIEF FACTS:
+Criminal breach of trust by a public servant was reported at Mangaluru City Center, Dakshina Kannada. Government funds amounting to Rs 5 lakhs were misappropriated.
+
+PERSONS INVOLVED:
+  ACCUSED: Indira Murthy, Age 25, Female
+  COMPLAINANT: Radha Rajput, Age 21, Accountant
+
+PROCEEDINGS:
+  ARREST: 2021-02-10, arresting IO: Sandeep, Inspector, Superintendent of Police
+  Location: 12.9096, 74.8599
+===
+
+=== CASE 2666 ===
+CaseMasterID: 2666
+CrimeNo: 100130087202300003 | CaseNo: 202300003
+Station: Hubballi Urban Police Station, Dharwad
+District: Dharwad
+Crime Type: Hurt / Grievous Hurt
+Status: Under Investigation
+Court: Additional District and Sessions Court, Dharwad
+Registered: 2023-03-24 | Incident: 2023-03-19 12:00:00 to 2023-03-20 12:00:00
+IO: Chandrashekar, Sub-Inspector, Circle Inspector
+Sections: CrPC 154, CrPC 161, IEA 24
+
+BRIEF FACTS:
+The accused administered poison to the victim at Old Hubballi, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Manjunath Mahajan, Age 19, Male
+  ACCUSED: Chandrika Rajput, Age 18, Female
+  COMPLAINANT: Basavaraj Ganguly, Age 65, Farmer
+
+PROCEEDINGS:
+  ARREST: 2023-03-31, arresting IO: Chandrashekar, Sub-Inspector, Circle Inspector
+  Location: 15.3551, 75.17
+===
+
+=== CASE 2667 ===
+CaseMasterID: 2667
+CrimeNo: 500110022202100007 | CaseNo: 202100007
+Station: Dakshina Kannada District Police Office, Dakshina Kannada
+District: Dakshina Kannada
+Crime Type: Assault on Women
+Status: Acquitted
+Court: Chief Judicial Magistrate Court, Mangaluru
+Registered: 2020-04-07 | Incident: 2020-04-01 12:00:00 to 2020-04-04 12:00:00
+IO: Parvati, Commissioner of Police, Police Constable
+Sections: CrPC 154, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+The accused assaulted a woman with intent to outrage her modesty at Bunder Mangaluru, Dakshina Kannada.
+
+PERSONS INVOLVED:
+  ACCUSED: Naveen Sen, Age 26, Male
+  ACCUSED: Siddalinga Hegde, Age 22, Male
+  ACCUSED: Rahul Kamat, Age 35, Male
+  ACCUSED: Manjunath Gupta, Age 23, Male
+  VICTIM: Shaurya Nair, Age 49, Male
+  VICTIM: Manjunath Hegde, Age 76, Male
+  COMPLAINANT: Priya Shinde, Age 23, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2020-08-20 00:00:00
+  ARREST: 2020-04-10, arresting IO: Parvati, Commissioner of Police, Police Constable
+  Location: 12.8725, 74.8431
+===
+
+=== CASE 2668 ===
+CaseMasterID: 2668
+CrimeNo: 200220080202500009 | CaseNo: 202500009
+Station: Mysuru North Police Station, Mysuru
+District: Mysuru
+Crime Type: Dowry Death
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Mysuru
+Registered: 2025-05-22 | Incident: 2025-05-20 12:00:00 to 2025-05-21 12:00:00
+IO: Deepak, Additional Commissioner of Police, Investigating Officer
+Sections: IPC 498A, CrPC 157, IEA 65B
+
+BRIEF FACTS:
+Dowry death by hanging was reported at Mysuru City Center, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Vijay Ghorpade, Age 61, Male
+  COMPLAINANT: Venkatesh Deshmukh, Age 37, Painter
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2026-04-21 00:00:00
+  ARREST: 2025-05-23, arresting IO: Deepak, Additional Commissioner of Police, Investigating Officer
+  Location: 12.2906, 76.6431
+===
+
+=== CASE 2669 ===
+CaseMasterID: 2669
+CrimeNo: 100050068202000006 | CaseNo: 202000006
+Station: Peenya Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Dacoity
+Status: Under Investigation
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2019-07-20 | Incident: 2019-07-13 12:00:00 to 2019-07-18 12:00:00
+IO: Akash, Superintendent of Police, Joint Commissioner of Police
+Sections: CrPC 157, CrPC 161, CrPC 164, IEA 24, IEA 65B
+
+BRIEF FACTS:
+A gang of dacoits stopped a truck on the highway near HSR Layout, Bengaluru Urban and looted the consignment.
+
+PERSONS INVOLVED:
+  ACCUSED: Asha Kumar, Age 27, Female
+  COMPLAINANT: Vihaan Acharya, Age 32, Housewife
+
+PROCEEDINGS:
+  ARREST: 2019-08-16, arresting IO: Akash, Superintendent of Police, Joint Commissioner of Police
+  Location: 12.9165, 77.6225
+===
+
+=== CASE 2670 ===
+CaseMasterID: 2670
+CrimeNo: 300230034202300004 | CaseNo: 202300004
+Station: Raichur District Police Office, Raichur
+District: Raichur
+Crime Type: Theft
+Status: Under Investigation
+Court: District and Sessions Court, Raichur
+Registered: 2023-01-17 | Incident: 2023-01-09 12:00:00 to 2023-01-15 12:00:00
+IO: Pranav, Inspector, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 24, IEA 65B
+
+BRIEF FACTS:
+A motor vehicle theft was reported at Raichur City, Raichur. A motorcycle bearing local registration was stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Nagaraj Gowda, Age 27, Male
+  ACCUSED: Manish Aiyappa, Age 46, Male
+  VICTIM: Harish Kamat, Age 27, Male
+  COMPLAINANT: Sita Singh, Age 61, Doctor
+
+PROCEEDINGS:
+  ARREST: 2023-01-19, arresting IO: Pranav, Inspector, Deputy Superintendent of Police
+  Location: 16.2126, 77.3612
+===
+
+=== CASE 2671 ===
+CaseMasterID: 2671
+CrimeNo: 300220078202500003 | CaseNo: 202500003
+Station: KR Nagar Police Station, Mysuru
+District: Mysuru
+Crime Type: Counterfeiting
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Mysuru
+Registered: 2025-04-06 | Incident: 2025-03-28 12:00:00 to 2025-04-01 12:00:00
+IO: Ishita, Sub-Inspector, Deputy Superintendent of Police
+Sections: IPC 489A, CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Counterfeit currency notes of Rs 500 denomination were seized near KR Nagar Mysuru, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Prakash Menon, Age 26, Male
+  ACCUSED: Rani Shetty, Age 37, Female
+  ACCUSED: Mohan Bhatt, Age 54, Male
+  COMPLAINANT: Ishaan Chowdhury, Age 44, Cook
+
+PROCEEDINGS:
+  ARREST: 2025-04-11, arresting IO: Ishita, Sub-Inspector, Deputy Superintendent of Police
+  ARREST: 2025-04-11, arresting IO: Ishita, Sub-Inspector, Deputy Superintendent of Police
+  Location: 12.2849, 76.666
+===
+
+=== CASE 2672 ===
+CaseMasterID: 2672
+CrimeNo: 500050054202400003 | CaseNo: 202400003
+Station: Malleswaram Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Counterfeiting
+Status: Charge Sheet Filed
+Court: Fast Track Court, Bengaluru
+Registered: 2023-12-05 | Incident: 2023-11-29 12:00:00 to 2023-12-01 12:00:00
+IO: Anand, Additional Commissioner of Police, Police Constable
+Sections: IPC 489A, CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Possession of counterfeit currency notes was traced to a hideout near HSR Layout, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  VICTIM: Yamuna Nair, Age 77, Female
+  COMPLAINANT: Pooja Das, Age 20, Business Owner
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-10-20 00:00:00
+  Location: 12.9083, 77.6316
+===
+
+=== CASE 2673 ===
+CaseMasterID: 2673
+CrimeNo: 100020010202400010 | CaseNo: 202400010
+Station: Northern Range Headquarters, Belagavi, Belagavi
+District: Belagavi
+Crime Type: Counterfeiting
+Status: Closed as Mistake of Law
+Court: Chief Judicial Magistrate Court, Belagavi
+Registered: 2024-12-26 | Incident: 2024-12-23 12:00:00 to 2024-12-23 12:00:00
+IO: Ayaan, Director General of Police, Head Constable
+Sections: IPC 489A, CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Counterfeit Indian currency with face value of Rs 2 lakhs was recovered at Belagavi City, Belagavi.
+
+PERSONS INVOLVED:
+  ACCUSED: Ayaan Mehta, Age 20, Male
+  ACCUSED: Hemanth Acharya, Age 25, Male
+  VICTIM: Narasimha Murthy, Age 74, Male
+  COMPLAINANT: Radha Mallya, Age 23, Shopkeeper
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2025-04-28 00:00:00
+  Location: 15.8433, 74.4958
+===
+
+=== CASE 2674 ===
+CaseMasterID: 2674
+CrimeNo: 400170104202400007 | CaseNo: 202400007
+Station: Kalaburagi Traffic Police Unit, Kalaburagi (Gulbarga)
+District: Kalaburagi (Gulbarga)
+Crime Type: Rape
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Kalaburagi
+Registered: 2023-01-24 | Incident: 2023-01-13 12:00:00 to 2023-01-20 12:00:00
+IO: Pavan, Head Constable, Head Constable
+Sections: IEA 24, IEA 65B, CrPC 154, CrPC 161
+
+BRIEF FACTS:
+A minor girl aged 15 years was raped by the accused near Kalaburagi City Center, Kalaburagi (Gulbarga). The survivor was rescued and medical examination confirmed the offence.
+
+PERSONS INVOLVED:
+  ACCUSED: Ishaan Iyer, Age 32, Male
+  COMPLAINANT: Sanjay Kamat, Age 34, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2023-04-16 00:00:00
+  Location: 17.3304, 76.8375
+===
+
+=== CASE 2675 ===
+CaseMasterID: 2675
+CrimeNo: 200020100202200002 | CaseNo: 202200002
+Station: Maruti Police Station, Belagavi, Belagavi
+District: Belagavi
+Crime Type: Criminal Trespass
+Status: Closed as Mistake of Fact
+Court: Chief Judicial Magistrate Court, Belagavi
+Registered: 2022-07-07 | Incident: 2022-07-03 12:00:00 to 2022-07-06 12:00:00
+IO: Vishwanath, Sub-Inspector, Director General of Police
+Sections: CrPC 157, CrPC 161, IEA 24
+
+BRIEF FACTS:
+Lurking house trespass was committed at Belagavi Camp, Belagavi during the daytime.
+
+PERSONS INVOLVED:
+  ACCUSED: pprakash Das, Age 27, Male
+  COMPLAINANT: Asha Chauhan, Age 44, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2023-01-31 00:00:00
+  Location: 15.8535, 74.5246
+===
+
+=== CASE 2676 ===
+CaseMasterID: 2676
+CrimeNo: 400050076202300004 | CaseNo: 202300004
+Station: Bengaluru Cyber Crime Cell, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Rape
+Status: Under Investigation
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2022-10-11 | Incident: 2022-10-06 12:00:00 to 2022-10-09 12:00:00
+IO: Vivaan, Joint Commissioner of Police, Inspector of Police
+Sections: IEA 24, IEA 65B, CrPC 154, CrPC 157
+
+BRIEF FACTS:
+A minor girl aged 15 years was raped by the accused near Indiranagar, Bengaluru Urban. The survivor was rescued and medical examination confirmed the offence.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavya Gupta, Age 33, Female
+  ACCUSED: Geeta Naik, Age 59, Female
+  VICTIM: Mohan Ganguly, Age 85, Male
+  VICTIM: Arjun Das, Age 29, Male
+  VICTIM: Geeta Deshmukh, Age 60, Female
+  COMPLAINANT: Arjun Shetty, Age 36, Milk Vendor
+
+PROCEEDINGS:
+  ARREST: 2022-10-17, arresting IO: Vivaan, Joint Commissioner of Police, Inspector of Police
+  Location: 12.9838, 77.6665
+===
+
+=== CASE 2677 ===
+CaseMasterID: 2677
+CrimeNo: 300250036202300003 | CaseNo: 202300003
+Station: Shivamogga District Police Office, Shivamogga
+District: Shivamogga
+Crime Type: Attempt to Murder
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Shivamogga
+Registered: 2023-11-16 | Incident: 2023-11-11 12:00:00 to 2023-11-13 12:00:00
+IO: Gururaj, Joint Commissioner of Police, Inspector of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+The accused attempted to strangulate the victim at Shivamogga City, Shivamogga. Neighbors intervened and rescued the victim.
+
+PERSONS INVOLVED:
+  ACCUSED: Vinay Pawar, Age 39, Male
+  ACCUSED: Yamuna Trivedi, Age 45, Female
+  ACCUSED: Rahul Reddy, Age 28, Male
+  VICTIM: Gururaj Verma, Age 54, Male
+  VICTIM: Venkatesh Mukherjee, Age 33, Male
+  COMPLAINANT: Ravi Chowdhury, Age 49, Business Owner
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-05-05 00:00:00
+  ARREST: 2023-11-19, arresting IO: Gururaj, Joint Commissioner of Police, Inspector of Police
+  Location: 13.9325, 75.5752
+===
+
+=== CASE 2678 ===
+CaseMasterID: 2678
+CrimeNo: 100050052202400002 | CaseNo: 202400002
+Station: Seshadripuram Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cyber Crime
+Status: Closed as Mistake of Fact
+Court: Fast Track Court, Bengaluru
+Registered: 2023-12-09 | Incident: 2023-12-07 12:00:00 to 2023-12-07 12:00:00
+IO: Varun, Sub-Inspector, Police Constable
+Sections: IT Act 43, IT Act 66, CrPC 154, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+An email phishing scam was reported at HSR Layout, Bengaluru Urban. The victim lost Rs 1.2 lakhs.
+
+PERSONS INVOLVED:
+  ACCUSED: Chandrika Shetty, Age 25, Female
+  ACCUSED: Amit Naik, Age 25, Male
+  VICTIM: Sanjay Iyengar, Age 44, Male
+  VICTIM: Shwetha Sen, Age 8, Female
+  COMPLAINANT: Ramachandra Mallya, Age 57, Milk Vendor
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-08-08 00:00:00
+  Location: 12.903, 77.628
+===
+
+=== CASE 2679 ===
+CaseMasterID: 2679
+CrimeNo: 300120105202500002 | CaseNo: 202500002
+Station: Davanagere City Police Station, Davanagere
+District: Davanagere
+Crime Type: Assault on Women
+Status: Convicted
+Court: District and Sessions Court, Davanagere
+Registered: 2024-02-29 | Incident: 2024-02-26 12:00:00 to 2024-02-28 12:00:00
+IO: Rajesh, Assistant Sub-Inspector, Commissioner of Police
+Sections: CrPC 154, IEA 65B
+
+BRIEF FACTS:
+Stalking was reported by a woman at Davanagere City, Davanagere.
+
+PERSONS INVOLVED:
+  VICTIM: Suresh Mukherjee, Age 84, Male
+  VICTIM: Savitri Kulkarni, Age 32, Female
+  COMPLAINANT: Mala Kamat, Age 20, Auto Rickshaw Driver
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2025-01-21 00:00:00
+  Location: 14.4669, 75.9229
+===
+
+=== CASE 2680 ===
+CaseMasterID: 2680
+CrimeNo: 500050073202500003 | CaseNo: 202500003
+Station: JP Nagar Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Criminal Trespass
+Status: Closed as Mistake of Fact
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2025-08-09 | Incident: 2025-07-31 12:00:00 to 2025-08-06 12:00:00
+IO: Sanjay, Sub-Inspector, Inspector of Police
+Sections: CrPC 154, CrPC 157, CrPC 164, IEA 24
+
+BRIEF FACTS:
+House trespass was committed by the accused at Rajajinagar, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavitha Nair, Age 59, Female
+  VICTIM: Ansh Naik, Age 13, Male
+  COMPLAINANT: Sita Aiyappa, Age 31, Accountant
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2026-05-07 00:00:00
+  ARREST: 2025-08-09, arresting IO: Sanjay, Sub-Inspector, Inspector of Police
+  Location: 12.9528, 77.5703
+===
+
+=== CASE 2681 ===
+CaseMasterID: 2681
+CrimeNo: 500270109202200006 | CaseNo: 202200006
+Station: Udupi Town Police Station, Udupi
+District: Udupi
+Crime Type: Dowry Death
+Status: Closed as Mistake of Fact
+Court: District and Sessions Court, Udupi
+Registered: 2021-03-06 | Incident: 2021-03-03 12:00:00 to 2021-03-05 12:00:00
+IO: Arjun, Commissioner of Police, Additional Superintendent of Police
+Sections: IPC 498A, CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+A married woman died due to poisoning at Udupi Town, Udupi. Investigation revealed dowry harassment.
+
+PERSONS INVOLVED:
+  ACCUSED: Saanvi Nair, Age 61, Female
+  ACCUSED: Shobha Bhatth, Age 52, Female
+  ACCUSED: Shankar Hegde, Age 64, Male
+  ACCUSED: Nagaraj Iyer, Age 42, Male
+  VICTIM: Usha Joshi, Age 49, Female
+  VICTIM: Manjunath Acharya, Age 73, Male
+  COMPLAINANT: Rudra Mehta, Age 44, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2021-12-28 00:00:00
+  ARREST: 2021-03-09, arresting IO: Arjun, Commissioner of Police, Additional Superintendent of Police
+  Location: 13.3421, 74.7351
+===
+
+=== CASE 2682 ===
+CaseMasterID: 2682
+CrimeNo: 200130086202400003 | CaseNo: 202400003
+Station: Hubballi Rural Police Station, Dharwad
+District: Dharwad
+Crime Type: Criminal Trespass
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Dharwad
+Registered: 2024-03-04 | Incident: 2024-02-22 12:00:00 to 2024-02-28 12:00:00
+IO: Pavan, Deputy Superintendent of Police, Assistant Sub-Inspector
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused trespassed into a government office at Vidyanagar Hubballi, Dharwad and threatened the officials.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavitha Nayak, Age 57, Female
+  COMPLAINANT: Aanya Murthy, Age 37, Self Employed
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-05-10 00:00:00
+  Location: 15.3806, 75.113
+===
+
+=== CASE 2683 ===
+CaseMasterID: 2683
+CrimeNo: 400190030202100004 | CaseNo: 202100004
+Station: Kolar District Police Office, Kolar
+District: Kolar
+Crime Type: Rape
+Status: Closed as Mistake of Fact
+Court: District and Sessions Court, Kolar
+Registered: 2020-07-08 | Incident: 2020-07-04 12:00:00 to 2020-07-06 12:00:00
+IO: Dhruv, Deputy Commissioner of Police, Sub-Inspector
+Sections: IEA 24, IEA 65B, CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+A minor girl aged 15 years was raped by the accused near Kolar Gold Fields, Kolar. The survivor was rescued and medical examination confirmed the offence.
+
+PERSONS INVOLVED:
+  ACCUSED: Vinay Murthy, Age 24, Male
+  ACCUSED: Pranav Rao, Age 45, Male
+  ACCUSED: Deepika Menon, Age 63, Female
+  VICTIM: Madhuri Pawar, Age 48, Female
+  VICTIM: Narasimha Nair, Age 25, Male
+  COMPLAINANT: Rani Murthy, Age 45, Nurse
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-07-02 00:00:00
+  ARREST: 2020-07-09, arresting IO: Dhruv, Deputy Commissioner of Police, Sub-Inspector
+  ARREST: 2020-07-10, arresting IO: Dhruv, Deputy Commissioner of Police, Sub-Inspector
+  Location: 12.9635, 78.2736
+===
+
+=== CASE 2684 ===
+CaseMasterID: 2684
+CrimeNo: 200050052202500003 | CaseNo: 202500003
+Station: Seshadripuram Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Riots
+Status: Charge Sheet Filed
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2024-09-11 | Incident: 2024-09-07 12:00:00 to 2024-09-08 12:00:00
+IO: Sharath, Inspector, Superintendent of Police
+
+BRIEF FACTS:
+A factional fight at Yeshwanthpur, Bengaluru Urban resulted in damage to public property.
+
+PERSONS INVOLVED:
+  ACCUSED: Narasimha Murthy, Age 34, Male
+  COMPLAINANT: Pavan Thakur, Age 49, Driver
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2024-12-17 00:00:00
+  Location: 13.0179, 77.559
+===
+
+=== CASE 2685 ===
+CaseMasterID: 2685
+CrimeNo: 400060108202500002 | CaseNo: 202500002
+Station: Bidar City Police Station, Bidar
+District: Bidar
+Crime Type: Hurt / Grievous Hurt
+Status: Trial in Progress
+Court: Chief Judicial Magistrate Court, Bidar
+Registered: 2024-07-18 | Incident: 2024-07-13 12:00:00 to 2024-07-15 12:00:00
+IO: Sanjay, Deputy Commissioner of Police, Director General of Police
+Sections: CrPC 154, CrPC 157, IEA 65B
+
+BRIEF FACTS:
+Hurt by rash driving occurred at Bidar City, Bidar. A pedestrian was knocked down.
+
+PERSONS INVOLVED:
+  ACCUSED: Aanya Shah, Age 47, Female
+  ACCUSED: Vijay Sarkar, Age 52, Male
+  ACCUSED: Naveen Bose, Age 23, Male
+  VICTIM: Hemanth Sharma, Age 60, Male
+  COMPLAINANT: Gowri More, Age 44, Retired
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2025-06-11 00:00:00
+  Location: 17.9034, 77.5183
+===
+
+=== CASE 2686 ===
+CaseMasterID: 2686
+CrimeNo: 400190030202200003 | CaseNo: 202200003
+Station: Kolar District Police Office, Kolar
+District: Kolar
+Crime Type: Robbery
+Status: Under Investigation
+Court: District and Sessions Court, Kolar
+Registered: 2021-08-02 | Incident: 2021-07-27 12:00:00 to 2021-07-31 12:00:00
+IO: Dhruv, Deputy Commissioner of Police, Sub-Inspector
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Robbery at a jewellery store at Kolar Town, Kolar was committed by two masked persons. Ornaments worth Rs 10 lakhs were stolen.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Revathi Naik, Age 48, Accountant
+  Location: 13.1332, 78.1234
+===
+
+=== CASE 2687 ===
+CaseMasterID: 2687
+CrimeNo: 500170011202300008 | CaseNo: 202300008
+Station: Eastern Range Headquarters, Kalaburagi, Kalaburagi (Gulbarga)
+District: Kalaburagi (Gulbarga)
+Crime Type: Murder
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Kalaburagi
+Registered: 2023-02-26 | Incident: 2023-02-18 12:00:00 to 2023-02-23 12:00:00
+IO: Mallikarjun, Deputy Commissioner of Police, Investigating Officer
+Sections: IPC 302, CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+A dead body with multiple stab wounds was found at Kalaburagi Suburban, Kalaburagi (Gulbarga). During investigation, the accused was arrested and the murder weapon recovered.
+
+PERSONS INVOLVED:
+  ACCUSED: Yamuna Gupta, Age 55, Female
+  ACCUSED: kharasimha Pathil, Age 51, Male
+  COMPLAINANT: Nandini Sen, Age 63, Electrician
+
+PROCEEDINGS:
+  ARREST: 2023-05-14, arresting IO: Mallikarjun, Deputy Commissioner of Police, Investigating Officer
+  Location: 17.3087, 76.8128
+===
+
+=== CASE 2688 ===
+CaseMasterID: 2688
+CrimeNo: 500050063202300003 | CaseNo: 202300003
+Station: Ulsoor Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Theft
+Status: Under Investigation
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2023-10-13 | Incident: 2023-10-03 12:00:00 to 2023-10-09 12:00:00
+IO: Yash, Police Constable, Head Constable
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+A motor vehicle theft was reported at Indiranagar, Bengaluru Urban. A motorcycle bearing local registration was stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Pooja Bose, Age 28, Female
+  ACCUSED: Narasimha Shinde, Age 26, Male
+  VICTIM: Diya Rao, Age 35, Female
+  VICTIM: Yash Sharma, Age 35, Male
+  VICTIM: Hema Patil, Age 27, Female
+  COMPLAINANT: Akash Nayak, Age 32, Nurse
+
+PROCEEDINGS:
+  ARREST: 2023-10-15, arresting IO: Yash, Police Constable, Head Constable
+  Location: 12.9934, 77.6609
+===
+
+=== CASE 2689 ===
+CaseMasterID: 2689
+CrimeNo: 100130024202200009 | CaseNo: 202200009
+Station: Dharwad District Police Office, Dharwad
+District: Dharwad
+Crime Type: Criminal Breach of Trust
+Status: Acquitted
+Court: Additional District and Sessions Court, Dharwad
+Registered: 2021-05-29 | Incident: 2021-05-25 12:00:00 to 2021-05-26 12:00:00
+IO: Sandeep, Assistant Sub-Inspector, Deputy Commissioner of Police
+Sections: CrPC 154, CrPC 161, IEA 24
+
+BRIEF FACTS:
+The trustee of a charitable trust misused trust funds near Vidyanagar Hubballi, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Krishna Bhat, Age 56, Male
+  VICTIM: Uma Yadav, Age 69, Female
+  COMPLAINANT: Madhuri Gowda, Age 40, Student
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2022-01-18 00:00:00
+  ARREST: 2021-06-01, arresting IO: Sandeep, Assistant Sub-Inspector, Deputy Commissioner of Police
+  Location: 15.3807, 75.1058
+===
+
+=== CASE 2690 ===
+CaseMasterID: 2690
+CrimeNo: 400050048202100004 | CaseNo: 202100004
+Station: Karnataka State Fingerprint Bureau, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Hurt / Grievous Hurt
+Status: Under Investigation
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2021-06-21 | Incident: 2021-06-15 12:00:00 to 2021-06-21 12:00:00
+IO: Raj, Commissioner of Police, Assistant Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24
+
+BRIEF FACTS:
+Simple hurt was caused during a quarrel at Koramangala, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Ravi Sarkar, Age 27, Barber
+  Location: 12.9422, 77.6029
+===
+
+=== CASE 2691 ===
+CaseMasterID: 2691
+CrimeNo: 300050052202400003 | CaseNo: 202400003
+Station: Seshadripuram Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Kidnapping & Abduction
+Status: Trial in Progress
+Court: Chief Judicial Magistrate Court, Bengaluru
+Registered: 2024-01-18 | Incident: 2024-01-13 12:00:00 to 2024-01-14 12:00:00
+IO: Myra, Joint Commissioner of Police, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+A newborn baby was kidnapped from the hospital near Indiranagar, Bengaluru Urban. CCTV footage helped identify the accused.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavya Aiyappa, Age 51, Female
+  ACCUSED: Yash Jadhav, Age 44, Male
+  VICTIM: Manjunath Yadav, Age 34, Male
+  VICTIM: Siddharth Aiyappa, Age 66, Male
+  COMPLAINANT: Tara Menon, Age 47, Housewife
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-10-23 00:00:00
+  Location: 12.9903, 77.6639
+===
+
+=== CASE 2692 ===
+CaseMasterID: 2692
+CrimeNo: 400230117202200003 | CaseNo: 202200003
+Station: Raichur City Police Station, Raichur
+District: Raichur
+Crime Type: Assault on Women
+Status: Under Investigation
+Court: District and Sessions Court, Raichur
+Registered: 2021-09-23 | Incident: 2021-09-20 12:00:00 to 2021-09-21 12:00:00
+IO: Riya, Inspector, Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Voyeurism was reported at Raichur City, Raichur. The accused was caught filming.
+
+PERSONS INVOLVED:
+  ACCUSED: Bheemesh Sen, Age 44, Male
+  VICTIM: Geeta Aiyappa, Age 49, Female
+  COMPLAINANT: Yash Ganguly, Age 20, Nurse
+  Location: 16.2119, 77.3584
+===
+
+=== CASE 2693 ===
+CaseMasterID: 2693
+CrimeNo: 400020013202500007 | CaseNo: 202500007
+Station: Belagavi District Police Office, Belagavi
+District: Belagavi
+Crime Type: Culpable Homicide
+Status: Acquitted
+Court: Chief Judicial Magistrate Court, Belagavi
+Registered: 2024-10-02 | Incident: 2024-09-23 12:00:00 to 2024-09-29 12:00:00
+IO: Asha, Assistant Sub-Inspector, Commissioner of Police
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused driving a rash vehicle knocked down the victim near Belagavi City, Belagavi. The victim died on the spot due to severe head injuries.
+
+PERSONS INVOLVED:
+  ACCUSED: Tara Mehta, Age 34, Female
+  ACCUSED: Diya Reddy, Age 42, Female
+  ACCUSED: Venkatesh Chowdhury, Age 24, Male
+  ACCUSED: Amit Verma, Age 48, Male
+  VICTIM: Rajesh More, Age 27, Male
+  COMPLAINANT: Suresh Naik, Age 33, Housewife
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2024-12-27 00:00:00
+  ARREST: 2024-10-05, arresting IO: Asha, Assistant Sub-Inspector, Commissioner of Police
+  ARREST: 2024-10-22, arresting IO: Asha, Assistant Sub-Inspector, Commissioner of Police
+  ARREST: 2024-10-07, arresting IO: Asha, Assistant Sub-Inspector, Commissioner of Police
+  Location: 15.8474, 74.5021
+===
+
+=== CASE 2694 ===
+CaseMasterID: 2694
+CrimeNo: 500190121202400002 | CaseNo: 202400002
+Station: Kolar Gold Fields Police Station, Kolar
+District: Kolar
+Crime Type: Robbery
+Status: Under Investigation
+Court: District and Sessions Court, Kolar
+Registered: 2024-11-10 | Incident: 2024-11-02 12:00:00 to 2024-11-07 12:00:00
+IO: Dhruv, Additional Commissioner of Police, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+A woman was robbed of her gold chain by two bike-borne accused near Kolar Town, Kolar.
+
+PERSONS INVOLVED:
+  ACCUSED: Pranav Hegde, Age 23, Male
+  ACCUSED: Harish Pawar, Age 51, Male
+  COMPLAINANT: Mohan Nair, Age 29, Business Owner
+  Location: 13.1372, 78.1275
+===
+
+=== CASE 2695 ===
+CaseMasterID: 2695
+CrimeNo: 100050055202500003 | CaseNo: 202500003
+Station: Yeshwanthpur Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Counterfeiting
+Status: Convicted
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2024-08-03 | Incident: 2024-07-28 12:00:00 to 2024-07-30 12:00:00
+IO: Manjunath, Superintendent of Police, Additional Superintendent of Police
+Sections: IPC 489A, CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Forged documents including property deeds were seized from a gang operating near Koramangala, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Kaveri Singh, Age 60, Female
+  VICTIM: Mahesh Murthy, Age 33, Male
+  COMPLAINANT: Aanya Mallya, Age 35, Newspaper Vendor
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2025-06-17 00:00:00
+  Location: 12.9354, 77.6037
+===
+
+=== CASE 2696 ===
+CaseMasterID: 2696
+CrimeNo: 500010012202500002 | CaseNo: 202500002
+Station: Bagalkot District Police Office, Bagalkot
+District: Bagalkot
+Crime Type: Rape
+Status: Acquitted
+Court: Chief Judicial Magistrate Court, Bagalkot
+Registered: 2025-06-02 | Incident: 2025-05-30 12:00:00 to 2025-05-30 12:00:00
+IO: Sanjay, Commissioner of Police, Station House Officer
+Sections: IEA 24, CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The accused repeatedly raped the survivor at Bagalkot City, Bagalkot over several months by promising marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Myra Jadhav, Age 50, Female
+  ACCUSED: Mala Ganguly, Age 38, Female
+  VICTIM: Priya Nair, Age 49, Female
+  COMPLAINANT: Ishaan Shetty, Age 62, Cook
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2026-05-18 00:00:00
+  ARREST: 2025-06-08, arresting IO: Sanjay, Commissioner of Police, Station House Officer
+  ARREST: 2025-06-05, arresting IO: Sanjay, Commissioner of Police, Station House Officer
+  Location: 16.1691, 75.6549
+===
+
+=== CASE 2697 ===
+CaseMasterID: 2697
+CrimeNo: 400130089202300004 | CaseNo: 202300004
+Station: Gokul Road Police Station, Dharwad
+District: Dharwad
+Crime Type: Criminal Trespass
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Dharwad
+Registered: 2022-04-12 | Incident: 2022-04-07 12:00:00 to 2022-04-11 12:00:00
+IO: Navya, Head Constable, Police Constable
+Sections: CrPC 157, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+House trespass was committed by the accused at Old Hubballi, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Revathi Iyengar, Age 32, Female
+  VICTIM: Sharada Banerjee, Age 37, Female
+  COMPLAINANT: Kavya Gowda, Age 36, Teacher
+  Location: 15.3448, 75.1661
+===
+
+=== CASE 2698 ===
+CaseMasterID: 2698
+CrimeNo: 400120105202400006 | CaseNo: 202400006
+Station: Davanagere City Police Station, Davanagere
+District: Davanagere
+Crime Type: Criminal Breach of Trust
+Status: Under Investigation
+Court: District and Sessions Court, Davanagere
+Registered: 2023-09-30 | Incident: 2023-09-28 12:00:00 to 2023-09-29 12:00:00
+IO: Ramesh, Head Constable, Deputy Commissioner of Police
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Criminal breach of trust by a public servant was reported at Davanagere City, Davanagere. Government funds amounting to Rs 5 lakhs were misappropriated.
+
+PERSONS INVOLVED:
+  ACCUSED: Yash Sarkar, Age 46, Male
+  ACCUSED: Amit Acharya, Age 61, Male
+  ACCUSED: Manish Verma, Age 22, Male
+  ACCUSED: Tara Banerjee, Age 42, Female
+  VICTIM: Yash Gowda, Age 69, Male
+  COMPLAINANT: Ishita Sharma, Age 34, Carpenter
+
+PROCEEDINGS:
+  ARREST: 2023-10-01, arresting IO: Ramesh, Head Constable, Deputy Commissioner of Police
+  ARREST: 2023-10-07, arresting IO: Ramesh, Head Constable, Deputy Commissioner of Police
+  Location: 14.4576, 75.9248
+===
+
+=== CASE 2699 ===
+CaseMasterID: 2699
+CrimeNo: 100220078202200004 | CaseNo: 202200004
+Station: KR Nagar Police Station, Mysuru
+District: Mysuru
+Crime Type: Culpable Homicide
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Mysuru
+Registered: 2021-08-02 | Incident: 2021-07-25 12:00:00 to 2021-08-01 12:00:00
+IO: Mahesh, Assistant Sub-Inspector, Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The victim died due to medical negligence at a private clinic near Kuvempunagar Mysuru, Mysuru.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Arjun Nayak, Age 24, Sweeper
+  Location: 12.3049, 76.6098
+===
+
+=== CASE 2700 ===
+CaseMasterID: 2700
+CrimeNo: 100050052202200003 | CaseNo: 202200003
+Station: Seshadripuram Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Rape
+Status: Under Investigation
+Court: Principal Civil Judge (Senior Division) Court, Bengaluru
+Registered: 2022-01-23 | Incident: 2022-01-14 12:00:00 to 2022-01-20 12:00:00
+IO: Vikas, Assistant Sub-Inspector, Joint Commissioner of Police
+Sections: IEA 24, CrPC 154, CrPC 157, CrPC 164
+
+BRIEF FACTS:
+The accused repeatedly raped the survivor at Koramangala, Bengaluru Urban over several months by promising marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Jagadish Pawar, Age 38, Male
+  VICTIM: Vijay Naik, Age 12, Male
+  VICTIM: Manish Mallya, Age 79, Male
+  COMPLAINANT: Yadunandan Bhat, Age 30, Shopkeeper
+  Location: 12.9319, 77.6153
+===
+
+=== CASE 2701 ===
+CaseMasterID: 2701
+CrimeNo: 400130004202500008 | CaseNo: 202500008
+Station: Hubballi-Dharwad Police Commissionerate, Dharwad
+District: Dharwad
+Crime Type: Cyber Crime
+Status: Closed as Mistake of Law
+Court: Chief Judicial Magistrate Court, Dharwad
+Registered: 2024-01-29 | Incident: 2024-01-26 12:00:00 to 2024-01-27 12:00:00
+IO: Ibrahim, Deputy Superintendent of Police, Sub-Inspector
+Sections: IT Act 43, IT Act 66, CrPC 154, CrPC 157, IEA 24, IEA 65B
+
+BRIEF FACTS:
+Data theft from a company server was detected at Old Hubballi, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Sita Verma, Age 25, Female
+  ACCUSED: Rudra Thakur, Age 35, Male
+  VICTIM: Shobha Deshmukh, Age 52, Female
+  COMPLAINANT: Ishaan Kumar, Age 22, Teacher
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-07-13 00:00:00
+  ARREST: 2024-02-01, arresting IO: Ibrahim, Deputy Superintendent of Police, Sub-Inspector
+  Location: 15.3513, 75.1649
+===
+
+=== CASE 2702 ===
+CaseMasterID: 2702
+CrimeNo: 100120105202100004 | CaseNo: 202100004
+Station: Davanagere City Police Station, Davanagere
+District: Davanagere
+Crime Type: Rape
+Status: Under Investigation
+Court: Additional District and Sessions Court, Davanagere
+Registered: 2021-12-27 | Incident: 2021-12-23 12:00:00 to 2021-12-24 12:00:00
+IO: Akash, Joint Commissioner of Police, Joint Commissioner of Police
+Sections: IEA 24, CrPC 154, CrPC 157, CrPC 164
+
+BRIEF FACTS:
+The accused committed rape of a major woman at Davanagere City, Davanagere under the pretext of marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavitha Kulkarni, Age 37, Female
+  ACCUSED: Riya Shetty, Age 28, Female
+  ACCUSED: Ravi Rajput, Age 44, Male
+  VICTIM: Neha Jadhav, Age 8, Female
+  COMPLAINANT: Rani Bhat, Age 31, Accountant
+  Location: 14.4679, 75.9162
+===
+
+=== CASE 2703 ===
+CaseMasterID: 2703
+CrimeNo: 200020101202500007 | CaseNo: 202500007
+Station: Belagavi Traffic Police Unit, Belagavi
+District: Belagavi
+Crime Type: Attempt to Murder
+Status: Trial in Progress
+Court: District and Sessions Court, Belagavi
+Registered: 2025-08-26 | Incident: 2025-08-22 12:00:00 to 2025-08-23 12:00:00
+IO: Arjun, Sub-Inspector, Station House Officer
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused threw acid on the victim near Belagavi City, Belagavi over a personal rivalry. The victim suffered severe burns.
+
+PERSONS INVOLVED:
+  ACCUSED: Padma Kulkarni, Age 25, Female
+  ACCUSED: Pooja Jadhav, Age 63, Female
+  ACCUSED: Radha Ghorpade, Age 43, Female
+  COMPLAINANT: Yamuna Rao, Age 26, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2026-05-15 00:00:00
+  ARREST: 2025-08-29, arresting IO: Arjun, Sub-Inspector, Station House Officer
+  ARREST: 2025-08-30, arresting IO: Arjun, Sub-Inspector, Station House Officer
+  Location: 15.8524, 74.4966
+===
+
+=== CASE 2704 ===
+CaseMasterID: 2704
+CrimeNo: 100220083202500003 | CaseNo: 202500003
+Station: Kuvempunagar Police Station, Mysuru
+District: Mysuru
+Crime Type: Rape
+Status: Closed as Mistake of Fact
+Court: Chief Judicial Magistrate Court, Mysuru
+Registered: 2025-12-28 | Incident: 2025-12-19 12:00:00 to 2025-12-26 12:00:00
+IO: Shankar, Superintendent of Police, Joint Commissioner of Police
+Sections: IEA 24, IEA 65B, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+The accused repeatedly raped the survivor at Mysuru North, Mysuru over several months by promising marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Indira Banerjee, Age 53, Female
+  VICTIM: Deepika Iyengar, Age 73, Female
+  VICTIM: Aditi Shetty, Age 63, Female
+  COMPLAINANT: Chandrashekar Bose, Age 46, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2026-03-03 00:00:00
+  Location: 12.3326, 76.649
+===
+
+=== CASE 2705 ===
+CaseMasterID: 2705
+CrimeNo: 300220083202300005 | CaseNo: 202300005
+Station: Kuvempunagar Police Station, Mysuru
+District: Mysuru
+Crime Type: Robbery
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Mysuru
+Registered: 2023-10-17 | Incident: 2023-10-13 12:00:00 to 2023-10-15 12:00:00
+IO: Shobha, Commissioner of Police, Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Armed robbery was committed at a petrol bunk near Mysuru North, Mysuru. The accused fled with cash amounting to Rs 2 lakhs.
+
+PERSONS INVOLVED:
+  ACCUSED: Satish Iyengar, Age 52, Male
+  COMPLAINANT: Vihaan Iyengar, Age 33, Laborer
+
+PROCEEDINGS:
+  ARREST: 2023-10-22, arresting IO: Shobha, Commissioner of Police, Commissioner of Police
+  Location: 12.3373, 76.6549
+===
+
+=== CASE 2706 ===
+CaseMasterID: 2706
+CrimeNo: 400050063202300004 | CaseNo: 202300004
+Station: Ulsoor Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Dacoity
+Status: Under Investigation
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2022-08-06 | Incident: 2022-07-31 12:00:00 to 2022-08-03 12:00:00
+IO: Akash, Assistant Sub-Inspector, Head Constable
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Highway dacoity committed on the bypass near Koramangala, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Mahesh Ganguly, Age 56, Male
+  VICTIM: Yamuna Thakur, Age 25, Female
+  COMPLAINANT: Eashwar Murthy, Age 46, Electrician
+  Location: 12.9375, 77.6078
+===
+
+=== CASE 2707 ===
+CaseMasterID: 2707
+CrimeNo: 400050053202200005 | CaseNo: 202200005
+Station: Rajajinagar Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cheating
+Status: Charge Sheet Filed
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2022-09-09 | Incident: 2022-09-01 12:00:00 to 2022-09-07 12:00:00
+IO: Jyothi, Head Constable, Joint Commissioner of Police
+Sections: CrPC 154, CrPC 161, CrPC 164, IEA 24
+
+BRIEF FACTS:
+Online fraud was reported from Jayanagar, Bengaluru Urban. The victim was tricked into transferring Rs 50,000 through phishing.
+
+PERSONS INVOLVED:
+  ACCUSED: Sanjay Aiyappa, Age 64, Male
+  COMPLAINANT: Riya Nair, Age 30, Retired
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2023-07-03 00:00:00
+  Location: 12.9655, 77.5879
+===
+
+=== CASE 2708 ===
+CaseMasterID: 2708
+CrimeNo: 400200031202100011 | CaseNo: 202100011
+Station: Koppal District Police Office, Koppal
+District: Koppal
+Crime Type: Counterfeiting
+Status: Under Investigation
+Court: Additional District and Sessions Court, Ballari
+Registered: 2021-08-12 | Incident: 2021-08-04 12:00:00 to 2021-08-07 12:00:00
+IO: Suresh, Sub-Inspector, Joint Commissioner of Police
+Sections: IPC 489A, CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Counterfeit Indian currency with face value of Rs 2 lakhs was recovered at Koppal City, Koppal.
+
+PERSONS INVOLVED:
+  ACCUSED: Myra Pawar, Age 30, Female
+  ACCUSED: Usha Pawar, Age 43, Female
+  ACCUSED: Vinay Thakur, Age 25, Male
+  ACCUSED: Madhuri Iyengar, Age 57, Female
+  ACCUSED: Prakash Shinde, Age 43, Male
+  ACCUSED: Manjunath Sen, Age 32, Male
+  VICTIM: Shobha Chauhan, Age 36, Female
+  COMPLAINANT: Chandrika Naik, Age 62, Sweeper
+
+PROCEEDINGS:
+  ARREST: 2021-08-14, arresting IO: Suresh, Sub-Inspector, Joint Commissioner of Police
+  ARREST: 2021-11-10, arresting IO: Suresh, Sub-Inspector, Joint Commissioner of Police
+  ARREST: 2021-08-13, arresting IO: Suresh, Sub-Inspector, Joint Commissioner of Police
+  Location: 15.3531, 76.1485
+===
+
+=== CASE 2709 ===
+CaseMasterID: 2709
+CrimeNo: 400230117202500007 | CaseNo: 202500007
+Station: Raichur City Police Station, Raichur
+District: Raichur
+Crime Type: Culpable Homicide
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Raichur
+Registered: 2025-09-14 | Incident: 2025-09-10 12:00:00 to 2025-09-11 12:00:00
+IO: Riya, Inspector, Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 24
+
+BRIEF FACTS:
+The accused was involved in a construction collapse at Raichur City, Raichur due to use of substandard materials, resulting in death of two laborers.
+
+PERSONS INVOLVED:
+  ACCUSED: Manjunath Mehta, Age 42, Male
+  VICTIM: Dhruv Mehta, Age 31, Male
+  COMPLAINANT: Nalini Bhatt, Age 46, Self Employed
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2025-11-06 00:00:00
+  Location: 16.2067, 77.3594
+===
+
+=== CASE 2710 ===
+CaseMasterID: 2710
+CrimeNo: 400130004202400003 | CaseNo: 202400003
+Station: Hubballi-Dharwad Police Commissionerate, Dharwad
+District: Dharwad
+Crime Type: Kidnapping & Abduction
+Status: Trial in Progress
+Court: District and Sessions Court, Dharwad at Hubballi
+Registered: 2024-10-04 | Incident: 2024-09-28 12:00:00 to 2024-10-02 12:00:00
+IO: Pavan, Additional Commissioner of Police, Station House Officer
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused kidnapped a minor boy from near Dharwad City Center, Dharwad for ransom. The child was safely rescued.
+
+PERSONS INVOLVED:
+  ACCUSED: Aarav Chowdhury, Age 26, Male
+  ACCUSED: Ansh Das, Age 35, Male
+  ACCUSED: Savitri Mukherjee, Age 62, Female
+  ACCUSED: Aanya Nayak, Age 23, Female
+  VICTIM: Mohan Sen, Age 23, Male
+  COMPLAINANT: Myra Trivedi, Age 64, Electrician
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2025-07-16 00:00:00
+  ARREST: 2024-10-07, arresting IO: Pavan, Additional Commissioner of Police, Station House Officer
+  Location: 15.4552, 75.0086
+===
+
+=== CASE 2711 ===
+CaseMasterID: 2711
+CrimeNo: 200020013202500008 | CaseNo: 202500008
+Station: Belagavi District Police Office, Belagavi
+District: Belagavi
+Crime Type: Hurt / Grievous Hurt
+Status: Under Investigation
+Court: Fast Track Court, Belagavi
+Registered: 2025-03-21 | Incident: 2025-03-13 12:00:00 to 2025-03-18 12:00:00
+IO: Ibrahim, Director General of Police, Inspector of Police
+Sections: CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Hurt by rash driving occurred at Belagavi City, Belagavi. A pedestrian was knocked down.
+
+PERSONS INVOLVED:
+  ACCUSED: Savitri Patil, Age 53, Female
+  VICTIM: Chandrashekar Bhat, Age 85, Male
+  COMPLAINANT: Reyansh Banerjee, Age 34, Barber
+
+PROCEEDINGS:
+  ARREST: 2025-03-21, arresting IO: Ibrahim, Director General of Police, Inspector of Police
+  Location: 15.8478, 74.5049
+===
+
+=== CASE 2712 ===
+CaseMasterID: 2712
+CrimeNo: 300250106202400004 | CaseNo: 202400004
+Station: Shivamogga City Police Station, Shivamogga
+District: Shivamogga
+Crime Type: Theft
+Status: Under Investigation
+Court: District and Sessions Court, Shivamogga
+Registered: 2024-02-21 | Incident: 2024-02-13 12:00:00 to 2024-02-18 12:00:00
+IO: Manish, Police Constable, Director General of Police
+Sections: CrPC 154, CrPC 161, IEA 24
+
+BRIEF FACTS:
+Chain snatching occurred at Shivamogga City, Shivamogga by two bike-borne accused.
+
+PERSONS INVOLVED:
+  ACCUSED: Sita Sen, Age 40, Female
+  COMPLAINANT: Pavan Murthy, Age 31, Electrician
+
+PROCEEDINGS:
+  ARREST: 2024-02-27, arresting IO: Manish, Police Constable, Director General of Police
+  Location: 13.9245, 75.5666
+===
+
+=== CASE 2713 ===
+CaseMasterID: 2713
+CrimeNo: 500020100202400003 | CaseNo: 202400003
+Station: Maruti Police Station, Belagavi, Belagavi
+District: Belagavi
+Crime Type: Arson
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Belagavi
+Registered: 2023-04-18 | Incident: 2023-04-16 12:00:00 to 2023-04-16 12:00:00
+IO: Mohan, Police Constable, Police Constable
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused set fire to the thatched house of the victim at Maruti Galli Belagavi, Belagavi following a property dispute.
+
+PERSONS INVOLVED:
+  VICTIM: Arjun Rajput, Age 65, Male
+  COMPLAINANT: Suresh Iyengar, Age 58, Watchman
+  Location: 15.8336, 74.484
+===
+
+=== CASE 2714 ===
+CaseMasterID: 2714
+CrimeNo: 100020006202400003 | CaseNo: 202400003
+Station: Belagavi City Police Commissionerate, Belagavi
+District: Belagavi
+Crime Type: Criminal Trespass
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Belagavi
+Registered: 2023-02-24 | Incident: 2023-02-19 12:00:00 to 2023-02-23 12:00:00
+IO: Lokesh, Superintendent of Police, Director General of Police
+Sections: CrPC 154, CrPC 161
+
+BRIEF FACTS:
+Lurking house trespass was committed at Maruti Galli Belagavi, Belagavi during the daytime.
+
+PERSONS INVOLVED:
+  ACCUSED: Neha Menon, Age 28, Female
+  ACCUSED: Nagaraj Hegde, Age 51, Male
+  ACCUSED: Moohan Verma, Age 63, Male
+  VICTIM: Venkatesh Nair, Age 82, Male
+  COMPLAINANT: Basavaraj Menon, Age 41, Tailor
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2023-06-10 00:00:00
+  ARREST: 2023-03-17, arresting IO: Lokesh, Superintendent of Police, Director General of Police
+  ARREST: 2023-02-24, arresting IO: Lokesh, Superintendent of Police, Director General of Police
+  Location: 15.8272, 74.4742
+===
+
+=== CASE 2715 ===
+CaseMasterID: 2715
+CrimeNo: 100190120202400005 | CaseNo: 202400005
+Station: Kolar Town Police Station, Kolar
+District: Kolar
+Crime Type: Dacoity
+Status: Under Investigation
+Court: District and Sessions Court, Kolar
+Registered: 2024-10-22 | Incident: 2024-10-15 12:00:00 to 2024-10-21 12:00:00
+IO: Vani, Inspector, Circle Inspector
+Sections: CrPC 154, CrPC 161
+
+BRIEF FACTS:
+Highway dacoity committed on the bypass near Kolar Town, Kolar.
+
+PERSONS INVOLVED:
+  ACCUSED: Bhagya Kulkarni, Age 27, Female
+  ACCUSED: Manish Rao, Age 55, Male
+  ACCUSED: Vijay Mehta, Age 57, Male
+  VICTIM: Vihaan Acharya, Age 71, Male
+  VICTIM: Shobha Menon, Age 22, Female
+  COMPLAINANT: Jagadish More, Age 54, Milk Vendor
+
+PROCEEDINGS:
+  ARREST: 2024-10-27, arresting IO: Vani, Inspector, Circle Inspector
+  ARREST: 2025-01-13, arresting IO: Vani, Inspector, Circle Inspector
+  Location: 13.1353, 78.1325
+===
+
+=== CASE 2716 ===
+CaseMasterID: 2716
+CrimeNo: 100170103202200005 | CaseNo: 202200005
+Station: Kalaburagi Suburban Police Station, Kalaburagi (Gulbarga)
+District: Kalaburagi (Gulbarga)
+Crime Type: Assault on Women
+Status: Under Investigation
+Court: Additional District and Sessions Court, Kalaburagi
+Registered: 2021-04-08 | Incident: 2021-04-02 12:00:00 to 2021-04-05 12:00:00
+IO: Shaila, Police Constable, Inspector of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused assaulted a woman with intent to outrage her modesty at Kalaburagi City Center, Kalaburagi (Gulbarga).
+
+PERSONS INVOLVED:
+  ACCUSED: Hemanth Singh, Age 20, Male
+  VICTIM: Vijay Pillai, Age 52, Male
+  VICTIM: Pranav Iyer, Age 15, Male
+  COMPLAINANT: Riya Kulkarni, Age 30, Nurse
+  Location: 17.3315, 76.8361
+===
+
+=== CASE 2717 ===
+CaseMasterID: 2717
+CrimeNo: 300020010202500007 | CaseNo: 202500007
+Station: Northern Range Headquarters, Belagavi, Belagavi
+District: Belagavi
+Crime Type: Hurt / Grievous Hurt
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Belagavi
+Registered: 2024-09-09 | Incident: 2024-08-30 12:00:00 to 2024-09-05 12:00:00
+IO: Channabasava, Additional Commissioner of Police, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The accused administered poison to the victim at Maruti Galli Belagavi, Belagavi.
+
+PERSONS INVOLVED:
+  ACCUSED: Arjun Mahajan, Age 51, Male
+  ACCUSED: Pallavi Bose, Age 26, Female
+  ACCUSED: Shobha Acharya, Age 25, Female
+  COMPLAINANT: Hema Ganguly, Age 60, Retired
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2024-11-06 00:00:00
+  ARREST: 2024-09-15, arresting IO: Channabasava, Additional Commissioner of Police, Deputy Superintendent of Police
+  Location: 15.8366, 74.4783
+===
+
+=== CASE 2718 ===
+CaseMasterID: 2718
+CrimeNo: 400120105202400007 | CaseNo: 202400007
+Station: Davanagere City Police Station, Davanagere
+District: Davanagere
+Crime Type: Extortion
+Status: Under Investigation
+Court: Additional District and Sessions Court, Davanagere
+Registered: 2023-02-19 | Incident: 2023-02-13 12:00:00 to 2023-02-16 12:00:00
+IO: Akash, Joint Commissioner of Police, Joint Commissioner of Police
+Sections: CrPC 157, CrPC 161, IEA 24
+
+BRIEF FACTS:
+The accused intimidated the shopkeeper at Davanagere City, Davanagere and demanded protection money.
+
+PERSONS INVOLVED:
+  ACCUSED: Nandini Iyengar, Age 40, Female
+  VICTIM: Manjunath Bhatt, Age 56, Male
+  COMPLAINANT: Basavaraj Kulkarni, Age 34, Lawyer
+
+PROCEEDINGS:
+  ARREST: 2023-02-23, arresting IO: Akash, Joint Commissioner of Police, Joint Commissioner of Police
+  Location: 14.4584, 75.9168
+===
+
+=== CASE 2719 ===
+CaseMasterID: 2719
+CrimeNo: 200020010202100005 | CaseNo: 202100005
+Station: Northern Range Headquarters, Belagavi, Belagavi
+District: Belagavi
+Crime Type: Hurt / Grievous Hurt
+Status: Charge Sheet Filed
+Court: Additional District and Sessions Court, Belagavi
+Registered: 2021-03-18 | Incident: 2021-03-10 12:00:00 to 2021-03-14 12:00:00
+IO: Sandeep, Superintendent of Police, Circle Inspector
+Sections: CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+Grievous hurt was caused by the accused using a sword at Maruti Galli Belagavi, Belagavi.
+
+PERSONS INVOLVED:
+  VICTIM: Jagadish Gupta, Age 44, Male
+  COMPLAINANT: Akash Gowda, Age 24, Driver
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-11-19 00:00:00
+  Location: 15.8237, 74.4731
+===
+
+=== CASE 2720 ===
+CaseMasterID: 2720
+CrimeNo: 300130088202000006 | CaseNo: 202000006
+Station: Vidyanagar Police Station, Hubballi, Dharwad
+District: Dharwad
+Crime Type: Robbery
+Status: Charge Sheet Filed
+Court: Family Court, Hubballi
+Registered: 2019-12-24 | Incident: 2019-12-19 12:00:00 to 2019-12-20 12:00:00
+IO: Kala, Deputy Commissioner of Police, Additional Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+A gang of three persons robbed commuters on the highway near Navanagar, Dharwad at knife point.
+
+PERSONS INVOLVED:
+  ACCUSED: Deepak Chauhan, Age 43, Male
+  COMPLAINANT: Kaveri Ganguly, Age 31, Engineer
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2020-12-14 00:00:00
+  ARREST: 2019-12-31, arresting IO: Kala, Deputy Commissioner of Police, Additional Superintendent of Police
+  Location: 15.3853, 75.0807
+===
+
+=== CASE 2721 ===
+CaseMasterID: 2721
+CrimeNo: 100220082202000005 | CaseNo: 202000005
+Station: Udayagiri Police Station, Mysuru
+District: Mysuru
+Crime Type: Assault on Women
+Status: Closed as Mistake of Fact
+Court: Chief Judicial Magistrate Court, Mysuru
+Registered: 2020-07-19 | Incident: 2020-07-10 12:00:00 to 2020-07-15 12:00:00
+IO: Deepika, Inspector, Additional Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Stalking was reported by a woman at Mysuru South, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Shaurya Patil, Age 36, Male
+  VICTIM: Rani Singh, Age 31, Female
+  COMPLAINANT: Kiran Bose, Age 22, Electrician
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-01-04 00:00:00
+  ARREST: 2020-07-21, arresting IO: Deepika, Inspector, Additional Commissioner of Police
+  Location: 12.3246, 76.62
+===
+
+=== CASE 2722 ===
+CaseMasterID: 2722
+CrimeNo: 300050069202400005 | CaseNo: 202400005
+Station: Magadi Road Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Murder
+Status: Under Investigation
+Court: Fast Track Court, Bengaluru
+Registered: 2024-04-22 | Incident: 2024-04-20 12:00:00 to 2024-04-20 12:00:00
+IO: Aditya, Inspector, Deputy Superintendent of Police
+Sections: IPC 302, CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused conspired with unknown persons to murder the victim using a firearm near Malleswaram, Bengaluru Urban. Postmortem confirmed death due to gunshot injury.
+
+PERSONS INVOLVED:
+  ACCUSED: Rani Patil, Age 33, Female
+  ACCUSED: Sita Mehta, Age 29, Female
+  VICTIM: Madhuri Iyengar, Age 26, Female
+  COMPLAINANT: Gowri Shetty, Age 22, Shopkeeper
+
+PROCEEDINGS:
+  ARREST: 2024-05-13, arresting IO: Aditya, Inspector, Deputy Superintendent of Police
+  Location: 12.9732, 77.5858
+===
+
+=== CASE 2723 ===
+CaseMasterID: 2723
+CrimeNo: 400150026202100006 | CaseNo: 202100006
+Station: Hassan District Police Office, Hassan
+District: Hassan
+Crime Type: Assault on Women
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Hassan
+Registered: 2021-01-02 | Incident: 2020-12-27 12:00:00 to 2020-12-30 12:00:00
+IO: Indira, Joint Commissioner of Police, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+The accused assaulted a woman with intent to outrage her modesty at Hassan Town, Hassan.
+
+PERSONS INVOLVED:
+  ACCUSED: Pallavi Yadav, Age 46, Female
+  VICTIM: Shobha Kamat, Age 29, Female
+  COMPLAINANT: Riya Banerjee, Age 54, Watchman
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2021-07-12 00:00:00
+  ARREST: 2021-01-06, arresting IO: Indira, Joint Commissioner of Police, Deputy Superintendent of Police
+  Location: 13.0013, 76.0918
+===
+
+=== CASE 2724 ===
+CaseMasterID: 2724
+CrimeNo: 100110097202200004 | CaseNo: 202200004
+Station: Mangaluru Cyber Crime Cell, Dakshina Kannada
+District: Dakshina Kannada
+Crime Type: Arson
+Status: Under Investigation
+Court: Additional District and Sessions Court, Mangaluru
+Registered: 2022-09-06 | Incident: 2022-09-01 12:00:00 to 2022-09-03 12:00:00
+IO: Ganesh, Superintendent of Police, Additional Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused set fire to agricultural fields near Panambur Mangaluru, Dakshina Kannada over a land dispute.
+
+PERSONS INVOLVED:
+  ACCUSED: Yadunandan Patil, Age 34, Male
+  ACCUSED: Priya Murthy, Age 48, Female
+  COMPLAINANT: Riya Yadav, Age 61, Driver
+
+PROCEEDINGS:
+  ARREST: 2022-12-03, arresting IO: Ganesh, Superintendent of Police, Additional Superintendent of Police
+  Location: 12.919, 74.8656
+===
+
+=== CASE 2725 ===
+CaseMasterID: 2725
+CrimeNo: 400050051202200004 | CaseNo: 202200004
+Station: High Grounds Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Criminal Trespass
+Status: Trial in Progress
+Court: Principal Civil Judge (Senior Division) Court, Bengaluru
+Registered: 2022-07-30 | Incident: 2022-07-24 12:00:00 to 2022-07-30 12:00:00
+IO: Krishna, Inspector, Deputy Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Criminal trespass by a public servant at Yeshwanthpur, Bengaluru Urban was reported.
+
+PERSONS INVOLVED:
+  ACCUSED: Geeta Chauhan, Age 27, Female
+  COMPLAINANT: Indira Nair, Age 64, Lawyer
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2023-04-03 00:00:00
+  Location: 13.0273, 77.5563
+===
+
+=== CASE 2726 ===
+CaseMasterID: 2726
+CrimeNo: 500050072202300008 | CaseNo: 202300008
+Station: HSR Layout Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Culpable Homicide
+Status: Trial in Progress
+Court: Fast Track Court, Bengaluru
+Registered: 2022-02-19 | Incident: 2022-02-13 12:00:00 to 2022-02-17 12:00:00
+IO: Gururaj, Superintendent of Police, Deputy Commissioner of Police
+Sections: CrPC 154, CrPC 161, CrPC 164, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused driving a rash vehicle knocked down the victim near Rajajinagar, Bengaluru Urban. The victim died on the spot due to severe head injuries.
+
+PERSONS INVOLVED:
+  ACCUSED: Manjunath Pillai, Age 38, Male
+  ACCUSED: Vivaan Kamat, Age 45, Male
+  COMPLAINANT: Vivaan Hegde, Age 46, Police Officer
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2022-05-10 00:00:00
+  ARREST: 2022-02-19, arresting IO: Gururaj, Superintendent of Police, Deputy Commissioner of Police
+  ARREST: 2022-04-10, arresting IO: Gururaj, Superintendent of Police, Deputy Commissioner of Police
+  Location: 12.9552, 77.57
+===
+
+=== CASE 2727 ===
+CaseMasterID: 2727
+CrimeNo: 400050049202000005 | CaseNo: 202000005
+Station: Karnataka State Dog Squad Unit, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cyber Crime
+Status: Under Investigation
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2019-10-19 | Incident: 2019-10-15 12:00:00 to 2019-10-16 12:00:00
+IO: Rakesh, Commissioner of Police, Additional Commissioner of Police
+Sections: IT Act 43, IT Act 66, CrPC 154, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+Identity theft was reported at Indiranagar, Bengaluru Urban. The accused used the victims Aadhaar details.
+
+PERSONS INVOLVED:
+  ACCUSED: Ravi Aiyappa, Age 59, Male
+  ACCUSED: Mala Chauhan, Age 35, Female
+  VICTIM: Priya Pawar, Age 73, Female
+  VICTIM: Vijay Banerjee, Age 71, Male
+  COMPLAINANT: Vivaan Aiyappa, Age 23, Housewife
+  Location: 12.9876, 77.6545
+===
+
+=== CASE 2728 ===
+CaseMasterID: 2728
+CrimeNo: 500050057202500006 | CaseNo: 202500006
+Station: Banaswadi Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Extortion
+Status: Under Investigation
+Court: Family Court, Bengaluru
+Registered: 2024-04-19 | Incident: 2024-04-14 12:00:00 to 2024-04-15 12:00:00
+IO: Aditya, Director General of Police, Assistant Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Extortion by anonymous phone calls was reported at Basavanagudi, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Vinay Ganguly, Age 54, Male
+  VICTIM: Riya Ghorpade, Age 65, Female
+  VICTIM: Akash Iyengar, Age 24, Male
+  COMPLAINANT: Venkatesh Pillai, Age 25, Housewife
+
+PROCEEDINGS:
+  ARREST: 2024-04-26, arresting IO: Aditya, Director General of Police, Assistant Sub-Inspector
+  Location: 12.936, 77.5474
+===
+
+=== CASE 2729 ===
+CaseMasterID: 2729
+CrimeNo: 300230034202200004 | CaseNo: 202200004
+Station: Raichur District Police Office, Raichur
+District: Raichur
+Crime Type: Cyber Crime
+Status: Acquitted
+Court: Chief Judicial Magistrate Court, Raichur
+Registered: 2022-01-03 | Incident: 2021-12-29 12:00:00 to 2022-01-01 12:00:00
+IO: Siddharth, Commissioner of Police, Deputy Commissioner of Police
+Sections: IT Act 43, IT Act 66, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+An email phishing scam was reported at Sindhanur, Raichur. The victim lost Rs 1.2 lakhs.
+
+PERSONS INVOLVED:
+  ACCUSED: Rajesh Aiyappa, Age 29, Male
+  ACCUSED: Lakshmi Bose, Age 33, Female
+  ACCUSED: Suresh Mukherjee, Age 25, Male
+  COMPLAINANT: Suresh Shah, Age 29, Government Employee
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2022-12-08 00:00:00
+  ARREST: 2022-03-03, arresting IO: Siddharth, Commissioner of Police, Deputy Commissioner of Police
+  Location: 15.6002, 76.9497
+===
+
+=== CASE 2730 ===
+CaseMasterID: 2730
+CrimeNo: 100130086202200003 | CaseNo: 202200003
+Station: Hubballi Rural Police Station, Dharwad
+District: Dharwad
+Crime Type: Rape
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Dharwad
+Registered: 2022-10-25 | Incident: 2022-10-24 12:00:00 to 2022-10-24 12:00:00
+IO: Vinay, Superintendent of Police, Director General of Police
+Sections: IEA 24, IEA 65B, CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+The accused repeatedly raped the survivor at Hubballi Railway Station, Dharwad over several months by promising marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Reyansh Aiyappa, Age 62, Male
+  ACCUSED: Akash Menon, Age 56, Male
+  VICTIM: Nalini Chowdhury, Age 46, Female
+  VICTIM: Shankar Chowdhury, Age 60, Male
+  VICTIM: Nalini Bose, Age 71, Female
+  COMPLAINANT: Dhruv Thakur, Age 41, Tailor
+  Location: 15.3595, 75.1413
+===
+
+=== CASE 2731 ===
+CaseMasterID: 2731
+CrimeNo: 100050057202200005 | CaseNo: 202200005
+Station: Banaswadi Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Rape
+Status: Charge Sheet Filed
+Court: Additional Chief Judicial Magistrate Court, Bengaluru
+Registered: 2022-05-10 | Incident: 2022-05-08 12:00:00 to 2022-05-08 12:00:00
+IO: Narasimha, Police Constable, Investigating Officer
+Sections: IEA 24, IEA 65B, CrPC 154, CrPC 157
+
+BRIEF FACTS:
+A minor girl aged 15 years was raped by the accused near Yeshwanthpur, Bengaluru Urban. The survivor was rescued and medical examination confirmed the offence.
+
+PERSONS INVOLVED:
+  ACCUSED: Riya Acharya, Age 28, Female
+  ACCUSED: Arjun Shinde, Age 38, Male
+  ACCUSED: Bhagya Sarkar, Age 21, Female
+  VICTIM: Jagadish Sarkar, Age 12, Male
+  COMPLAINANT: Bheemesh Kumar, Age 48, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2022-10-16 00:00:00
+  ARREST: 2022-05-24, arresting IO: Narasimha, Police Constable, Investigating Officer
+  Location: 13.0273, 77.558
+===
+
+=== CASE 2732 ===
+CaseMasterID: 2732
+CrimeNo: 200240035202300003 | CaseNo: 202300003
+Station: Ramanagara District Police Office, Ramanagara
+District: Ramanagara
+Crime Type: Murder
+Status: Charge Sheet Filed
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2022-09-28 | Incident: 2022-09-20 12:00:00 to 2022-09-25 12:00:00
+IO: Lakshmi, Commissioner of Police, Deputy Superintendent of Police
+Sections: IPC 302, CrPC 157, IEA 24
+
+BRIEF FACTS:
+A dead body with multiple stab wounds was found at Ramanagara, Ramanagara. During investigation, the accused was arrested and the murder weapon recovered.
+
+PERSONS INVOLVED:
+  ACCUSED: Dhruv Gupta, Age 58, Male
+  ACCUSED: Mohan Yadav, Age 50, Male
+  VICTIM: Indira Nair, Age 49, Female
+  VICTIM: Hemanth Mallya, Age 21, Male
+  VICTIM: Pallavi Pawar, Age 29, Female
+  VICTIM: Yadunandan Das, Age 48, Male
+  COMPLAINANT: Mala Shinde, Age 40, Nurse
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2023-09-05 00:00:00
+  Location: 12.7197, 77.2835
+===
+
+=== CASE 2733 ===
+CaseMasterID: 2733
+CrimeNo: 200270038202200004 | CaseNo: 202200004
+Station: Udupi District Police Office, Udupi
+District: Udupi
+Crime Type: Dacoity
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Udupi
+Registered: 2021-09-13 | Incident: 2021-09-10 12:00:00 to 2021-09-11 12:00:00
+IO: Bhagya, Superintendent of Police, Assistant Sub-Inspector
+Sections: CrPC 157, CrPC 161
+
+BRIEF FACTS:
+A gang of dacoits stopped a truck on the highway near Udupi Town, Udupi and looted the consignment.
+
+PERSONS INVOLVED:
+  ACCUSED: Rahul Pillai, Age 24, Male
+  ACCUSED: Usha Mehta, Age 43, Female
+  ACCUSED: Sita Nayak, Age 42, Female
+  COMPLAINANT: Geeta Ghorpade, Age 24, Business Owner
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2021-11-01 00:00:00
+  ARREST: 2021-09-16, arresting IO: Bhagya, Superintendent of Police, Assistant Sub-Inspector
+  Location: 13.3441, 74.7408
+===
+
+=== CASE 2734 ===
+CaseMasterID: 2734
+CrimeNo: 300220083202300006 | CaseNo: 202300006
+Station: Kuvempunagar Police Station, Mysuru
+District: Mysuru
+Crime Type: Riots
+Status: Under Investigation
+Court: Family Court, Mysuru
+Registered: 2023-05-18 | Incident: 2023-05-12 12:00:00 to 2023-05-14 12:00:00
+IO: Jyothi, Assistant Sub-Inspector, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+A factional fight at Mysuru North, Mysuru resulted in damage to public property.
+
+PERSONS INVOLVED:
+  ACCUSED: Ansh Mallya, Age 36, Male
+  VICTIM: Rajesh Bhatt, Age 31, Male
+  VICTIM: Nandini Ghorpade, Age 15, Female
+  COMPLAINANT: Chandrika Singh, Age 33, Shopkeeper
+
+PROCEEDINGS:
+  ARREST: 2023-05-20, arresting IO: Jyothi, Assistant Sub-Inspector, Deputy Superintendent of Police
+  Location: 12.3392, 76.6558
+===
+
+=== CASE 2735 ===
+CaseMasterID: 2735
+CrimeNo: 400040015202300003 | CaseNo: 202300003
+Station: Bengaluru Rural District Police Office, Bengaluru Rural
+District: Bengaluru Rural
+Crime Type: Assault on Women
+Status: Charge Sheet Filed
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2022-02-25 | Incident: 2022-02-21 12:00:00 to 2022-02-22 12:00:00
+IO: Raj, Superintendent of Police, Assistant Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Sexual harassment was reported at the workplace at Bengaluru Rural, Bengaluru Rural.
+
+PERSONS INVOLVED:
+  ACCUSED: Riya Mallya, Age 22, Female
+  VICTIM: Deepika Shah, Age 43, Female
+  COMPLAINANT: Uma Shinde, Age 55, Auto Rickshaw Driver
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2022-05-25 00:00:00
+  Location: 13.0027, 77.6053
+===
+
+=== CASE 2736 ===
+CaseMasterID: 2736
+CrimeNo: 500050056202100003 | CaseNo: 202100003
+Station: Hebbal Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Theft
+Status: Charge Sheet Filed
+Court: Principal Civil Judge (Senior Division) Court, Bengaluru
+Registered: 2020-11-01 | Incident: 2020-10-27 12:00:00 to 2020-10-31 12:00:00
+IO: Hema, Superintendent of Police, Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Mobile phone theft occurred at a bus stop at Indiranagar, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Ayaan Mallya, Age 59, Male
+  ACCUSED: Pooja Aiyappa, Age 35, Female
+  VICTIM: Vihaan Sarkar, Age 43, Male
+  VICTIM: Prakash Murthy, Age 11, Male
+  COMPLAINANT: Shobha Mehta, Age 44, Barber
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-01-11 00:00:00
+  ARREST: 2020-11-05, arresting IO: Hema, Superintendent of Police, Superintendent of Police
+  Location: 12.9837, 77.6617
+===
+
+=== CASE 2737 ===
+CaseMasterID: 2737
+CrimeNo: 200050059202100006 | CaseNo: 202100006
+Station: Koramangala Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cheating
+Status: Trial in Progress
+Court: Chief Judicial Magistrate Court, Bengaluru
+Registered: 2021-05-07 | Incident: 2021-05-04 12:00:00 to 2021-05-04 12:00:00
+IO: Anand, Deputy Superintendent of Police, Commissioner of Police
+Sections: CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+The accused obtained a loan by submitting forged documents to a bank near Koramangala, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  VICTIM: Rajesh Joshi, Age 61, Male
+  VICTIM: Manish Chowdhury, Age 54, Male
+  COMPLAINANT: Aanya More, Age 54, Laborer
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-12-19 00:00:00
+  Location: 12.9292, 77.6073
+===
+
+=== CASE 2738 ===
+CaseMasterID: 2738
+CrimeNo: 300010012202500003 | CaseNo: 202500003
+Station: Bagalkot District Police Office, Bagalkot
+District: Bagalkot
+Crime Type: Culpable Homicide
+Status: Under Investigation
+Court: District and Sessions Court, Bagalkot
+Registered: 2025-03-24 | Incident: 2025-03-20 12:00:00 to 2025-03-22 12:00:00
+IO: Bhagya, Director General of Police, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The victim died due to medical negligence at a private clinic near Bagalkot City, Bagalkot.
+
+PERSONS INVOLVED:
+  ACCUSED: Satish Reddy, Age 65, Male
+  ACCUSED: Indira Pillai, Age 27, Female
+  ACCUSED: Narasimha Chowdhury, Age 61, Male
+  VICTIM: Dhruv Chowdhury, Age 60, Male
+  COMPLAINANT: Pallavi Das, Age 42, Retired
+  Location: 16.1655, 75.6534
+===
+
+=== CASE 2739 ===
+CaseMasterID: 2739
+CrimeNo: 500100021202200007 | CaseNo: 202200007
+Station: Chitradurga District Police Office, Chitradurga
+District: Chitradurga
+Crime Type: Kidnapping & Abduction
+Status: Under Investigation
+Court: District and Sessions Court, Chitradurga
+Registered: 2021-10-28 | Incident: 2021-10-23 12:00:00 to 2021-10-26 12:00:00
+IO: Ansh, Commissioner of Police, Station House Officer
+Sections: CrPC 154, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+The accused abducted a woman at Chitradurga City, Chitradurga with intent to force her into marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Aditi Bhatt, Age 60, Female
+  VICTIM: Bhagya Yadav, Age 40, Female
+  VICTIM: Gururaj Kumar, Age 45, Male
+  VICTIM: Chandrashekar Mehta, Age 48, Male
+  COMPLAINANT: Vivaan Ganguly, Age 40, Student
+  Location: 14.2225, 76.4027
+===
+
+=== CASE 2740 ===
+CaseMasterID: 2740
+CrimeNo: 100050063202400005 | CaseNo: 202400005
+Station: Ulsoor Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Dacoity
+Status: Under Investigation
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2024-04-10 | Incident: 2024-04-03 12:00:00 to 2024-04-05 12:00:00
+IO: Eashwar, Director General of Police, Investigating Officer
+Sections: CrPC 154, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+A group of unknown miscreants committed dacoity at a temple near Basavanagudi, Bengaluru Urban and looted the donation box.
+
+PERSONS INVOLVED:
+  ACCUSED: Vinay Singh, Age 58, Male
+  VICTIM: Ansh Ganguly, Age 13, Male
+  COMPLAINANT: Yamuna Iyer, Age 34, Electrician
+  Location: 12.9367, 77.5411
+===
+
+=== CASE 2741 ===
+CaseMasterID: 2741
+CrimeNo: 500020112202400008 | CaseNo: 202400008
+Station: Chikkodi Police Station, Belagavi
+District: Belagavi
+Crime Type: Criminal Breach of Trust
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Belagavi
+Registered: 2024-06-16 | Incident: 2024-06-09 12:00:00 to 2024-06-13 12:00:00
+IO: Deepak, Police Constable, Sub-Inspector
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused misappropriated funds collected from farmers near Belagavi Camp, Belagavi.
+
+PERSONS INVOLVED:
+  ACCUSED: Gururaj Rajput, Age 64, Male
+  ACCUSED: Gururaj Gowda, Age 63, Male
+  COMPLAINANT: Deepak Iyer, Age 22, Doctor
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2024-12-31 00:00:00
+  Location: 15.8563, 74.5216
+===
+
+=== CASE 2742 ===
+CaseMasterID: 2742
+CrimeNo: 200110094202000006 | CaseNo: 202000006
+Station: Bunder Police Station, Dakshina Kannada
+District: Dakshina Kannada
+Crime Type: Theft
+Status: Under Investigation
+Court: Additional District and Sessions Court, Mangaluru
+Registered: 2020-04-11 | Incident: 2020-04-01 12:00:00 to 2020-04-07 12:00:00
+IO: Mallikarjun, Inspector, Deputy Superintendent of Police
+Sections: CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Mobile phone theft occurred at a bus stop at Panambur Mangaluru, Dakshina Kannada.
+
+PERSONS INVOLVED:
+  ACCUSED: Gururaj Kumar, Age 37, Male
+  ACCUSED: Rahul Rajput, Age 32, Male
+  ACCUSED: Mohan Menon, Age 53, Male
+  COMPLAINANT: Roopa Deshmukh, Age 38, Painter
+  Location: 12.9135, 74.8746
+===
+
+=== CASE 2743 ===
+CaseMasterID: 2743
+CrimeNo: 300260115202400004 | CaseNo: 202400004
+Station: Tiptur Police Station, Tumakuru
+District: Tumakuru
+Crime Type: Arson
+Status: Trial in Progress
+Court: District and Sessions Court, Tumakuru
+Registered: 2023-02-02 | Incident: 2023-01-26 12:00:00 to 2023-01-30 12:00:00
+IO: Rudra, Police Constable, Police Constable
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Arson of a public building was committed at Tiptur, Tumakuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Naveen Deshmukh, Age 50, Male
+  ACCUSED: Radha Kulkarni, Age 23, Female
+  ACCUSED: Madhuri Mahajan, Age 34, Female
+  COMPLAINANT: Savitri Murthy, Age 46, Business Owner
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2023-07-13 00:00:00
+  ARREST: 2023-02-06, arresting IO: Rudra, Police Constable, Police Constable
+  ARREST: 2023-02-06, arresting IO: Rudra, Police Constable, Police Constable
+  Location: 13.2618, 76.6459
+===
+
+=== CASE 2744 ===
+CaseMasterID: 2744
+CrimeNo: 300220077202000004 | CaseNo: 202000004
+Station: Nazarbad Police Station, Mysuru
+District: Mysuru
+Crime Type: Burglary
+Status: Charge Sheet Filed
+Court: Family Court, Mysuru
+Registered: 2019-05-20 | Incident: 2019-05-12 12:00:00 to 2019-05-17 12:00:00
+IO: Vikas, Joint Commissioner of Police, Director General of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Burglary at a commercial establishment at Mysuru North, Mysuru was reported. CCTV footage shows a single accused.
+
+PERSONS INVOLVED:
+  ACCUSED: Bhagya Kumar, Age 22, Female
+  VICTIM: Pallavi Gupta, Age 38, Female
+  COMPLAINANT: Radha Kumar, Age 48, Business Owner
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2020-03-04 00:00:00
+  Location: 12.3462, 76.6557
+===
+
+=== CASE 2745 ===
+CaseMasterID: 2745
+CrimeNo: 200050061202200002 | CaseNo: 202200002
+Station: Basavanagudi Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Robbery
+Status: Under Investigation
+Court: Family Court, Bengaluru
+Registered: 2022-11-05 | Incident: 2022-11-01 12:00:00 to 2022-11-01 12:00:00
+IO: Prakash, Additional Commissioner of Police, Commissioner of Police
+Sections: CrPC 157, CrPC 161
+
+BRIEF FACTS:
+A gang of three persons robbed commuters on the highway near Basavanagudi, Bengaluru Urban at knife point.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Dhruv Joshi, Age 54, Laborer
+  Location: 12.9351, 77.5364
+===
+
+=== CASE 2746 ===
+CaseMasterID: 2746
+CrimeNo: 200250036202200002 | CaseNo: 202200002
+Station: Shivamogga District Police Office, Shivamogga
+District: Shivamogga
+Crime Type: Attempt to Murder
+Status: Trial in Progress
+Court: District and Sessions Court, Shivamogga
+Registered: 2021-04-03 | Incident: 2021-03-28 12:00:00 to 2021-04-01 12:00:00
+IO: Ramesh, Deputy Commissioner of Police, Commissioner of Police
+Sections: CrPC 157, IEA 24
+
+BRIEF FACTS:
+The accused fired a gunshot at the victim near Shivamogga City, Shivamogga. The victim sustained serious injuries and is undergoing treatment at the district hospital.
+
+PERSONS INVOLVED:
+  ACCUSED: Dhruv Singh, Age 23, Male
+  ACCUSED: Krishna Thakur, Age 20, Male
+  ACCUSED: Vivaan Iyengar, Age 60, Male
+  VICTIM: Rohan Gowda, Age 80, Male
+  COMPLAINANT: Aarav Murthy, Age 24, Engineer
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-11-17 00:00:00
+  ARREST: 2021-04-10, arresting IO: Ramesh, Deputy Commissioner of Police, Commissioner of Police
+  Location: 13.9332, 75.5677
+===
+
+=== CASE 2747 ===
+CaseMasterID: 2747
+CrimeNo: 400020013202500009 | CaseNo: 202500009
+Station: Belagavi District Police Office, Belagavi
+District: Belagavi
+Crime Type: Riots
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Belagavi
+Registered: 2024-08-24 | Incident: 2024-08-21 12:00:00 to 2024-08-23 12:00:00
+IO: Usha, Police Constable, Additional Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Rioting occurred at Belagavi City, Belagavi during a religious procession. Stones were pelted.
+
+PERSONS INVOLVED:
+  ACCUSED: Geeta Singh, Age 31, Female
+  COMPLAINANT: Vijay Iyer, Age 37, Engineer
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-12-05 00:00:00
+  Location: 15.8519, 74.4974
+===
+
+=== CASE 2748 ===
+CaseMasterID: 2748
+CrimeNo: 200100021202100002 | CaseNo: 202100002
+Station: Chitradurga District Police Office, Chitradurga
+District: Chitradurga
+Crime Type: Attempt to Murder
+Status: Convicted
+Court: District and Sessions Court, Chitradurga
+Registered: 2021-02-12 | Incident: 2021-02-04 12:00:00 to 2021-02-09 12:00:00
+IO: Bheemesh, Superintendent of Police, Police Constable
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused attempted to strangulate the victim at Chitradurga City, Chitradurga. Neighbors intervened and rescued the victim.
+
+PERSONS INVOLVED:
+  ACCUSED: Pallavi Das, Age 51, Female
+  ACCUSED: Ishita Naik, Age 55, Female
+  ACCUSED: Suresh Yadav, Age 62, Male
+  VICTIM: Myra Kulkarni, Age 57, Female
+  VICTIM: Revathi Hegde, Age 35, Female
+  COMPLAINANT: Siddalinga Trivedi, Age 37, Tailor
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-11-12 00:00:00
+  ARREST: 2021-02-17, arresting IO: Bheemesh, Superintendent of Police, Police Constable
+  Location: 14.2187, 76.4022
+===
+
+=== CASE 2749 ===
+CaseMasterID: 2749
+CrimeNo: 100050065202000004 | CaseNo: 202000004
+Station: Whitefield Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Dacoity
+Status: Under Investigation
+Court: Additional Chief Judicial Magistrate Court, Bengaluru
+Registered: 2020-12-22 | Incident: 2020-12-14 12:00:00 to 2020-12-21 12:00:00
+IO: Pranav, Deputy Commissioner of Police, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Armed dacoity was committed at a textile showroom at Koramangala, Bengaluru Urban by a gang of five persons. Goods worth Rs 15 lakhs looted.
+
+PERSONS INVOLVED:
+  ACCUSED: Madhuri Shinde, Age 49, Female
+  VICTIM: Pavan Shinde, Age 60, Male
+  COMPLAINANT: Gowri Kumar, Age 37, Accountant
+
+PROCEEDINGS:
+  ARREST: 2020-12-29, arresting IO: Pranav, Deputy Commissioner of Police, Circle Inspector
+  Location: 12.933, 77.6102
+===
+
+=== CASE 2750 ===
+CaseMasterID: 2750
+CrimeNo: 300050060202100004 | CaseNo: 202100004
+Station: Jayanagar Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Culpable Homicide
+Status: Trial in Progress
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2021-03-20 | Incident: 2021-03-18 12:00:00 to 2021-03-18 12:00:00
+IO: Shankar, Director General of Police, Additional Superintendent of Police
+Sections: CrPC 154, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Death occurred due to electrocution at Jayanagar, Bengaluru Urban caused by negligence of the electricity department.
+
+PERSONS INVOLVED:
+  ACCUSED: Diya Kamat, Age 22, Female
+  ACCUSED: Padma Verma, Age 63, Female
+  ACCUSED: Gowri Sarkar, Age 40, Female
+  COMPLAINANT: Rudra Singh, Age 30, Accountant
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2021-06-03 00:00:00
+  ARREST: 2021-04-09, arresting IO: Shankar, Director General of Police, Additional Superintendent of Police
+  ARREST: 2021-03-26, arresting IO: Shankar, Director General of Police, Additional Superintendent of Police
+  Location: 12.9643, 77.5927
+===
+
+=== CASE 2751 ===
+CaseMasterID: 2751
+CrimeNo: 200050057202100008 | CaseNo: 202100008
+Station: Banaswadi Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Criminal Trespass
+Status: Under Investigation
+Court: Additional Chief Judicial Magistrate Court, Bengaluru
+Registered: 2020-05-05 | Incident: 2020-04-29 12:00:00 to 2020-04-30 12:00:00
+IO: Hemanth, Inspector, Additional Superintendent of Police
+Sections: CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+The accused trespassed into a government office at Bengaluru City Center, Bengaluru Urban and threatened the officials.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Krishna Reddy, Age 25, Accountant
+  Location: 12.9776, 77.5901
+===
+
+=== CASE 2752 ===
+CaseMasterID: 2752
+CrimeNo: 100050075202000003 | CaseNo: 202000003
+Station: Bengaluru Traffic Police Unit, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Dacoity
+Status: Charge Sheet Filed
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2020-02-20 | Incident: 2020-02-16 12:00:00 to 2020-02-16 12:00:00
+IO: Deepak, Assistant Sub-Inspector, Station House Officer
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Dacoity with murder occurred at a farmhouse near Yeshwanthpur, Bengaluru Urban. The gang killed the watchman.
+
+PERSONS INVOLVED:
+  ACCUSED: Sanjay Naaik, Age 52, Male
+  ACCUSED: Pooja Mahajan, Age 63, Female
+  VICTIM: Narasimha Rajput, Age 18, Male
+  COMPLAINANT: Tara Menon, Age 31, Government Employee
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2020-10-03 00:00:00
+  Location: 13.0198, 77.56
+===
+
+=== CASE 2753 ===
+CaseMasterID: 2753
+CrimeNo: 400050069202300005 | CaseNo: 202300005
+Station: Magadi Road Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Dowry Death
+Status: Closed as Mistake of Fact
+Court: Family Court, Bengaluru
+Registered: 2023-06-19 | Incident: 2023-06-10 12:00:00 to 2023-06-15 12:00:00
+IO: Aditya, Inspector, Deputy Superintendent of Police
+Sections: IPC 498A, CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Dowry death by hanging was reported at Yeshwanthpur, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Asha Ghorpade, Age 22, Female
+  ACCUSED: Yadunandan Shinde, Age 19, Male
+  VICTIM: Aditi Mahajan, Age 30, Female
+  COMPLAINANT: Nagaraj Sharma, Age 28, Lawyer
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2024-01-07 00:00:00
+  ARREST: 2023-07-10, arresting IO: Aditya, Inspector, Deputy Superintendent of Police
+  Location: 13.0151, 77.5545
+===
+
+=== CASE 2754 ===
+CaseMasterID: 2754
+CrimeNo: 100220009202000007 | CaseNo: 202000007
+Station: Southern Range Headquarters, Mysuru, Mysuru
+District: Mysuru
+Crime Type: Assault on Women
+Status: Under Investigation
+Court: Fast Track Court, Mysuru
+Registered: 2020-02-04 | Incident: 2020-02-01 12:00:00 to 2020-02-02 12:00:00
+IO: Vijaya, Assistant Sub-Inspector, Police Constable
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused passed lewd comments at a woman near Mysuru North, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Aanya Jadhav, Age 47, Female
+  ACCUSED: Arjun Ganguly, Age 30, Male
+  VICTIM: Rahul Chauhan, Age 23, Male
+  VICTIM: Narasimha Acharya, Age 82, Male
+  COMPLAINANT: Mallikarjun Mahajan, Age 51, Accountant
+
+PROCEEDINGS:
+  ARREST: 2020-02-22, arresting IO: Vijaya, Assistant Sub-Inspector, Police Constable
+  Location: 12.3354, 76.6446
+===
+
+=== CASE 2755 ===
+CaseMasterID: 2755
+CrimeNo: 400260115202000003 | CaseNo: 202000003
+Station: Tiptur Police Station, Tumakuru
+District: Tumakuru
+Crime Type: Rape
+Status: Convicted
+Court: District and Sessions Court, Tumakuru
+Registered: 2020-01-17 | Incident: 2020-01-09 12:00:00 to 2020-01-14 12:00:00
+IO: Aarav, Assistant Sub-Inspector, Director General of Police
+Sections: IEA 24, IEA 65B, CrPC 154, CrPC 157, CrPC 164
+
+BRIEF FACTS:
+The accused, a relative of the survivor, committed rape at Tiptur, Tumakuru by threatening the survivor.
+
+PERSONS INVOLVED:
+  ACCUSED: Amit Gowda, Age 52, Male
+  ACCUSED: Rohan Mallya, Age 21, Male
+  ACCUSED: Kaveri Reddy, Age 21, Female
+  VICTIM: Indira Bhatt, Age 71, Female
+  COMPLAINANT: Pavan Pawar, Age 65, Shopkeeper
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2020-07-07 00:00:00
+  ARREST: 2020-01-23, arresting IO: Aarav, Assistant Sub-Inspector, Director General of Police
+  ARREST: 2020-01-17, arresting IO: Aarav, Assistant Sub-Inspector, Director General of Police
+  Location: 13.2525, 76.6451
+===
+
+=== CASE 2756 ===
+CaseMasterID: 2756
+CrimeNo: 100130088202000007 | CaseNo: 202000007
+Station: Vidyanagar Police Station, Hubballi, Dharwad
+District: Dharwad
+Crime Type: Assault on Women
+Status: Under Investigation
+Court: Additional District and Sessions Court, Dharwad
+Registered: 2020-03-19 | Incident: 2020-03-16 12:00:00 to 2020-03-17 12:00:00
+IO: Amit, Head Constable, Assistant Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Voyeurism was reported at Navanagar, Dharwad. The accused was caught filming.
+
+PERSONS INVOLVED:
+  ACCUSED: Usha Mallya, Age 20, Female
+  VICTIM: Krishna Aiyappa, Age 53, Male
+  COMPLAINANT: Tara Menon, Age 38, Carpenter
+  Location: 15.386, 75.0726
+===
+
+=== CASE 2757 ===
+CaseMasterID: 2757
+CrimeNo: 100300041202100007 | CaseNo: 202100007
+Station: Vijayapura District Police Office, Vijayapura
+District: Vijayapura
+Crime Type: Rape
+Status: Closed as Mistake of Fact
+Court: Chief Judicial Magistrate Court, Vijayapura
+Registered: 2021-03-20 | Incident: 2021-03-11 12:00:00 to 2021-03-16 12:00:00
+IO: Shankar, Head Constable, Assistant Sub-Inspector
+Sections: IEA 24, CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The accused committed rape of a major woman at Vijayapura City, Vijayapura under the pretext of marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Pooja Chowdhury, Age 60, Female
+  ACCUSED: Deepika Banerjee, Age 22, Female
+  ACCUSED: Geeta Trivedi, Age 44, Female
+  ACCUSED: Ravi More, Age 32, Male
+  ACCUSED: Ishita Mallya, Age 33, Female
+  VICTIM: Ramachandra Pawar, Age 50, Male
+  VICTIM: Yadunandan Verma, Age 65, Male
+  COMPLAINANT: Savitri Joshi, Age 24, Business Owner
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2021-10-20 00:00:00
+  ARREST: 2021-04-16, arresting IO: Shankar, Head Constable, Assistant Sub-Inspector
+  ARREST: 2021-03-26, arresting IO: Shankar, Head Constable, Assistant Sub-Inspector
+  ARREST: 2021-03-25, arresting IO: Shankar, Head Constable, Assistant Sub-Inspector
+  ARREST: 2021-03-26, arresting IO: Shankar, Head Constable, Assistant Sub-Inspector
+  Location: 16.8332, 75.7139
+===
+
+=== CASE 2758 ===
+CaseMasterID: 2758
+CrimeNo: 400130088202100006 | CaseNo: 202100006
+Station: Vidyanagar Police Station, Hubballi, Dharwad
+District: Dharwad
+Crime Type: Dacoity
+Status: Under Investigation
+Court: District and Sessions Court, Dharwad at Hubballi
+Registered: 2021-04-13 | Incident: 2021-04-05 12:00:00 to 2021-04-09 12:00:00
+IO: Venkatesh, Sub-Inspector, Commissioner of Police
+Sections: CrPC 154, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Dacoity with murder occurred at a farmhouse near Dharwad City Center, Dharwad. The gang killed the watchman.
+
+PERSONS INVOLVED:
+  ACCUSED: Siddharth Mehta, Age 64, Male
+  ACCUSED: Pavan Shah, Age 33, Male
+  VICTIM: Vinay Mallya, Age 48, Male
+  COMPLAINANT: Manish Kumar, Age 37, Electrician
+
+PROCEEDINGS:
+  ARREST: 2021-04-14, arresting IO: Venkatesh, Sub-Inspector, Commissioner of Police
+  Location: 15.4663, 75.0108
+===
+
+=== CASE 2759 ===
+CaseMasterID: 2759
+CrimeNo: 300230117202300004 | CaseNo: 202300004
+Station: Raichur City Police Station, Raichur
+District: Raichur
+Crime Type: Hurt / Grievous Hurt
+Status: Under Investigation
+Court: District and Sessions Court, Raichur
+Registered: 2023-11-25 | Incident: 2023-11-17 12:00:00 to 2023-11-22 12:00:00
+IO: Arun, Joint Commissioner of Police, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Grievous hurt was caused by the accused using a sword at Sindhanur, Raichur.
+
+PERSONS INVOLVED:
+  VICTIM: Chandrashekar Yadav, Age 22, Male
+  VICTIM: Pavan Chauhan, Age 83, Male
+  COMPLAINANT: Basavaraj Nair, Age 51, Engineer
+  Location: 15.5973, 76.955
+===
+
+=== CASE 2760 ===
+CaseMasterID: 2760
+CrimeNo: 400240035202200005 | CaseNo: 202200005
+Station: Ramanagara District Police Office, Ramanagara
+District: Ramanagara
+Crime Type: Cyber Crime
+Status: Under Investigation
+Court: Family Court, Bengaluru
+Registered: 2022-02-19 | Incident: 2022-02-19 12:00:00 to 2022-02-19 12:00:00
+IO: Mala, Sub-Inspector, Superintendent of Police
+Sections: IT Act 43, IT Act 66, CrPC 154, CrPC 157, CrPC 164
+
+BRIEF FACTS:
+Identity theft was reported at Ramanagara, Ramanagara. The accused used the victims Aadhaar details.
+
+PERSONS INVOLVED:
+  ACCUSED: Reyansh Mallya, Age 26, Male
+  COMPLAINANT: Nagaraj Rao, Age 45, Housewife
+  Location: 12.7219, 77.2888
+===
+
+=== CASE 2761 ===
+CaseMasterID: 2761
+CrimeNo: 100050054202000007 | CaseNo: 202000007
+Station: Malleswaram Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cheating
+Status: Under Investigation
+Court: Motor Accident Claims Tribunal, Bengaluru
+Registered: 2020-03-10 | Incident: 2020-03-04 12:00:00 to 2020-03-06 12:00:00
+IO: Eashwar, Assistant Sub-Inspector, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused cheated the victim by selling a fake property at Jayanagar, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Uma Shah, Age 31, Female
+  ACCUSED: Aditi Sharma, Age 32, Female
+  ACCUSED: Ishaan Ganguly, Age 21, Male
+  VICTIM: Harish Gowda, Age 46, Male
+  COMPLAINANT: Harish Ghorpade, Age 41, Sweeper
+
+PROCEEDINGS:
+  ARREST: 2020-03-10, arresting IO: Eashwar, Assistant Sub-Inspector, Circle Inspector
+  Location: 12.9739, 77.5969
+===
+
+=== CASE 2762 ===
+CaseMasterID: 2762
+CrimeNo: 100170102202100005 | CaseNo: 202100005
+Station: Kalaburagi City Police Station, Kalaburagi (Gulbarga)
+District: Kalaburagi (Gulbarga)
+Crime Type: Counterfeiting
+Status: Under Investigation
+Court: Additional District and Sessions Court, Kalaburagi
+Registered: 2020-08-17 | Incident: 2020-08-14 12:00:00 to 2020-08-16 12:00:00
+IO: Amit, Deputy Commissioner of Police, Additional Superintendent of Police
+Sections: IPC 489A, CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+A racket of stamp paper counterfeiting was busted at Kalaburagi City Center, Kalaburagi (Gulbarga).
+
+PERSONS INVOLVED:
+  ACCUSED: Sanjay Kumar, Age 41, Male
+  ACCUSED: Vijay Aiyappa, Age 25, Male
+  COMPLAINANT: Ayaan More, Age 37, Plumber
+
+PROCEEDINGS:
+  ARREST: 2020-08-24, arresting IO: Amit, Deputy Commissioner of Police, Additional Superintendent of Police
+  Location: 17.3276, 76.8303
+===
+
+=== CASE 2763 ===
+CaseMasterID: 2763
+CrimeNo: 200020112202200005 | CaseNo: 202200005
+Station: Chikkodi Police Station, Belagavi
+District: Belagavi
+Crime Type: Hurt / Grievous Hurt
+Status: Under Investigation
+Court: District and Sessions Court, Belagavi
+Registered: 2022-04-15 | Incident: 2022-04-08 12:00:00 to 2022-04-11 12:00:00
+IO: Ajay, Joint Commissioner of Police, Director General of Police
+Sections: CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Simple hurt was caused during a quarrel at Belagavi Camp, Belagavi.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Nagaraj Pawar, Age 49, Doctor
+  Location: 15.8553, 74.5157
+===
+
+=== CASE 2764 ===
+CaseMasterID: 2764
+CrimeNo: 200130024202000007 | CaseNo: 202000007
+Station: Dharwad District Police Office, Dharwad
+District: Dharwad
+Crime Type: Culpable Homicide
+Status: Charge Sheet Filed
+Court: Chief Judicial Magistrate Court, Dharwad
+Registered: 2020-06-08 | Incident: 2020-06-02 12:00:00 to 2020-06-08 12:00:00
+IO: Yash, Sub-Inspector, Superintendent of Police
+Sections: CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+The accused driving a rash vehicle knocked down the victim near Old Hubballi, Dharwad. The victim died on the spot due to severe head injuries.
+
+PERSONS INVOLVED:
+  ACCUSED: Hema Verma, Age 32, Female
+  ACCUSED: Nalini Rao, Age 32, Female
+  ACCUSED: Radha Bhatt, Age 45, Female
+  VICTIM: Rahul Kumar, Age 61, Male
+  COMPLAINANT: Geeta Chowdhury, Age 43, Sweeper
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2020-08-17 00:00:00
+  ARREST: 2020-07-24, arresting IO: Yash, Sub-Inspector, Superintendent of Police
+  Location: 15.3525, 75.1677
+===
+
+=== CASE 2765 ===
+CaseMasterID: 2765
+CrimeNo: 100050056202300005 | CaseNo: 202300005
+Station: Hebbal Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Counterfeiting
+Status: Under Investigation
+Court: Principal Civil Judge (Senior Division) Court, Bengaluru
+Registered: 2023-04-19 | Incident: 2023-04-09 12:00:00 to 2023-04-15 12:00:00
+IO: Aanya, Inspector, Joint Commissioner of Police
+Sections: IPC 489A, CrPC 154, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+Counterfeit Indian currency with face value of Rs 2 lakhs was recovered at Jayanagar, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Lakshmi Patil, Age 38, Female
+  VICTIM: Ishita Sen, Age 63, Female
+  COMPLAINANT: Ishaan Bose, Age 26, Farmer
+  Location: 12.9636, 77.5897
+===
+
+=== CASE 2766 ===
+CaseMasterID: 2766
+CrimeNo: 300170104202500006 | CaseNo: 202500006
+Station: Kalaburagi Traffic Police Unit, Kalaburagi (Gulbarga)
+District: Kalaburagi (Gulbarga)
+Crime Type: Riots
+Status: Under Investigation
+Court: District and Sessions Court, Kalaburagi
+Registered: 2025-08-12 | Incident: 2025-08-09 12:00:00 to 2025-08-10 12:00:00
+IO: Parvati, Inspector, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Rioting occurred at Kalaburagi City Center, Kalaburagi (Gulbarga) during a religious procession. Stones were pelted.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavitha Rajput, Age 57, Female
+  COMPLAINANT: Sanjay More, Age 43, Doctor
+
+PROCEEDINGS:
+  ARREST: 2025-10-06, arresting IO: Parvati, Inspector, Circle Inspector
+  Location: 17.3243, 76.8289
+===
+
+=== CASE 2767 ===
+CaseMasterID: 2767
+CrimeNo: 300300041202100008 | CaseNo: 202100008
+Station: Vijayapura District Police Office, Vijayapura
+District: Vijayapura
+Crime Type: Murder
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Vijayapura
+Registered: 2020-10-04 | Incident: 2020-10-01 12:00:00 to 2020-10-03 12:00:00
+IO: Arjun, Deputy Superintendent of Police, Inspector of Police
+Sections: IPC 302, CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The accused attacked the victim with a sharp weapon near Vijayapura City, Vijayapura over a property dispute. The victim succumbed to injuries on the way to the hospital.
+
+PERSONS INVOLVED:
+  ACCUSED: Rajesh Pillai, Age 62, Male
+  ACCUSED: Shankar Mahajan, Age 38, Male
+  ACCUSED: Kaveri Mallya, Age 48, Female
+  VICTIM: Vihaan Bhat, Age 83, Male
+  VICTIM: Yash Shah, Age 55, Male
+  VICTIM: Shaurya Mehta, Age 17, Male
+  COMPLAINANT: Yamuna Naik, Age 65, Watchman
+
+PROCEEDINGS:
+  ARREST: 2020-12-14, arresting IO: Arjun, Deputy Superintendent of Police, Inspector of Police
+  Location: 16.8368, 75.703
+===
+
+=== CASE 2768 ===
+CaseMasterID: 2768
+CrimeNo: 300050054202200004 | CaseNo: 202200004
+Station: Malleswaram Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Arson
+Status: Under Investigation
+Court: Motor Accident Claims Tribunal, Bengaluru
+Registered: 2022-02-05 | Incident: 2022-01-27 12:00:00 to 2022-02-03 12:00:00
+IO: Rohan, Deputy Commissioner of Police, Director General of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused set fire to the thatched house of the victim at Yeshwanthpur, Bengaluru Urban following a property dispute.
+
+PERSONS INVOLVED:
+  VICTIM: Manish Gowda, Age 11, Male
+  COMPLAINANT: Manjunath Reddy, Age 62, Police Officer
+  Location: 13.015, 77.5529
+===
+
+=== CASE 2769 ===
+CaseMasterID: 2769
+CrimeNo: 300010012202300005 | CaseNo: 202300005
+Station: Bagalkot District Police Office, Bagalkot
+District: Bagalkot
+Crime Type: Kidnapping & Abduction
+Status: Under Investigation
+Court: District and Sessions Court, Bagalkot
+Registered: 2023-09-23 | Incident: 2023-09-17 12:00:00 to 2023-09-20 12:00:00
+IO: Bhagya, Director General of Police, Circle Inspector
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused abducted a woman at Bagalkot City, Bagalkot with intent to force her into marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Ravi Sen, Age 25, Male
+  ACCUSED: Yadunandan Bhatt, Age 18, Male
+  COMPLAINANT: Roopa Iyengar, Age 26, Newspaper Vendor
+
+PROCEEDINGS:
+  ARREST: 2023-10-29, arresting IO: Bhagya, Director General of Police, Circle Inspector
+  Location: 16.1667, 75.6545
+===
+
+=== CASE 2770 ===
+CaseMasterID: 2770
+CrimeNo: 200110022202400003 | CaseNo: 202400003
+Station: Dakshina Kannada District Police Office, Dakshina Kannada
+District: Dakshina Kannada
+Crime Type: Murder
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Mangaluru
+Registered: 2024-12-21 | Incident: 2024-12-15 12:00:00 to 2024-12-17 12:00:00
+IO: Radha, Deputy Commissioner of Police, Assistant Sub-Inspector
+Sections: IPC 302, CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused conspired with unknown persons to murder the victim using a firearm near Panambur Mangaluru, Dakshina Kannada. Postmortem confirmed death due to gunshot injury.
+
+PERSONS INVOLVED:
+  ACCUSED: Aarav Chowdhury, Age 34, Male
+  ACCUSED: Bhagya Verma, Age 57, Female
+  ACCUSED: Pooja Chowdhury, Age 26, Female
+  VICTIM: Uma Gupta, Age 69, Female
+  VICTIM: Eashwar Mahajan, Age 36, Male
+  VICTIM: Pavan Ganguly, Age 56, Male
+  VICTIM: Rudra Shinde, Age 72, Male
+  COMPLAINANT: Padma Chauhan, Age 54, Painter
+
+PROCEEDINGS:
+  ARREST: 2024-12-26, arresting IO: Radha, Deputy Commissioner of Police, Assistant Sub-Inspector
+  Location: 12.9251, 74.8627
+===
+
+=== CASE 2771 ===
+CaseMasterID: 2771
+CrimeNo: 300220083202500004 | CaseNo: 202500004
+Station: Kuvempunagar Police Station, Mysuru
+District: Mysuru
+Crime Type: Burglary
+Status: Under Investigation
+Court: District and Sessions Court, Mysuru
+Registered: 2025-02-03 | Incident: 2025-01-29 12:00:00 to 2025-01-31 12:00:00
+IO: Prakash, Sub-Inspector, Head Constable
+Sections: CrPC 157, CrPC 161, CrPC 164, IEA 24
+
+BRIEF FACTS:
+The accused broke into a house at KR Nagar Mysuru, Mysuru by cutting the grill.
+
+PERSONS INVOLVED:
+  ACCUSED: Usha Bhat, Age 24, Female
+  ACCUSED: Padma Jadhav, Age 33, Female
+  ACCUSED: Narasimha Mukherjee, Age 64, Male
+  VICTIM: Vijay Menon, Age 46, Male
+  VICTIM: Vijay Bhat, Age 20, Male
+  COMPLAINANT: Basavaraj Mukherjee, Age 57, Sweeper
+
+PROCEEDINGS:
+  ARREST: 2025-04-12, arresting IO: Prakash, Sub-Inspector, Head Constable
+  ARREST: 2025-02-22, arresting IO: Prakash, Sub-Inspector, Head Constable
+  Location: 12.2855, 76.6671
+===
+
+=== CASE 2772 ===
+CaseMasterID: 2772
+CrimeNo: 100230034202100005 | CaseNo: 202100005
+Station: Raichur District Police Office, Raichur
+District: Raichur
+Crime Type: Cheating
+Status: Closed as Mistake of Law
+Court: District and Sessions Court, Raichur
+Registered: 2021-12-18 | Incident: 2021-12-09 12:00:00 to 2021-12-16 12:00:00
+IO: Siddharth, Commissioner of Police, Deputy Commissioner of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+A Ponzi scheme was operated by the accused near Sindhanur, Raichur. Hundreds of investors were cheated.
+
+PERSONS INVOLVED:
+  VICTIM: Mahesh Gupta, Age 21, Male
+  VICTIM: Bheemesh Mallya, Age 78, Male
+  COMPLAINANT: Kiran Pawar, Age 23, Driver
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2022-10-12 00:00:00
+  Location: 15.6056, 76.9506
+===
+
+=== CASE 2773 ===
+CaseMasterID: 2773
+CrimeNo: 300250036202000005 | CaseNo: 202000005
+Station: Shivamogga District Police Office, Shivamogga
+District: Shivamogga
+Crime Type: Burglary
+Status: Under Investigation
+Court: District and Sessions Court, Shivamogga
+Registered: 2019-05-17 | Incident: 2019-05-13 12:00:00 to 2019-05-16 12:00:00
+IO: Vivaan, Additional Commissioner of Police, Inspector of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Night burglary was committed at a godown at Shivamogga City, Shivamogga. Stock worth Rs 5 lakhs was stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Shaurya Shinde, Age 47, Male
+  ACCUSED: Asha Sen, Age 46, Female
+  COMPLAINANT: Saanvi Shinde, Age 26, Private Employee
+  Location: 13.9289, 75.5607
+===
+
+=== CASE 2774 ===
+CaseMasterID: 2774
+CrimeNo: 100110093202300005 | CaseNo: 202300005
+Station: Mangaluru North Police Station, Dakshina Kannada
+District: Dakshina Kannada
+Crime Type: Attempt to Murder
+Status: Closed as Mistake of Law
+Court: Family Court, Mangaluru
+Registered: 2022-10-21 | Incident: 2022-10-19 12:00:00 to 2022-10-20 12:00:00
+IO: Raghu, Joint Commissioner of Police, Head Constable
+Sections: CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The accused attempted to murder the victim by hitting with an iron rod at Bunder Mangaluru, Dakshina Kannada.
+
+PERSONS INVOLVED:
+  COMPLAINANT: Mahesh Rajput, Age 39, Government Employee
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2023-05-05 00:00:00
+  Location: 12.8856, 74.8353
+===
+
+=== CASE 2775 ===
+CaseMasterID: 2775
+CrimeNo: 300300041202500001 | CaseNo: 202500001
+Station: Vijayapura District Police Office, Vijayapura
+District: Vijayapura
+Crime Type: Extortion
+Status: Closed as Mistake of Fact
+Court: Chief Judicial Magistrate Court, Vijayapura
+Registered: 2025-04-21 | Incident: 2025-04-15 12:00:00 to 2025-04-19 12:00:00
+IO: Arun, Additional Commissioner of Police, Police Constable
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Extortion by anonymous phone calls was reported at Vijayapura City, Vijayapura.
+
+PERSONS INVOLVED:
+  ACCUSED: Siddharth Menon, Age 18, Male
+  ACCUSED: Myra Thakur, Age 33, Female
+  VICTIM: Gowri Bose, Age 5, Female
+  COMPLAINANT: Harish Banerjee, Age 42, Milk Vendor
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2025-09-11 00:00:00
+  Location: 16.8292, 75.7121
+===
+
+=== CASE 2776 ===
+CaseMasterID: 2776
+CrimeNo: 100050060202400005 | CaseNo: 202400005
+Station: Jayanagar Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Extortion
+Status: Under Investigation
+Court: Family Court, Bengaluru
+Registered: 2024-12-28 | Incident: 2024-12-21 12:00:00 to 2024-12-25 12:00:00
+IO: Raghu, Superintendent of Police, Police Constable
+Sections: CrPC 154, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused intimidated the shopkeeper at Rajajinagar, Bengaluru Urban and demanded protection money.
+
+PERSONS INVOLVED:
+  ACCUSED: Reyansh Hegde, Age 50, Male
+  ACCUSED: Rahul Bhatt, Age 29, Male
+  COMPLAINANT: Shwetha Kamat, Age 33, Electrician
+
+PROCEEDINGS:
+  ARREST: 2024-12-30, arresting IO: Raghu, Superintendent of Police, Police Constable
+  Location: 12.9485, 77.5675
+===
+
+=== CASE 2777 ===
+CaseMasterID: 2777
+CrimeNo: 100220077202400002 | CaseNo: 202400002
+Station: Nazarbad Police Station, Mysuru
+District: Mysuru
+Crime Type: Hurt / Grievous Hurt
+Status: Under Investigation
+Court: Additional District and Sessions Court, Mysuru
+Registered: 2023-08-14 | Incident: 2023-08-09 12:00:00 to 2023-08-11 12:00:00
+IO: Mahesh, Commissioner of Police, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Simple hurt was caused during a quarrel at Kuvempunagar Mysuru, Mysuru.
+
+PERSONS INVOLVED:
+  ACCUSED: Rani Pillai, Age 50, Female
+  ACCUSED: Diya Pawar, Age 32, Female
+  VICTIM: Narasimha Thakur, Age 38, Male
+  COMPLAINANT: Gowri Bhat, Age 39, Carpenter
+  Location: 12.3062, 76.6131
+===
+
+=== CASE 2778 ===
+CaseMasterID: 2778
+CrimeNo: 100310042202000004 | CaseNo: 202000004
+Station: Yadgir District Police Office, Yadgir
+District: Yadgir
+Crime Type: Robbery
+Status: Under Investigation
+Court: Additional District and Sessions Court, Kalaburagi
+Registered: 2020-03-18 | Incident: 2020-03-11 12:00:00 to 2020-03-14 12:00:00
+IO: Dinesh, Police Constable, Sub-Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24
+
+BRIEF FACTS:
+Armed robbery was committed at a petrol bunk near Yadgir City, Yadgir. The accused fled with cash amounting to Rs 2 lakhs.
+
+PERSONS INVOLVED:
+  ACCUSED: Bheemesh Pillai, Age 63, Male
+  ACCUSED: Ishita Kamat, Age 23, Female
+  ACCUSED: Prakash Singh, Age 49, Male
+  ACCUSED: Diya Pawar, Age 42, Female
+  COMPLAINANT: Siddalinga Yadav, Age 22, Auto Rickshaw Driver
+
+PROCEEDINGS:
+  ARREST: 2020-03-22, arresting IO: Dinesh, Police Constable, Sub-Inspector
+  Location: 16.764, 77.1345
+===
+
+=== CASE 2779 ===
+CaseMasterID: 2779
+CrimeNo: 200310042202400002 | CaseNo: 202400002
+Station: Yadgir District Police Office, Yadgir
+District: Yadgir
+Crime Type: Dowry Death
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Kalaburagi
+Registered: 2024-04-26 | Incident: 2024-04-18 12:00:00 to 2024-04-23 12:00:00
+IO: Uma, Inspector, Deputy Commissioner of Police
+Sections: IPC 498A, IEA 65B
+
+BRIEF FACTS:
+The accused caused the dowry death of the victim at Yadgir City, Yadgir.
+
+PERSONS INVOLVED:
+  ACCUSED: Eashwar Joshi, Age 55, Male
+  ACCUSED: Krishna Kulkarni, Age 54, Male
+  ACCUSED: Aditi Shetty, Age 34, Female
+  VICTIM: Roopa Iyengar, Age 15, Female
+  VICTIM: Padma Acharya, Age 50, Female
+  COMPLAINANT: Reyansh Kumar, Age 40, Student
+  Location: 16.7747, 77.1425
+===
+
+=== CASE 2780 ===
+CaseMasterID: 2780
+CrimeNo: 200110097202000005 | CaseNo: 202000005
+Station: Mangaluru Cyber Crime Cell, Dakshina Kannada
+District: Dakshina Kannada
+Crime Type: Riots
+Status: Charge Sheet Filed
+Court: Additional District and Sessions Court, Mangaluru
+Registered: 2019-08-15 | Incident: 2019-08-06 12:00:00 to 2019-08-13 12:00:00
+IO: Harish, Commissioner of Police, Head Constable
+Sections: CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+Unlawful assembly was formed at Mangaluru City Center, Dakshina Kannada causing public nuisance.
+
+PERSONS INVOLVED:
+  ACCUSED: Kavitha Gowda, Age 41, Female
+  ACCUSED: Vinay Reddy, Age 37, Male
+  VICTIM: Chandrashekar Pillai, Age 27, Male
+  COMPLAINANT: Ramachandra Iyengar, Age 54, Retired
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2020-02-28 00:00:00
+  Location: 12.9127, 74.8489
+===
+
+=== CASE 2781 ===
+CaseMasterID: 2781
+CrimeNo: 200130024202100007 | CaseNo: 202100007
+Station: Dharwad District Police Office, Dharwad
+District: Dharwad
+Crime Type: Robbery
+Status: Under Investigation
+Court: District and Sessions Court, Dharwad at Hubballi
+Registered: 2021-03-28 | Incident: 2021-03-24 12:00:00 to 2021-03-25 12:00:00
+IO: Shaurya, Sub-Inspector, Additional Commissioner of Police
+Sections: CrPC 157, CrPC 161
+
+BRIEF FACTS:
+Robbery at a jewellery store at Hubballi City Center, Dharwad was committed by two masked persons. Ornaments worth Rs 10 lakhs were stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Lalitha Mahajan, Age 61, Female
+  VICTIM: Yamuna Sarkar, Age 60, Female
+  VICTIM: Rohan Ganguly, Age 58, Male
+  COMPLAINANT: Prakash Aiyappa, Age 22, Shopkeeper
+  Location: 15.3627, 75.1211
+===
+
+=== CASE 2782 ===
+CaseMasterID: 2782
+CrimeNo: 500050064202500004 | CaseNo: 202500004
+Station: Frazer Town Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Kidnapping & Abduction
+Status: Charge Sheet Filed
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2024-10-03 | Incident: 2024-10-01 12:00:00 to 2024-10-02 12:00:00
+IO: Rajeshwari, Additional Commissioner of Police, Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused abducted a woman at Koramangala, Bengaluru Urban with intent to force her into marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Venkatesh Reddy, Age 62, Male
+  ACCUSED: Basavaraj Aiyappa, Age 59, Male
+  VICTIM: Shwetha Kamat, Age 63, Female
+  VICTIM: Roopa Shinde, Age 47, Female
+  COMPLAINANT: Manish Ganguly, Age 59, Cook
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2025-07-31 00:00:00
+  ARREST: 2024-10-10, arresting IO: Rajeshwari, Additional Commissioner of Police, Superintendent of Police
+  Location: 12.9323, 77.6135
+===
+
+=== CASE 2783 ===
+CaseMasterID: 2783
+CrimeNo: 200210116202300003 | CaseNo: 202300003
+Station: Mandya Town Police Station, Mandya
+District: Mandya
+Crime Type: Culpable Homicide
+Status: Trial in Progress
+Court: District and Sessions Court, Mandya
+Registered: 2023-07-09 | Incident: 2023-07-06 12:00:00 to 2023-07-07 12:00:00
+IO: Prathibha, Inspector, Additional Commissioner of Police
+Sections: CrPC 161, CrPC 164, IEA 24
+
+BRIEF FACTS:
+The accused was involved in a construction collapse at Mandya Town, Mandya due to use of substandard materials, resulting in death of two laborers.
+
+PERSONS INVOLVED:
+  ACCUSED: Manjunath Chowdhury, Age 23, Male
+  VICTIM: Hemanth Ghorpade, Age 40, Male
+  COMPLAINANT: Rohan Ghorpade, Age 41, Driver
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2024-01-05 00:00:00
+  Location: 12.5238, 76.8886
+===
+
+=== CASE 2784 ===
+CaseMasterID: 2784
+CrimeNo: 200100122202500003 | CaseNo: 202500003
+Station: Chitradurga City Police Station, Chitradurga
+District: Chitradurga
+Crime Type: Kidnapping & Abduction
+Status: Under Investigation
+Court: Chief Judicial Magistrate Court, Chitradurga
+Registered: 2025-08-18 | Incident: 2025-08-09 12:00:00 to 2025-08-16 12:00:00
+IO: Nikhil, Additional Commissioner of Police, Director General of Police
+Sections: CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+The accused abducted a woman at Chitradurga City, Chitradurga with intent to force her into marriage.
+
+PERSONS INVOLVED:
+  ACCUSED: Indira Joshi, Age 57, Female
+  COMPLAINANT: Rudra Thakur, Age 20, Tailor
+
+PROCEEDINGS:
+  ARREST: 2025-08-22, arresting IO: Nikhil, Additional Commissioner of Police, Director General of Police
+  Location: 14.2249, 76.3965
+===
+
+=== CASE 2785 ===
+CaseMasterID: 2785
+CrimeNo: 500150026202000002 | CaseNo: 202000002
+Station: Hassan District Police Office, Hassan
+District: Hassan
+Crime Type: Burglary
+Status: Under Investigation
+Court: District and Sessions Court, Hassan
+Registered: 2019-10-08 | Incident: 2019-10-02 12:00:00 to 2019-10-07 12:00:00
+IO: Mohan, Director General of Police, Circle Inspector
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Burglary occurred at a residence at Hassan Town, Hassan during night hours. Gold jewellery and cash worth Rs 8 lakhs were stolen.
+
+PERSONS INVOLVED:
+  ACCUSED: Pavan Gupta, Age 49, Male
+  COMPLAINANT: Pallavi Nair, Age 37, Doctor
+  Location: 13.002, 76.0991
+===
+
+=== CASE 2786 ===
+CaseMasterID: 2786
+CrimeNo: 200040015202500006 | CaseNo: 202500006
+Station: Bengaluru Rural District Police Office, Bengaluru Rural
+District: Bengaluru Rural
+Crime Type: Assault on Women
+Status: Under Investigation
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2024-04-02 | Incident: 2024-03-30 12:00:00 to 2024-04-01 12:00:00
+IO: Kumar, Joint Commissioner of Police, Deputy Commissioner of Police
+Sections: CrPC 157, IEA 65B
+
+BRIEF FACTS:
+Voyeurism was reported at Bengaluru Rural, Bengaluru Rural. The accused was caught filming.
+
+PERSONS INVOLVED:
+  ACCUSED: Ishita Trivedi, Age 51, Female
+  ACCUSED: Padma Aiyappa, Age 44, Female
+  ACCUSED: Ishaan Menon, Age 27, Male
+  VICTIM: Yash Nair, Age 81, Male
+  VICTIM: Shaurya Ganguly, Age 66, Male
+  COMPLAINANT: Usha Ganguly, Age 24, Nurse
+
+PROCEEDINGS:
+  ARREST: 2024-04-16, arresting IO: Kumar, Joint Commissioner of Police, Deputy Commissioner of Police
+  ARREST: 2024-04-07, arresting IO: Kumar, Joint Commissioner of Police, Deputy Commissioner of Police
+  Location: 12.9995, 77.6038
+===
+
+=== CASE 2787 ===
+CaseMasterID: 2787
+CrimeNo: 200090111202000006 | CaseNo: 202000006
+Station: Chikkamagaluru Town Police Station, Chikkamagaluru
+District: Chikkamagaluru
+Crime Type: Murder
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Chikkamagaluru
+Registered: 2020-06-15 | Incident: 2020-06-11 12:00:00 to 2020-06-14 12:00:00
+IO: Rani, Assistant Sub-Inspector, Director General of Police
+Sections: IPC 302, CrPC 157, CrPC 161, IEA 24
+
+BRIEF FACTS:
+The deceased was last seen with the accused at Chikkamagaluru Town, Chikkamagaluru. Later, the body was discovered in a secluded area with head injuries caused by a blunt object.
+
+PERSONS INVOLVED:
+  ACCUSED: Sita Pawar, Age 61, Female
+  VICTIM: Ishita Chowdhury, Age 80, Female
+  VICTIM: Satish Mehta, Age 34, Male
+  COMPLAINANT: Neha Ganguly, Age 54, Auto Rickshaw Driver
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2021-02-22 00:00:00
+  Location: 13.3193, 75.7741
+===
+
+=== CASE 2788 ===
+CaseMasterID: 2788
+CrimeNo: 500260115202500005 | CaseNo: 202500005
+Station: Tiptur Police Station, Tumakuru
+District: Tumakuru
+Crime Type: Rape
+Status: Under Investigation
+Court: District and Sessions Court, Tumakuru
+Registered: 2025-05-11 | Incident: 2025-05-04 12:00:00 to 2025-05-08 12:00:00
+IO: Deepak, Deputy Commissioner of Police, Inspector of Police
+Sections: IEA 24, CrPC 154, CrPC 157, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+The accused, a relative of the survivor, committed rape at Tumakuru City, Tumakuru by threatening the survivor.
+
+PERSONS INVOLVED:
+  ACCUSED: Sita Yadav, Age 53, Female
+  ACCUSED: Harish Reddy, Age 25, Male
+  ACCUSED: Bheemesh Reddy, Age 39, Male
+  VICTIM: Ansh Pillai, Age 76, Male
+  VICTIM: Vinay Pawar, Age 6, Male
+  COMPLAINANT: Padma Mallya, Age 21, Lawyer
+
+PROCEEDINGS:
+  ARREST: 2025-05-16, arresting IO: Deepak, Deputy Commissioner of Police, Inspector of Police
+  Location: 13.3306, 77.1147
+===
+
+=== CASE 2789 ===
+CaseMasterID: 2789
+CrimeNo: 500060108202100002 | CaseNo: 202100002
+Station: Bidar City Police Station, Bidar
+District: Bidar
+Crime Type: Arson
+Status: Trial in Progress
+Court: Chief Judicial Magistrate Court, Bidar
+Registered: 2020-06-15 | Incident: 2020-06-07 12:00:00 to 2020-06-13 12:00:00
+IO: Eashwar, Commissioner of Police, Joint Commissioner of Police
+Sections: CrPC 157, IEA 65B
+
+BRIEF FACTS:
+The accused set fire to agricultural fields near Bidar City, Bidar over a land dispute.
+
+PERSONS INVOLVED:
+  ACCUSED: Ansh Banerjee, Age 47, Male
+  ACCUSED: Rudra Kulkarni, Age 49, Male
+  COMPLAINANT: Yash Trivedi, Age 64, Retired
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2021-04-08 00:00:00
+  ARREST: 2020-09-04, arresting IO: Eashwar, Commissioner of Police, Joint Commissioner of Police
+  Location: 17.9133, 77.5151
+===
+
+=== CASE 2790 ===
+CaseMasterID: 2790
+CrimeNo: 500050044202000009 | CaseNo: 202000009
+Station: Karnataka State Cyber Crime Cell, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Riots
+Status: Under Investigation
+Court: Family Court, Bengaluru
+Registered: 2020-01-18 | Incident: 2020-01-16 12:00:00 to 2020-01-16 12:00:00
+IO: Narasimha, Commissioner of Police, Inspector of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Unlawful assembly was formed at Indiranagar, Bengaluru Urban causing public nuisance.
+
+PERSONS INVOLVED:
+  ACCUSED: Radha Chowdhury, Age 54, Female
+  ACCUSED: Yadunandan Kulkarni, Age 39, Male
+  VICTIM: Reyansh Iyer, Age 35, Male
+  VICTIM: Venkatesh Yadav, Age 83, Male
+  COMPLAINANT: Gowri Pillai, Age 21, Farmer
+  Location: 12.9845, 77.6607
+===
+
+=== CASE 2791 ===
+CaseMasterID: 2791
+CrimeNo: 100130090202200005 | CaseNo: 202200005
+Station: Dharwad City Police Station, Dharwad
+District: Dharwad
+Crime Type: Riots
+Status: Under Investigation
+Court: Family Court, Hubballi
+Registered: 2021-11-23 | Incident: 2021-11-15 12:00:00 to 2021-11-21 12:00:00
+IO: Raj, Deputy Superintendent of Police, Sub-Inspector
+Sections: CrPC 154, IEA 24, IEA 65B
+
+BRIEF FACTS:
+A group of persons armed with deadly weapons clashed near Hubballi Railway Station, Dharwad over a political rivalry.
+
+PERSONS INVOLVED:
+  ACCUSED: Reyansh Rajput, Age 53, Male
+  ACCUSED: Deepika Chowdhury, Age 45, Female
+  VICTIM: Nandini Shah, Age 15, Female
+  COMPLAINANT: Gururaj Banerjee, Age 24, Watchman
+
+PROCEEDINGS:
+  ARREST: 2021-11-28, arresting IO: Raj, Deputy Superintendent of Police, Sub-Inspector
+  Location: 15.3574, 75.1393
+===
+
+=== CASE 2792 ===
+CaseMasterID: 2792
+CrimeNo: 400050055202400010 | CaseNo: 202400010
+Station: Yeshwanthpur Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Riots
+Status: Under Investigation
+Court: Fast Track Court, Bengaluru
+Registered: 2024-04-19 | Incident: 2024-04-10 12:00:00 to 2024-04-14 12:00:00
+IO: Shankar, Deputy Commissioner of Police, Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+A factional fight at Yeshwanthpur, Bengaluru Urban resulted in damage to public property.
+
+PERSONS INVOLVED:
+  ACCUSED: Rohan Kumar, Age 39, Male
+  ACCUSED: Rani Gowda, Age 27, Female
+  VICTIM: Savitri Iyengar, Age 78, Female
+  COMPLAINANT: Rudra Iyer, Age 29, Student
+  Location: 13.0132, 77.5663
+===
+
+=== CASE 2793 ===
+CaseMasterID: 2793
+CrimeNo: 300100122202200003 | CaseNo: 202200003
+Station: Chitradurga City Police Station, Chitradurga
+District: Chitradurga
+Crime Type: Rape
+Status: Trial in Progress
+Court: District and Sessions Court, Chitradurga
+Registered: 2021-04-07 | Incident: 2021-03-31 12:00:00 to 2021-04-06 12:00:00
+IO: Channabasava, Inspector, Additional Superintendent of Police
+Sections: IEA 24, CrPC 154, CrPC 161
+
+BRIEF FACTS:
+The accused, a relative of the survivor, committed rape at Chitradurga City, Chitradurga by threatening the survivor.
+
+PERSONS INVOLVED:
+  ACCUSED: Bhagya Thakur, Age 33, Female
+  VICTIM: Nalini Chowdhury, Age 76, Female
+  VICTIM: Nalini Singh, Age 68, Female
+  COMPLAINANT: Ayaan Ganguly, Age 38, Shopkeeper
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2021-08-08 00:00:00
+  Location: 14.2183, 76.4003
+===
+
+=== CASE 2794 ===
+CaseMasterID: 2794
+CrimeNo: 300050046202500001 | CaseNo: 202500001
+Station: Karnataka State Anti-Narcotics Unit, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Cheating
+Status: Charge Sheet Filed
+Court: Additional District and Sessions Court, Bengaluru
+Registered: 2025-08-03 | Incident: 2025-07-26 12:00:00 to 2025-07-31 12:00:00
+IO: Chandan, Head Constable, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The accused cheated the victim by impersonating as a government official at Indiranagar, Bengaluru Urban and extracted Rs 2 lakhs.
+
+PERSONS INVOLVED:
+  ACCUSED: Raavi Menohn, Age 30, Male
+  ACCUSED: Myra Nair, Age 35, Female
+  COMPLAINANT: Pooja Nair, Age 48, Farmer
+
+PROCEEDINGS:
+  CHARGESHEET: Additional Report, 2025-12-25 00:00:00
+  ARREST: 2025-08-04, arresting IO: Chandan, Head Constable, Deputy Superintendent of Police
+  Location: 12.9901, 77.6541
+===
+
+=== CASE 2795 ===
+CaseMasterID: 2795
+CrimeNo: 400090111202200006 | CaseNo: 202200006
+Station: Chikkamagaluru Town Police Station, Chikkamagaluru
+District: Chikkamagaluru
+Crime Type: Kidnapping & Abduction
+Status: Charge Sheet Filed
+Court: District and Sessions Court, Chikkamagaluru
+Registered: 2021-04-09 | Incident: 2021-04-07 12:00:00 to 2021-04-08 12:00:00
+IO: Rani, Assistant Sub-Inspector, Director General of Police
+Sections: CrPC 154, CrPC 157, CrPC 161
+
+BRIEF FACTS:
+A newborn baby was kidnapped from the hospital near Chikkamagaluru Town, Chikkamagaluru. CCTV footage helped identify the accused.
+
+PERSONS INVOLVED:
+  ACCUSED: Aanya Kumar, Age 19, Female
+  VICTIM: Neha Naik, Age 18, Female
+  VICTIM: Usha Bose, Age 10, Female
+  VICTIM: Pavan Acharya, Age 63, Male
+  VICTIM: Priya Sharma, Age 84, Female
+  VICTIM: Naveen Menon, Age 75, Male
+  COMPLAINANT: Gururaj Sharma, Age 36, Barber
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2021-10-08 00:00:00
+  Location: 13.3201, 75.7714
+===
+
+=== CASE 2796 ===
+CaseMasterID: 2796
+CrimeNo: 500050067202000008 | CaseNo: 202000008
+Station: Jalahalli Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Kidnapping & Abduction
+Status: Closed as Mistake of Law
+Court: Principal District and Sessions Court, Bengaluru
+Registered: 2019-02-01 | Incident: 2019-01-26 12:00:00 to 2019-01-29 12:00:00
+IO: Ganga, Joint Commissioner of Police, Joint Commissioner of Police
+Sections: CrPC 154, IEA 24
+
+BRIEF FACTS:
+The accused kidnapped a minor boy from near Yeshwanthpur, Bengaluru Urban for ransom. The child was safely rescued.
+
+PERSONS INVOLVED:
+  ACCUSED: Ishita Pawar, Age 33, Female
+  VICTIM: Sharada Singh, Age 76, Female
+  VICTIM: Gururaj Rao, Age 64, Male
+  COMPLAINANT: Neha Mukherjee, Age 37, Housewife
+
+PROCEEDINGS:
+  CHARGESHEET: Final Report, 2019-04-01 00:00:00
+  ARREST: 2019-02-03, arresting IO: Ganga, Joint Commissioner of Police, Joint Commissioner of Police
+  Location: 13.0239, 77.5547
+===
+
+=== CASE 2797 ===
+CaseMasterID: 2797
+CrimeNo: 400050053202400004 | CaseNo: 202400004
+Station: Rajajinagar Police Station, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Hurt / Grievous Hurt
+Status: Charge Sheet Filed
+Court: Fast Track Court, Bengaluru
+Registered: 2023-10-18 | Incident: 2023-10-11 12:00:00 to 2023-10-17 12:00:00
+IO: Pooja, Joint Commissioner of Police, Station House Officer
+Sections: CrPC 154, CrPC 161, CrPC 164
+
+BRIEF FACTS:
+Hurt by rash driving occurred at Indiranagar, Bengaluru Urban. A pedestrian was knocked down.
+
+PERSONS INVOLVED:
+  ACCUSED: Priya Mallya, Age 57, Female
+  VICTIM: Rohan Shinde, Age 85, Male
+  VICTIM: Ramachandra Iyengar, Age 65, Male
+  COMPLAINANT: Arjun Murthy, Age 29, Business Owner
+
+PROCEEDINGS:
+  CHARGESHEET: Supplementary Charge Sheet, 2024-05-09 00:00:00
+  ARREST: 2023-12-03, arresting IO: Pooja, Joint Commissioner of Police, Station House Officer
+  Location: 12.9883, 77.6551
+===
+
+=== CASE 2798 ===
+CaseMasterID: 2798
+CrimeNo: 100130087202200008 | CaseNo: 202200008
+Station: Hubballi Urban Police Station, Dharwad
+District: Dharwad
+Crime Type: Counterfeiting
+Status: Under Investigation
+Court: Additional District and Sessions Court, Dharwad
+Registered: 2022-11-27 | Incident: 2022-11-20 12:00:00 to 2022-11-25 12:00:00
+IO: Ishaan, Inspector, Police Constable
+Sections: IPC 489A, CrPC 154, CrPC 157, CrPC 161, CrPC 164, IEA 65B
+
+BRIEF FACTS:
+Counterfeit currency notes of Rs 500 denomination were seized near Amargol, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Yash Gupta, Age 18, Male
+  VICTIM: Usha Acharya, Age 35, Female
+  COMPLAINANT: Kiran Sen, Age 58, Auto Rickshaw Driver
+  Location: 15.4316, 75.0638
+===
+
+=== CASE 2799 ===
+CaseMasterID: 2799
+CrimeNo: 100130086202200004 | CaseNo: 202200004
+Station: Hubballi Rural Police Station, Dharwad
+District: Dharwad
+Crime Type: Extortion
+Status: Under Investigation
+Court: Additional District and Sessions Court, Dharwad
+Registered: 2021-06-12 | Incident: 2021-06-09 12:00:00 to 2021-06-10 12:00:00
+IO: Vinay, Superintendent of Police, Director General of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 65B
+
+BRIEF FACTS:
+Extortion by anonymous phone calls was reported at Vidyanagar Hubballi, Dharwad.
+
+PERSONS INVOLVED:
+  ACCUSED: Chandrashekar Thakur, Age 59, Male
+  COMPLAINANT: Sita Shetty, Age 52, Police Officer
+
+PROCEEDINGS:
+  ARREST: 2021-08-06, arresting IO: Vinay, Superintendent of Police, Director General of Police
+  Location: 15.3869, 75.1085
+===
+
+=== CASE 2800 ===
+CaseMasterID: 2800
+CrimeNo: 100050046202500002 | CaseNo: 202500002
+Station: Karnataka State Anti-Narcotics Unit, Bengaluru Urban
+District: Bengaluru Urban
+Crime Type: Culpable Homicide
+Status: Under Investigation
+Court: Principal Civil Judge (Senior Division) Court, Bengaluru
+Registered: 2024-12-21 | Incident: 2024-12-14 12:00:00 to 2024-12-18 12:00:00
+IO: Myra, Police Constable, Deputy Superintendent of Police
+Sections: CrPC 154, CrPC 157, CrPC 161, IEA 24, IEA 65B
+
+BRIEF FACTS:
+The victim died due to medical negligence at a private clinic near Basavanagudi, Bengaluru Urban.
+
+PERSONS INVOLVED:
+  ACCUSED: Sharada Shahh, Age 44, Female
+  COMPLAINANT: Yadunandan Ghorpade, Age 34, Plumber
+  Location: 12.9378, 77.5343

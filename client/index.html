@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KSP Crime Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-dominant text-foreground font-body antialiased">
+    <div id="root"></div>
+    <!-- Catalyst Web SDK for Embedded Authentication -->
+    <script src="https://static.zohocdn.com/catalyst/sdk/js/4.6.1/catalystWebSDK.js"></script>
+    <script src="/__catalyst/sdk/init.js"></script>
+    <!-- Hidden div for Embedded Auth iFrame — shown/hidden by auth.js -->
+    <div id="catalyst-auth-container" style="display:none;"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

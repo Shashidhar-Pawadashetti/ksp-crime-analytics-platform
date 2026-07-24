@@ -3,64 +3,64 @@
 ## High-Level Architecture
 
 ```
-                           ┌──────────────────────────────┐
-                           │       User / Client           │
-                           │   (Slate UI / Postman / CLI)  │
-                           └──────────────┬───────────────┘
-                                          │ POST /pipeline/query
-                                          ▼
-                    ┌─────────────────────────────────────────┐
-                    │         Layer 3: Orchestration          │
-                    │    ┌───────────────────────────────┐    │
-                    │    │        pipeline/index.js       │    │
-                    │    │  - Input validation            │    │
-                    │    │  - Session (get-or-create)     │    │
-                    │    │  - Classifier (inline)         │    │
-                    │    │  - Route to 5 handlers         │    │
-                    │    │  - Session persistence         │    │
-                    │    └───────────────────────────────┘    │
-                    └──────────────────┬──────────────────────┘
-                                       │
-              ┌────────────────────────┼──────────────────────┐
-              │                        │                      │
-              ▼                        ▼                      ▼
-   ┌──────────────────┐   ┌──────────────────────┐  ┌──────────────────────┐
-   │  Layer 4: AI/ML  │   │  Layer 1: Edge       │  │  Layer 5: Data       │
-   │                  │   │                      │  │                      │
-   │ classifier/index │   │ entity-matching-eng  │  │ query_exec/index.js  │
-   │ nl_sql/index.js  │   │ graph-service/       │  │ session/index.js     │
-   │ rag/index.js     │   │ graph-traversal/     │  │                      │
-   └──────────────────┘   └──────────────────────┘  └──────────────────────┘
-                                       │
-                                       ▼
-                          ┌──────────────────────────┐
-                          │  Layer 2: Frontend/REST  │
-                          │  network-analysis/       │
-                          │  graph-visualization/    │
-                          └──────────────────────────┘
-                                       │
-                                       ▼
-                          ┌──────────────────────────┐
-                          │  Layer 6: Supporting     │
-                          │  personmaster-builder/   │
-                          │  personmaster-writer/    │
-                          │  sync-full/              │
-                          │  sync-incremental/       │
-                          └──────────────────────────┘
-                                       │
-                                       ▼
-           ┌──────────────────────────────────────────────┐
-           │    Catalyst Platform Services                │
-           │  ┌──────────┐ ┌──────────┐ ┌─────────────┐  │
-           │  │ Data     │ │ NoSQL    │ │ Cache       │  │
-           │  │ Store    │ │ PersonM. │ │ (session)   │  │
-           │  │ (ZCQL)   │ │          │ │             │  │
-           │  └──────────┘ └──────────┘ └─────────────┘  │
-           │  ┌──────────────────────────────────────┐   │
-           │  │ QuickML (GLM LLM)                     │   │
-           │  │ crm-di-glm47b_30b_it                  │   │
-           │  └──────────────────────────────────────┘   │
-           └──────────────────────────────────────────────┘
++------------------------------+
+|       User / Client           |
+|   (Slate UI / Postman / CLI)  |
++---------------+---------------+
+                | POST /pipeline/query
+                v
++-----------------------------------------+
+|         Layer 3: Orchestration          |
+|    +-------------------------------+    |
+|    |        pipeline/index.js       |    |
+|    |  - Input validation            |    |
+|    |  - Session (get-or-create)     |    |
+|    |  - Classifier (inline)         |    |
+|    |  - Route to 5 handlers         |    |
+|    |  - Session persistence         |    |
+|    +-------------------------------+    |
++------------------+----------------------+
+                   |
+  +----------------+----------------------+
+  |                |                      |
+  v                v                      v
++------------------+ +----------------------+ +----------------------+
+|  Layer 4: AI/ML  | |  Layer 1: Edge       | |  Layer 5: Data       |
+|                  | |                      | |                      |
+| classifier/index | | entity-matching-eng  | | query_exec/index.js  |
+| nl_sql/index.js  | | graph-service/       | | session/index.js     |
+| rag/index.js     | | graph-traversal/     | |                      |
++------------------+ +----------------------+ +----------------------+
+                   |
+                   v
++----------------------------+
+|  Layer 2: Frontend/REST    |
+|  network-analysis/         |
+|  graph-visualization/      |
++----------------------------+
+                   |
+                   v
++----------------------------+
+|  Layer 6: Supporting       |
+|  personmaster-builder/     |
+|  personmaster-writer/      |
+|  sync-full/                |
+|  sync-incremental/         |
++----------------------------+
+                   |
+                   v
++----------------------------------------------+
+|    Catalyst Platform Services                |
+|  +----------+ +----------+ +-------------+   |
+|  | Data     | | NoSQL    | | Cache       |   |
+|  | Store    | | PersonM. | | (session)   |   |
+|  | (ZCQL)   | |          | |             |   |
+|  +----------+ +----------+ +-------------+   |
+|  +--------------------------------------+    |
+|  | QuickML (GLM LLM)                     |   |
+|  | crm-di-glm47b_30b_it                  |   |
+|  +--------------------------------------+   |
++----------------------------------------------+
 ```
 
 ## Low-Level Component Architecture
@@ -69,81 +69,81 @@
 
 ```
 CSV Records (Accused / Victim / Complainant)
-  │
-  ▼
-┌──────────────────────────────────────────────────────┐
-│            entity-matching-engine/                    │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌─────────┐ │
-│  │normaliser│>│ phonetic │>│ blocking │>│ scorer  │ │
-│  │ .js      │ │ .js      │ │ .js      │ │ .js     │ │
-│  └──────────┘ └──────────┘ └──────────┘ └────┬────┘ │
-│                                               │      │
-│                                         ┌─────▼────┐ │
-│                                         │threshold │ │
-│                                         │ .js      │ │
-│                                         └──────────┘ │
-└──────────────────────┬────────────────────────────────┘
-                       │ matched pairs
-                       ▼
-┌──────────────────────────────────────────────────────┐
-│             personmaster-builder/                     │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ │
-│  │clusterBuilder│>│documentBuild │>│ edgeBuilder   │ │
-│  │ (Union-Find) │ │ er.js        │ │ .js          │ │
-│  └──────────────┘ └──────────────┘ └──────────────┘ │
-└──────────────────────┬────────────────────────────────┘
-                       │ PersonMaster docs + edges
-                       ▼
-┌──────────────────────────────────────────────────────┐
-│            personmaster-writer/                       │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ │
-│  │ writer.js    │ │ batch.js     │ │ validator.js │ │
-│  │ (batch=75)   │ │              │ │              │ │
-│  └──────────────┘ └──────────────┘ └──────────────┘ │
-└──────────────────────┬────────────────────────────────┘
-                       │ Catalyst NoSQL (PersonMaster table)
-                       ▼
-┌──────────────────────────────────────────────────────┐
-│ sync-incremental/ (real-time signal handler)         │
-│ candidateLoader → incrementalResolver → personUpdater│
-│                                      → edgeUpdater   │
-└──────────────────────────────────────────────────────┘
+  |
+  v
++----------------------------------------------------+
+|            entity-matching-engine/                    |
+|  +----------+ +----------+ +----------+ +---------+ |
+|  |normaliser|>| phonetic |>| blocking |>| scorer  | |
+|  | .js      | | .js      | | .js      | | .js     | |
+|  +----------+ +----------+ +----------+ +----+----+ |
+|                                               |      |
+|                                         +-----v----+ |
+|                                         |threshold | |
+|                                         | .js      | |
+|                                         +----------+ |
++----------------------+-------------------------------+
+                       | matched pairs
+                       v
++----------------------------------------------------+
+|             personmaster-builder/                     |
+|  +--------------+ +--------------+ +--------------+ |
+|  |clusterBuilder|>|documentBuild |>| edgeBuilder   | |
+|  | (Union-Find) | | er.js        | | .js          | |
+|  +--------------+ +--------------+ +--------------+ |
++----------------------+-------------------------------+
+                       | PersonMaster docs + edges
+                       v
++----------------------------------------------------+
+|            personmaster-writer/                       |
+|  +--------------+ +--------------+ +--------------+ |
+|  | writer.js    | | batch.js     | | validator.js | |
+|  | (batch=75)   | |              | |              | |
+|  +--------------+ +--------------+ +--------------+ |
++----------------------+-------------------------------+
+                       | Catalyst NoSQL (PersonMaster table)
+                       v
++----------------------------------------------------+
+| sync-incremental/ (real-time signal handler)         |
+| candidateLoader -> incrementalResolver -> personUpdater|
+|                                      -> edgeUpdater   |
++----------------------------------------------------+
 ```
 
 ### Graph & Network Subsystem
 
 ```
 PersonMaster documents (NoSQL / flat files)
-  │
-  ▼
-┌────────────────────────────────────────────────────┐
-│              graph-service/                         │
-│  ┌──────────────┐ ┌──────────┐ ┌────────────────┐ │
-│  │graphRepositor│>│  cache   │>│ graphService   │ │
-│  │ y.js         │ │  .js     │ │ .js (singleton)│ │
-│  └──────────────┘ └──────────┘ └────────────────┘ │
-│  ┌──────────────┐                                 │
-│  │ statistics.js│                                 │
-│  └──────────────┘                                 │
-└──────────────────────┬─────────────────────────────┘
-                       ▼
-┌────────────────────────────────────────────────────┐
-│              graph-traversal/                       │
-│  ┌──────────┐ ┌────────────────┐ ┌──────────────┐ │
-│  │ bfs.js   │>│ traversalServ  │>│ pathUtils.js │ │
-│  │ (queue)  │ │ ice.js         │ │ (DFS paths)  │ │
-│  └──────────┘ └────────────────┘ └──────────────┘ │
-│  ┌──────────────┐                                 │
-│  │ validation.js│                                 │
-│  └──────────────┘                                 │
-└──────┬──────────────────────────────────┬──────────┘
-       │                                  │
-       ▼                                  ▼
-┌────────────────────┐    ┌──────────────────────────┐
-│ network-analysis/  │    │ graph-visualization/      │
-│ REST API           │    │ Cytoscape.js export       │
-│ 5 endpoints        │    │ 3 format modes            │
-└────────────────────┘    └──────────────────────────┘
+  |
+  v
++--------------------------------------------------+
+|              graph-service/                         |
+|  +--------------+ +----------+ +----------------+ |
+|  |graphRepositor|>|  cache   |>| graphService   | |
+|  | y.js         | |  .js     | | .js (singleton)| |
+|  +--------------+ +----------+ +----------------+ |
+|  +--------------+                                 |
+|  | statistics.js|                                 |
+|  +--------------+                                 |
++----------------------+----------------------------+
+                       v
++--------------------------------------------------+
+|              graph-traversal/                       |
+|  +----------+ +----------------+ +--------------+ |
+|  | bfs.js   |>| traversalServ  |>| pathUtils.js | |
+|  | (queue)  | | ice.js         | | (DFS paths)  | |
+|  +----------+ +----------------+ +--------------+ |
+|  +--------------+                                 |
+|  | validation.js|                                 |
+|  +--------------+                                 |
++------+----------------------------------+--------+
+       |                                  |
+       v                                  v
++--------------------+    +--------------------------+
+| network-analysis/  |    | graph-visualization/      |
+| REST API           |    | Cytoscape.js export       |
+| 5 endpoints        |    | 3 format modes            |
++--------------------+    +--------------------------+
 ```
 
 ## Folder Responsibilities

@@ -1,0 +1,47 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== Section (44 records) ===
+
+  ROWID: 47995000000333068, ActCode: 47995000000332168, SectionCode: 302, SectionDescription: Murder, Active: true
+  ROWID: 47995000000333069, ActCode: 47995000000332168, SectionCode: 304, SectionDescription: Culpable Homicide not amounting to murder, Active: true
+  ROWID: 47995000000333070, ActCode: 47995000000332168, SectionCode: 307, SectionDescription: Attempt to Murder, Active: true
+  ROWID: 47995000000333071, ActCode: 47995000000332168, SectionCode: 324, SectionDescription: Voluntarily causing hurt by dangerous weapons, Active: true
+  ROWID: 47995000000333072, ActCode: 47995000000332168, SectionCode: 354, SectionDescription: Assault or criminal force to woman with intent to outrage her modesty, Active: true
+  ROWID: 47995000000333073, ActCode: 47995000000332168, SectionCode: 363, SectionDescription: Kidnapping, Active: true
+  ROWID: 47995000000333074, ActCode: 47995000000332168, SectionCode: 376, SectionDescription: Rape, Active: true
+  ROWID: 47995000000333075, ActCode: 47995000000332168, SectionCode: 379, SectionDescription: Theft, Active: true
+  ROWID: 47995000000333076, ActCode: 47995000000332168, SectionCode: 380, SectionDescription: Theft in dwelling house, Active: true
+  ROWID: 47995000000333077, ActCode: 47995000000332168, SectionCode: 384, SectionDescription: Extortion, Active: true
+  ROWID: 47995000000333078, ActCode: 47995000000332168, SectionCode: 392, SectionDescription: Robbery, Active: true
+  ROWID: 47995000000333079, ActCode: 47995000000332168, SectionCode: 395, SectionDescription: Dacoity, Active: true
+  ROWID: 47995000000333080, ActCode: 47995000000332168, SectionCode: 406, SectionDescription: Criminal breach of trust, Active: true
+  ROWID: 47995000000333081, ActCode: 47995000000332168, SectionCode: 420, SectionDescription: Cheating and dishonestly inducing delivery of property, Active: true
+  ROWID: 47995000000333082, ActCode: 47995000000332168, SectionCode: 435, SectionDescription: Mischief by fire with intent to cause damage, Active: true
+  ROWID: 47995000000333083, ActCode: 47995000000332168, SectionCode: 441, SectionDescription: Criminal trespass, Active: true
+  ROWID: 47995000000333084, ActCode: 47995000000332168, SectionCode: 447, SectionDescription: Punishment for criminal trespass, Active: true
+  ROWID: 47995000000333085, ActCode: 47995000000332168, SectionCode: 457, SectionDescription: Lurking house-trespass by night, Active: true
+  ROWID: 47995000000333086, ActCode: 47995000000332168, SectionCode: 489A, SectionDescription: Counterfeiting currency notes, Active: true
+  ROWID: 47995000000333087, ActCode: 47995000000332168, SectionCode: 498A, SectionDescription: Dowry death, Active: true
+  ROWID: 47995000000333088, ActCode: 47995000000332169, SectionCode: 154, SectionDescription: Information in cognizable offences, Active: true
+  ROWID: 47995000000333089, ActCode: 47995000000332169, SectionCode: 155, SectionDescription: Information as to non-cognizable offences, Active: true
+  ROWID: 47995000000333090, ActCode: 47995000000332169, SectionCode: 157, SectionDescription: Procedure for investigation, Active: true
+  ROWID: 47995000000333091, ActCode: 47995000000332169, SectionCode: 161, SectionDescription: Examination of witnesses by police, Active: true
+  ROWID: 47995000000333092, ActCode: 47995000000332169, SectionCode: 164, SectionDescription: Recording of confessions and statements, Active: true
+  ROWID: 47995000000333093, ActCode: 47995000000332169, SectionCode: 167, SectionDescription: Procedure when investigation cannot be completed, Active: true
+  ROWID: 47995000000333094, ActCode: 47995000000332169, SectionCode: 173, SectionDescription: Report of police officer on completion of investigation, Active: true
+  ROWID: 47995000000333095, ActCode: 47995000000332170, SectionCode: 24, SectionDescription: Confession caused by inducement threat or promise, Active: true
+  ROWID: 47995000000333096, ActCode: 47995000000332170, SectionCode: 25, SectionDescription: Confession to police officer not to be proved, Active: true
+  ROWID: 47995000000333097, ActCode: 47995000000332170, SectionCode: 26, SectionDescription: Confession by accused while in custody of police, Active: true
+  ROWID: 47995000000333098, ActCode: 47995000000332170, SectionCode: 27, SectionDescription: How much of information received from accused may be proved, Active: true
+  ROWID: 47995000000333099, ActCode: 47995000000332170, SectionCode: 65B, SectionDescription: Admissibility of electronic records, Active: true
+  ROWID: 47995000000333100, ActCode: 47995000000332171, SectionCode: 8, SectionDescription: Prohibition of certain operations, Active: true
+  ROWID: 47995000000333101, ActCode: 47995000000332171, SectionCode: 15, SectionDescription: Punishment for contravention in relation to poppy straw, Active: true
+  ROWID: 47995000000333102, ActCode: 47995000000332171, SectionCode: 18, SectionDescription: Punishment for contravention in relation to cannabis plant, Active: true
+  ROWID: 47995000000333103, ActCode: 47995000000332171, SectionCode: 20, SectionDescription: Punishment for contravention in relation to cannabis, Active: true
+  ROWID: 47995000000333104, ActCode: 47995000000332171, SectionCode: 21, SectionDescription: Punishment for contravention in relation to manufactured drugs, Active: true
+  ROWID: 47995000000333105, ActCode: 47995000000332171, SectionCode: 22, SectionDescription: Punishment for contravention in relation to psychotropic substances, Active: true
+  ROWID: 47995000000333106, ActCode: 47995000000332172, SectionCode: 3, SectionDescription: License for acquisition and possession, Active: true
+  ROWID: 47995000000333107, ActCode: 47995000000332172, SectionCode: 25, SectionDescription: Punishment for certain offences, Active: true
+  ROWID: 47995000000333108, ActCode: 47995000000332172, SectionCode: 27, SectionDescription: Punishment for using arms, Active: true
+  ROWID: 47995000000333109, ActCode: 47995000000332173, SectionCode: 43, SectionDescription: Penalty for unauthorized access to computer, Active: true
+  ROWID: 47995000000333110, ActCode: 47995000000332173, SectionCode: 66, SectionDescription: Hacking with computer system, Active: true
+  ROWID: 47995000000333111, ActCode: 47995000000332173, SectionCode: 67, SectionDescription: Punishment for publishing obscene information, Active: true

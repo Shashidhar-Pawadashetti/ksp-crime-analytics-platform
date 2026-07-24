@@ -221,26 +221,26 @@ Each mapping file maps business IDs to Catalyst ROWIDs:
 
 ```
 mappings/
-├── State.json
-├── District.json
-├── CaseCategory.json
-├── CrimeHead.json
-├── CrimeSubHead.json
-├── Act.json
-├── Section.json
-├── CaseStatusMaster.json
-├── Unit.json
-├── UnitType.json
-├── Court.json
-├── Rank.json
-├── Designation.json
-├── Employee.json
-├── OccupationMaster.json
-├── ReligionMaster.json
-├── CasteMaster.json
-├── GravityOffence.json
-├── CrimeHeadActSection.json
-└── EmployeeMapping.json
+|-- State.json
+|-- District.json
+|-- CaseCategory.json
+|-- CrimeHead.json
+|-- CrimeSubHead.json
+|-- Act.json
+|-- Section.json
+|-- CaseStatusMaster.json
+|-- Unit.json
+|-- UnitType.json
+|-- Court.json
+|-- Rank.json
+|-- Designation.json
+|-- Employee.json
+|-- OccupationMaster.json
+|-- ReligionMaster.json
+|-- CasteMaster.json
+|-- GravityOffence.json
+|-- CrimeHeadActSection.json
+|-- EmployeeMapping.json
 ```
 
 ### Fetching ROWIDs

@@ -1,0 +1,10 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== UnitType (7 records) ===
+
+  ROWID: 47995000000333237, UnitTypeID: 1, UnitTypeName: Police Station, CityDistState: Mumbai City
+  ROWID: 47995000000333238, UnitTypeID: 2, UnitTypeName: Police Commissionerate, CityDistState: Pune City
+  ROWID: 47995000000333239, UnitTypeID: 3, UnitTypeName: District Police Office, CityDistState: Thane District
+  ROWID: 47995000000333240, UnitTypeID: 4, UnitTypeName: Range Headquarters, CityDistState: Konkan Range
+  ROWID: 47995000000333241, UnitTypeID: 5, UnitTypeName: State Headquarters, CityDistState: Maharashtra State
+  ROWID: 47995000000333242, UnitTypeID: 6, UnitTypeName: Traffic Police Unit, CityDistState: Nagpur City
+  ROWID: 47995000000333243, UnitTypeID: 7, UnitTypeName: Cyber Crime Cell, CityDistState: Maharashtra State

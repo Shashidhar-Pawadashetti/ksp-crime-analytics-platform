@@ -60,11 +60,12 @@ async function traverseGraph(appInstance, rootPersonId, maxHops, maxNodes, calle
   /**
    * Build a node entry from a PersonMaster document.
    */
-  function buildNode(doc) {
+  function buildNode(doc, hop) {
     return {
       person_id: doc.person_id,
       label: (doc.name_variants || [])[0] || doc.name_normalised || doc.person_id,
       roles_summary: doc.roles_summary || {},
+      hop_distance: hop,
       source_records: (doc.source_records || []).map(function (sr) {
         return { table: sr.table, case_id: sr.case_id };
       })
@@ -103,7 +104,7 @@ async function traverseGraph(appInstance, rootPersonId, maxHops, maxNodes, calle
 
     if (!callerCanAccess(doc, callerScope)) continue;
 
-    nodes.push(buildNode(doc));
+    nodes.push(buildNode(doc, hop));
 
     if (hop >= actualHops) continue;
 

@@ -5,6 +5,7 @@ jspm_packages/
 # Local configuration and private keys
 .env
 .env.local
+.env.development
 *.env.json
 .app-config.json
 .catalystrc

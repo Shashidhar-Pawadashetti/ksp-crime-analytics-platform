@@ -1,0 +1,20 @@
+{
+  "table": "GravityOffence",
+  "columns": [
+    "ROWID",
+    "GravityOffenceID",
+    "LookupValue"
+  ],
+  "rows": [
+    {
+      "ROWID": "47995000000332156",
+      "GravityOffenceID": "1",
+      "LookupValue": "Cognizable & Bailable"
+    },
+    {
+      "ROWID": "47995000000332157",
+      "GravityOffenceID": "2",
+      "LookupValue": "Non-Cognizable & Non-Bailable"
+    }
+  ]
+}

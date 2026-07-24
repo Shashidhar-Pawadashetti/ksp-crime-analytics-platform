@@ -1,0 +1,53 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== Court (50 records) ===
+
+  ROWID: 47995000000332331, CourtID: 1, CourtName: Principal District and Sessions Court, Bengaluru, DistrictID: 47995000000332123, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332332, CourtID: 2, CourtName: Additional District and Sessions Court, Bengaluru, DistrictID: 47995000000332123, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332333, CourtID: 3, CourtName: Chief Judicial Magistrate Court, Bengaluru, DistrictID: 47995000000332123, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332334, CourtID: 4, CourtName: Additional Chief Judicial Magistrate Court, Bengaluru, DistrictID: 47995000000332123, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332335, CourtID: 5, CourtName: Principal Civil Judge (Senior Division) Court, Bengaluru, DistrictID: 47995000000332123, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332336, CourtID: 6, CourtName: Family Court, Bengaluru, DistrictID: 47995000000332123, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332337, CourtID: 7, CourtName: Motor Accident Claims Tribunal, Bengaluru, DistrictID: 47995000000332123, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332338, CourtID: 8, CourtName: Fast Track Court, Bengaluru, DistrictID: 47995000000332123, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332339, CourtID: 9, CourtName: District and Sessions Court, Mysuru, DistrictID: 47995000000332140, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332340, CourtID: 10, CourtName: Additional District and Sessions Court, Mysuru, DistrictID: 47995000000332140, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332341, CourtID: 11, CourtName: Chief Judicial Magistrate Court, Mysuru, DistrictID: 47995000000332140, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332342, CourtID: 12, CourtName: Family Court, Mysuru, DistrictID: 47995000000332140, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332343, CourtID: 13, CourtName: District and Sessions Court, Belagavi, DistrictID: 47995000000332120, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332344, CourtID: 14, CourtName: Additional District and Sessions Court, Belagavi, DistrictID: 47995000000332120, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332345, CourtID: 15, CourtName: Chief Judicial Magistrate Court, Belagavi, DistrictID: 47995000000332120, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332346, CourtID: 16, CourtName: District and Sessions Court, Dharwad at Hubballi, DistrictID: 47995000000332131, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332347, CourtID: 17, CourtName: Additional District and Sessions Court, Dharwad, DistrictID: 47995000000332131, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332348, CourtID: 18, CourtName: Chief Judicial Magistrate Court, Dharwad, DistrictID: 47995000000332131, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332349, CourtID: 19, CourtName: District and Sessions Court, Dakshina Kannada at Mangaluru, DistrictID: 47995000000332129, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332350, CourtID: 20, CourtName: Additional District and Sessions Court, Mangaluru, DistrictID: 47995000000332129, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332351, CourtID: 21, CourtName: Chief Judicial Magistrate Court, Mangaluru, DistrictID: 47995000000332129, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332352, CourtID: 22, CourtName: District and Sessions Court, Kalaburagi, DistrictID: 47995000000332135, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332353, CourtID: 23, CourtName: Additional District and Sessions Court, Kalaburagi, DistrictID: 47995000000332135, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332354, CourtID: 24, CourtName: Chief Judicial Magistrate Court, Kalaburagi, DistrictID: 47995000000332135, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332355, CourtID: 25, CourtName: District and Sessions Court, Ballari, DistrictID: 47995000000332121, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332356, CourtID: 26, CourtName: Additional District and Sessions Court, Ballari, DistrictID: 47995000000332121, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332357, CourtID: 27, CourtName: District and Sessions Court, Davanagere, DistrictID: 47995000000332130, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332358, CourtID: 28, CourtName: Additional District and Sessions Court, Davanagere, DistrictID: 47995000000332130, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332359, CourtID: 29, CourtName: District and Sessions Court, Shivamogga, DistrictID: 47995000000332143, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332360, CourtID: 30, CourtName: District and Sessions Court, Tumakuru, DistrictID: 47995000000332144, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332361, CourtID: 31, CourtName: District and Sessions Court, Udupi, DistrictID: 47995000000332145, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332362, CourtID: 32, CourtName: District and Sessions Court, Hassan, DistrictID: 47995000000332133, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332363, CourtID: 33, CourtName: District and Sessions Court, Kolar, DistrictID: 47995000000332137, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332364, CourtID: 34, CourtName: District and Sessions Court, Chikkamagaluru, DistrictID: 47995000000332127, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332365, CourtID: 35, CourtName: District and Sessions Court, Raichur, DistrictID: 47995000000332141, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332366, CourtID: 36, CourtName: District and Sessions Court, Bidar, DistrictID: 47995000000332124, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332367, CourtID: 37, CourtName: District and Sessions Court, Vijayapura, DistrictID: 47995000000332148, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332368, CourtID: 38, CourtName: District and Sessions Court, Mandya, DistrictID: 47995000000332139, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332369, CourtID: 39, CourtName: District and Sessions Court, Chitradurga, DistrictID: 47995000000332128, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332370, CourtID: 40, CourtName: District and Sessions Court, Bagalkot, DistrictID: 47995000000332119, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332371, CourtID: 41, CourtName: District and Sessions Court, Gadag, DistrictID: 47995000000332132, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332372, CourtID: 42, CourtName: Chief Judicial Magistrate Court, Bagalkot, DistrictID: 47995000000332119, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332373, CourtID: 43, CourtName: Chief Judicial Magistrate Court, Chitradurga, DistrictID: 47995000000332128, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332374, CourtID: 44, CourtName: Chief Judicial Magistrate Court, Raichur, DistrictID: 47995000000332141, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332375, CourtID: 45, CourtName: Chief Judicial Magistrate Court, Bidar, DistrictID: 47995000000332124, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332376, CourtID: 46, CourtName: Chief Judicial Magistrate Court, Vijayapura, DistrictID: 47995000000332148, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332377, CourtID: 47, CourtName: Family Court, Hubballi, DistrictID: 47995000000332131, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332378, CourtID: 48, CourtName: Family Court, Mangaluru, DistrictID: 47995000000332129, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332379, CourtID: 49, CourtName: Fast Track Court, Mysuru, DistrictID: 47995000000332140, StateID: 47995000000333047, Active: true
+  ROWID: 47995000000332380, CourtID: 50, CourtName: Fast Track Court, Belagavi, DistrictID: 47995000000332120, StateID: 47995000000333047, Active: true

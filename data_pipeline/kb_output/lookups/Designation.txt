@@ -1,0 +1,19 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== Designation (16 records) ===
+
+  ROWID: 47995000000332238, DesignationID: 1, DesignationName: Police Constable, Active: true, SortOrder: 1
+  ROWID: 47995000000332239, DesignationID: 2, DesignationName: Head Constable, Active: true, SortOrder: 2
+  ROWID: 47995000000332240, DesignationID: 3, DesignationName: Assistant Sub-Inspector, Active: true, SortOrder: 3
+  ROWID: 47995000000332241, DesignationID: 4, DesignationName: Sub-Inspector, Active: true, SortOrder: 4
+  ROWID: 47995000000332242, DesignationID: 5, DesignationName: Inspector of Police, Active: true, SortOrder: 5
+  ROWID: 47995000000332243, DesignationID: 6, DesignationName: Circle Inspector, Active: true, SortOrder: 6
+  ROWID: 47995000000332244, DesignationID: 7, DesignationName: Deputy Superintendent of Police, Active: true, SortOrder: 7
+  ROWID: 47995000000332245, DesignationID: 8, DesignationName: Additional Superintendent of Police, Active: true, SortOrder: 8
+  ROWID: 47995000000332246, DesignationID: 9, DesignationName: Superintendent of Police, Active: true, SortOrder: 9
+  ROWID: 47995000000332247, DesignationID: 10, DesignationName: Deputy Commissioner of Police, Active: true, SortOrder: 10
+  ROWID: 47995000000332248, DesignationID: 11, DesignationName: Additional Commissioner of Police, Active: true, SortOrder: 11
+  ROWID: 47995000000332249, DesignationID: 12, DesignationName: Joint Commissioner of Police, Active: true, SortOrder: 12
+  ROWID: 47995000000332250, DesignationID: 13, DesignationName: Commissioner of Police, Active: true, SortOrder: 13
+  ROWID: 47995000000332251, DesignationID: 14, DesignationName: Director General of Police, Active: true, SortOrder: 14
+  ROWID: 47995000000332252, DesignationID: 15, DesignationName: Station House Officer, Active: false, SortOrder: 15
+  ROWID: 47995000000332253, DesignationID: 16, DesignationName: Investigating Officer, Active: false, SortOrder: 16

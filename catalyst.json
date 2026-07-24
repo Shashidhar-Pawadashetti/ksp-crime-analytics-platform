@@ -15,7 +15,9 @@
       "graph-traversal",
       "personmaster-api",
       "pm-migration",
-      "sync-full-job"
+      "sync-full-job",
+      "dashboard",
+      "graph-service-api"
     ],
     "ignore": [],
     "source": "functions"
@@ -27,8 +29,12 @@
   },
   "slate": [
     {
-      "name": "slate-app",
-      "source": "C:\\Users\\shash\\OneDrive\\Desktop\\Hackathon\\Datathon2026\\slate-app"
+      "name": "crime-analytics-ui",
+      "type": "slate",
+      "framework": "react",
+      "build_command": "npm run build",
+      "build_path": "client",
+      "output_path": "client/dist"
     }
   ]
 }

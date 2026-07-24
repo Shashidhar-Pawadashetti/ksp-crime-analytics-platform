@@ -1,0 +1,33 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== OccupationMaster (30 records) ===
+
+  ROWID: 47995000000333197, OccupationID: 1, OccupationName: Farmer
+  ROWID: 47995000000333198, OccupationID: 2, OccupationName: Teacher
+  ROWID: 47995000000333199, OccupationID: 3, OccupationName: Doctor
+  ROWID: 47995000000333200, OccupationID: 4, OccupationName: Engineer
+  ROWID: 47995000000333201, OccupationID: 5, OccupationName: Lawyer
+  ROWID: 47995000000333202, OccupationID: 6, OccupationName: Shopkeeper
+  ROWID: 47995000000333203, OccupationID: 7, OccupationName: Driver
+  ROWID: 47995000000333204, OccupationID: 8, OccupationName: Laborer
+  ROWID: 47995000000333205, OccupationID: 9, OccupationName: Government Employee
+  ROWID: 47995000000333206, OccupationID: 10, OccupationName: Private Employee
+  ROWID: 47995000000333207, OccupationID: 11, OccupationName: Business Owner
+  ROWID: 47995000000333208, OccupationID: 12, OccupationName: Housewife
+  ROWID: 47995000000333209, OccupationID: 13, OccupationName: Student
+  ROWID: 47995000000333210, OccupationID: 14, OccupationName: Retired
+  ROWID: 47995000000333211, OccupationID: 15, OccupationName: Self Employed
+  ROWID: 47995000000333212, OccupationID: 16, OccupationName: Police Officer
+  ROWID: 47995000000333213, OccupationID: 17, OccupationName: Nurse
+  ROWID: 47995000000333214, OccupationID: 18, OccupationName: Accountant
+  ROWID: 47995000000333215, OccupationID: 19, OccupationName: Tailor
+  ROWID: 47995000000333216, OccupationID: 20, OccupationName: Barber
+  ROWID: 47995000000333217, OccupationID: 21, OccupationName: Cook
+  ROWID: 47995000000333218, OccupationID: 22, OccupationName: Sweeper
+  ROWID: 47995000000333219, OccupationID: 23, OccupationName: Watchman
+  ROWID: 47995000000333220, OccupationID: 24, OccupationName: Electrician
+  ROWID: 47995000000333221, OccupationID: 25, OccupationName: Plumber
+  ROWID: 47995000000333222, OccupationID: 26, OccupationName: Carpenter
+  ROWID: 47995000000333223, OccupationID: 27, OccupationName: Painter
+  ROWID: 47995000000333224, OccupationID: 28, OccupationName: Auto Rickshaw Driver
+  ROWID: 47995000000333225, OccupationID: 29, OccupationName: Milk Vendor
+  ROWID: 47995000000333226, OccupationID: 30, OccupationName: Newspaper Vendor

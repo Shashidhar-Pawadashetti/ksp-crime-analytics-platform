@@ -10,7 +10,7 @@ const STRUCTURED_PATTERNS = /\b(how many|count|total|list\s+\w+|show\s+(me|all|t
 const NARRATIVE_PATTERNS = /\b(describe|what\s+happened|tell\s+me\s+about|modus\s+operandi|summary\s+of|overview\s+of|details?\s+about\s+case|brief\s+facts|incident\s+details?|sequence\s+of\s+events)\b/i;
 const NETWORK_PATTERNS = /\b(associates?|linked\s+to|connected|co-accused|network|relationships?)\b/i;
 const RISK_PATTERNS = /\b(risk\s+score|high-risk|repeat\s+offender|risk\s+level|dangerous|threat\s+level)\b/i;
-const FORECAST_PATTERNS = /\b(predict|forecast|next\s+month|hotspot|trend|pattern|seasonal)\b/i;
+const FORECAST_PATTERNS = /\b(predict|forecast|next\s+month|hotspot|trend|pattern|seasonal|analysis|analytics|statistics|breakdown|compare|most\s+common)\b/i;
 
 function sendJson(res, status, data) {
 	res.writeHead(status, { 'Content-Type': 'application/json' });
