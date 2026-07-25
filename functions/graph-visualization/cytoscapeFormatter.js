@@ -35,11 +35,14 @@ function formatEdges(traversalEdges) {
     var e = traversalEdges[ei];
     var edgeStyle = styleHints.getEdgeStyle(e.edge_type);
 
+    var directed = e.edge_type === 'ACCUSED_TO_VICTIM';
+
     edges.push({
       data: {
         id: e.edge_id,
-        source: e.source,
-        target: e.target,
+        source: e.from || e.source,
+        target: e.to || e.target,
+        directed: directed,
         edge_type: e.edge_type,
         label: edgeStyle.label,
         weight: e.weight || 1,
@@ -130,10 +133,12 @@ function toCytoscape(traversalResult) {
   var degrees = {};
   for (var ei = 0; ei < traversalResult.edges.length; ei++) {
     var e = traversalResult.edges[ei];
-    if (!degrees[e.source]) degrees[e.source] = 0;
-    degrees[e.source]++;
-    if (!degrees[e.target]) degrees[e.target] = 0;
-    degrees[e.target]++;
+    var src = e.from || e.source;
+    var tgt = e.to || e.target;
+    if (!degrees[src]) degrees[src] = 0;
+    degrees[src]++;
+    if (!degrees[tgt]) degrees[tgt] = 0;
+    degrees[tgt]++;
   }
 
   var nodes = formatNodes(traversalResult.nodes, degrees);

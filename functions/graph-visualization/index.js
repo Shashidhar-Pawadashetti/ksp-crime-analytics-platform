@@ -4,17 +4,22 @@ const express = require('express');
 const helmet = require('helmet');
 const catalyst = require('zcatalyst-sdk-node');
 
-const { route: routeRequest } = require('./routes');
+const { GraphExportService } = require('./graphExportService');
 const { toCytoscape } = require('./cytoscapeFormatter');
 
 const expressApp = express();
 expressApp.use(helmet());
 expressApp.use(express.json({ limit: '1mb' }));
 
-function getAppInstance(req) {
-  try { return catalyst.initialize(req); }
-  catch (e) { return null; }
-}
+expressApp.use(function (req, res, next) {
+  try {
+    var catApp = catalyst.initialize(req);
+    req.catalystApp = catApp;
+    req.graphService = new GraphExportService(catApp);
+  } catch (e) {
+  }
+  next();
+});
 
 expressApp.get('/', (req, res) => {
   res.json({
@@ -31,8 +36,44 @@ expressApp.get('/', (req, res) => {
 
 expressApp.get('/person/:personId/graph', async (req, res) => {
   try {
-    const routeRes = await routeRequest({ url: req.originalUrl, method: req.method });
-    res.status(routeRes.statusCode || 200).set(routeRes.headers || {}).send(routeRes.body);
+    if (!req.graphService) {
+      return res.status(500).json({ status: 'error', error_code: 'SERVICE_UNAVAILABLE', message: 'Graph service not initialized' });
+    }
+    var graphService = req.graphService;
+    var extractCallerScope = require('./__vendored/traversal/rbacFilter').extractCallerScope;
+    var callerScope = extractCallerScope(req);
+
+    var format = req.query.format || 'cytoscape';
+    var maxHops = parseInt(req.query.max_hops, 10) || 2;
+    var includeUnconfirmed = req.query.include_unconfirmed === 'true';
+    var edgeTypeFilter = req.query.edge_type_filter ? req.query.edge_type_filter.split(',') : undefined;
+    var maxNodes = parseInt(req.query.max_nodes, 10) || 100;
+
+    var options = {
+      hops: maxHops,
+      include_unconfirmed: includeUnconfirmed,
+      edge_type_filter: edgeTypeFilter,
+      max_nodes: maxNodes,
+      caller_scope: callerScope
+    };
+
+    var result;
+    switch (format) {
+      case 'compact':
+        result = await graphService.toCompact(req.params.personId, options);
+        break;
+      case 'debug':
+        result = await graphService.toDebug(req.params.personId, options);
+        break;
+      default:
+        result = await graphService.toCytoscape(req.params.personId, options);
+    }
+
+    if (result && result.error) {
+      return res.status(404).json({ status: 'error', error_code: 'NOT_FOUND', message: result.error[0] || 'Person not found' });
+    }
+
+    res.json({ status: 'ok', data: result });
   } catch (e) {
     res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: e.message });
   }

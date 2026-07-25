@@ -46,11 +46,11 @@ var EDGE_STYLES = {
     style: 'solid',
     label: 'Accused → Victim'
   },
-  'UNCONFIRMED_MATCH': {
+  'CANDIDATE_MATCH': {
     color: '#9E9E9E',
     width: 1,
     style: 'dashed',
-    label: 'Unconfirmed'
+    label: 'Candidate'
   },
   'SHARED_LOCATION': {
     color: '#2196F3',
