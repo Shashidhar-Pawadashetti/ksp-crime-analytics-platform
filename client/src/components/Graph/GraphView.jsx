@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
+import { createScope, animate } from 'animejs';
 import PersonSearch from './PersonSearch';
 import GraphLegend from './GraphLegend';
 import GraphSkeleton from './GraphSkeleton';
@@ -141,7 +142,7 @@ var DEFAULT_STYLESHEET = [
     },
   },
   {
-    selector: 'node:hover',
+    selector: 'node.node-hover',
     style: {
       'border-color': '#60A5FA',
       'border-width': 3,
@@ -185,17 +186,6 @@ var DEFAULT_STYLESHEET = [
       opacity: 0.04,
       'text-opacity': 0,
       'z-index': 1,
-    },
-  },
-  {
-    selector: 'edge:hover',
-    style: {
-      opacity: 0.9,
-      'text-opacity': 1,
-      width: 3,
-      'z-index': 60,
-      'transition-property': 'opacity, width',
-      'transition-duration': '0.1s',
     },
   },
   {
@@ -305,6 +295,30 @@ export default function GraphView() {
   var setSelectedPersonInfo = _useState9[1];
 
   var cyRef = useRef(null);
+  var cyDestroyedRef = useRef(false);
+  var animScope = useRef(null);
+
+  useEffect(function () {
+    if (!cyRef.current || elements.length === 0) return;
+    var cy = cyRef.current;
+    var container = cy.container();
+    if (!container) return;
+
+    animScope.current = createScope({ root: container }).add(function () {
+      animate(container, {
+        opacity: [0, 1],
+        duration: 300,
+        ease: 'out(2)',
+      });
+    });
+
+    return function () {
+      if (animScope.current) {
+        animScope.current.revert();
+        animScope.current = null;
+      }
+    };
+  }, [elements]);
 
   var applyFilters = useCallback(function () {
     var cy = cyRef.current;
@@ -490,6 +504,20 @@ export default function GraphView() {
     setSelectedPersonInfo(null);
   }, []);
 
+  useEffect(function () {
+    cyDestroyedRef.current = false;
+    return function () {
+      cyDestroyedRef.current = true;
+      var cy = cyRef.current;
+      if (cy) {
+        try {
+          cy.removeAllListeners('layoutstop');
+        } catch (e) {}
+        cyRef.current = null;
+      }
+    };
+  }, []);
+
   var setupCy = useCallback(function (cy) {
     cyRef.current = cy;
 
@@ -537,6 +565,35 @@ export default function GraphView() {
     cy.on('zoom', zoomHandler);
 
     cy.on('layoutstop', function () {
+      setTimeout(function () {
+        if (cyDestroyedRef.current) return;
+        var nodes = cy.nodes();
+        var edges = cy.edges();
+        if (nodes.length === 0 && edges.length === 0) return;
+
+        nodes.style('opacity', 0);
+        edges.style('opacity', 0);
+
+        nodes.forEach(function (node, i) {
+          node.animate({
+            style: { opacity: 1 }
+          }, {
+            duration: 300,
+            delay: i * 60,
+            easing: 'ease-out'
+          });
+        });
+
+        edges.forEach(function (edge, i) {
+          edge.animate({
+            style: { opacity: 1 }
+          }, {
+            duration: 200,
+            delay: i * 40 + 100,
+            easing: 'ease-out'
+          });
+        });
+      }, 50);
     });
   }, [handleNodeClick, handleCanvasClick]);
 
@@ -546,8 +603,7 @@ export default function GraphView() {
     ? { name: 'grid', padding: 50, rows: 1 }
     : {
         name: 'cose',
-        animate: true,
-        animationDuration: 500,
+        animate: false,
         fit: true,
         padding: 50,
         nodeRepulsion: 5000,

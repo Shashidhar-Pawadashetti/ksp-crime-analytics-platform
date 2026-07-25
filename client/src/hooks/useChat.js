@@ -9,7 +9,7 @@ import { ChatContext } from '../contexts/ChatContext';
 /**
  * Access chat state and actions.
  * Must be used within a ChatProvider boundary.
- * @returns {{ messages: Array, isLoading: boolean, error: string|null, dispatch: function, sendMessage: function }}
+ * @returns {{ messages: Array, isLoading: boolean, error: string|null, sessions: Array, sessionsLoading: boolean, sessionId: string|null, dispatch: function, sendMessage: function, createNewSession: function, switchSession: function, loadSessions: function }}
  */
 export function useChat() {
   const context = useContext(ChatContext);

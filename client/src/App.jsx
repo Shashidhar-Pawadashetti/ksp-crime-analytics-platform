@@ -5,6 +5,7 @@ import Sidebar from './components/Layout/Sidebar'
 import ChatArea from './components/Chat/ChatArea'
 import EvidencePanel from './components/Citations/EvidencePanel'
 import DashboardView from './components/Dashboard/DashboardView'
+import PageTransition from './components/Layout/PageTransition'
 
 // Lazy-loaded stubs for views created in subsequent plans
 const GraphView = lazy(() => import('./components/Graph/GraphView'))
@@ -49,29 +50,30 @@ function App() {
         {canAccess ? (
           <div className="h-full w-full">
             {activeView === 'chat' && (
-              <div className="animate-[fade-in_200ms_ease-out] h-full">
-                <ChatArea />
+              <div className="h-full">
+                <PageTransition>
+                  <ChatArea />
+                </PageTransition>
               </div>
             )}
             {activeView === 'dashboard' && (
-              <div className="animate-[fade-in_200ms_ease-out] h-full">
-                <DashboardView />
+              <div className="h-full">
+                <PageTransition>
+                  <DashboardView />
+                </PageTransition>
               </div>
             )}
-            {activeView === 'graph' && (
-              <div className="animate-[fade-in_200ms_ease-out] h-full">
-                <Suspense fallback={<ViewFallback />}>
-                  <GraphView />
-                </Suspense>
-              </div>
-            )}
-            {activeView === 'hotspots' && (
-              <div className="animate-[fade-in_200ms_ease-out] h-full">
-                <Suspense fallback={<ViewFallback />}>
-                  <HotspotMapView />
-                </Suspense>
-              </div>
-            )}
+            {/* Graph and Hotspots kept mounted but hidden to prevent Cytoscape remount/layout rAF crash */}
+            <div className="h-full" style={{ display: activeView === 'graph' ? '' : 'none' }}>
+              <Suspense fallback={<ViewFallback />}>
+                <GraphView />
+              </Suspense>
+            </div>
+            <div className="h-full" style={{ display: activeView === 'hotspots' ? '' : 'none' }}>
+              <Suspense fallback={<ViewFallback />}>
+                <HotspotMapView />
+              </Suspense>
+            </div>
           </div>
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">

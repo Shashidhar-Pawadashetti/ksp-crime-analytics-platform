@@ -1177,6 +1177,39 @@ GROUP BY d.DistrictName ORDER BY COUNT(cm.CaseMasterID) DESC LIMIT 10`
 	};
 }
 
+async function updateSessionIndex(app, employeeId, sessionId, updates = {}) {
+	const seg = app.cache().segment(CACHE_SEGMENT);
+	const indexKey = 'sessions:index:' + employeeId;
+	let index = [];
+	try {
+		const raw = await seg.getValue(indexKey);
+		if (raw) index = JSON.parse(raw);
+	} catch {}
+
+	const existingIdx = index.findIndex(s => s.session_id === sessionId);
+	const now = new Date().toISOString();
+
+	if (existingIdx >= 0) {
+		index[existingIdx].last_activity = now;
+		if (updates.title) index[existingIdx].title = updates.title;
+		if (updates.incrementMessages) index[existingIdx].message_count = (index[existingIdx].message_count || 0) + 1;
+		const [item] = index.splice(existingIdx, 1);
+		index.unshift(item);
+	} else {
+		index.unshift({
+			session_id: sessionId,
+			title: updates.title || null,
+			created_at: now,
+			last_activity: now,
+			message_count: 0
+		});
+	}
+
+	if (index.length > 5) index = index.slice(0, 5);
+
+	await seg.put(indexKey, JSON.stringify(index), SESSION_TTL_HOURS);
+}
+
 async function getOrCreateSession(app, employeeId, sessionId) {
 	const seg = app.cache().segment(CACHE_SEGMENT);
 	const cacheKey = 's:' + sessionId;
@@ -1252,6 +1285,7 @@ async function getOrCreateSession(app, employeeId, sessionId) {
 	}
 
 	await seg.put(cacheKey, JSON.stringify(session), SESSION_TTL_HOURS);
+	try { await updateSessionIndex(app, employeeId, sessionId, {}); } catch (e) { console.error('Session index update failed: ' + e.message); }
 	return session;
 }
 
@@ -1274,6 +1308,16 @@ async function appendTurn(app, employeeId, sessionId, turn) {
 	session.turns.push(turn);
 
 	await seg.put(cacheKey, JSON.stringify(session), SESSION_TTL_HOURS);
+	try {
+		const updates = { incrementMessages: true };
+		if (turn.role === 'user') {
+			const priorUserTurns = session.turns.filter(t => t.role === 'user' && t.turn_id !== turn.turn_id);
+			if (priorUserTurns.length === 0) {
+				updates.title = turn.content ? turn.content.substring(0, 50) : null;
+			}
+		}
+		await updateSessionIndex(app, employeeId, sessionId, updates);
+	} catch (e) { console.error('Session index update failed: ' + e.message); }
 	return true;
 }
 
