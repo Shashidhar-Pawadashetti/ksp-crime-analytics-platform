@@ -1,145 +1,229 @@
 'use strict';
 
-var { callerCanAccess } = require('./rbacFilter');
+var CANONICAL_EDGE_TYPES = {
+  CO_ACCUSED: true,
+  ACCUSED_TO_VICTIM: true,
+  SHARED_LOCATION: true,
+  CANDIDATE_MATCH: true
+};
 
-/**
- * LLD §6.1 — BFS traversal from a root person through the crime graph.
- *
- * @param {Object} appInstance   — initialized Catalyst SDK instance
- * @param {string} rootPersonId  — starting PersonMaster person_id
- * @param {number} maxHops       — max traversal depth (hard cap at 3)
- * @param {number} maxNodes      — max nodes to return (default 50, max 100)
- * @param {Object} callerScope   — RBAC scope from extractCallerScope()
- * @returns {Object}
- *   @property {string}  root_person_id
- *   @property {Array}   nodes         — [{ person_id, label, roles_summary, source_records }]
- *   @property {Array}   edges         — [{ from, to, type, case_ids, confirmed }]
- *   @property {Array}   unconfirmed_edges — same structure, confirmed: false
- *   @property {boolean} truncated
- *   @property {number}  hops_requested
- *   @property {string}  scope_applied
- */
-async function traverseGraph(appInstance, rootPersonId, maxHops, maxNodes, callerScope) {
-  var CATALYST_ORG = process.env.CATALYST_ORG || '60073929329';
-  var visited = {};
+var UNDIRECTED_EDGE_TYPES = {
+  CO_ACCUSED: true,
+  SHARED_LOCATION: true,
+  CANDIDATE_MATCH: true
+};
+
+var DIRECTED_EDGE_TYPES = {
+  ACCUSED_TO_VICTIM: true
+};
+
+var MAX_ALLOWED_HOPS = 3;
+var DEFAULT_MAX_NODES = 50;
+var ABSOLUTE_MAX_NODES = 100;
+
+function isUndirected(edgeType) {
+  return !!UNDIRECTED_EDGE_TYPES[edgeType];
+}
+
+function isDirected(edgeType) {
+  return !!DIRECTED_EDGE_TYPES[edgeType];
+}
+
+function isValidEdgeType(edgeType) {
+  return !!CANONICAL_EDGE_TYPES[edgeType];
+}
+
+function buildNodeEntry(doc) {
+  return {
+    person_id: doc.person_id,
+    canonical_name: doc.canonical_name || '',
+    name_normalised: doc.name_normalised || '',
+    roles_summary: doc.roles_summary || {},
+    source_records: (doc.source_records || []).map(function (sr) {
+      return { table: sr.table, case_id: sr.case_id };
+    })
+  };
+}
+
+function buildEdgeEntry(edgeObj, fromPersonId) {
+  var toPersonId = edgeObj.target_person_id || edgeObj.with_person_id;
+  return {
+    edge_id: edgeObj.edge_id,
+    edge_type: edgeObj.edge_type,
+    from: fromPersonId,
+    to: toPersonId,
+    confidence: edgeObj.confidence || null,
+    evidence: edgeObj.evidence || [],
+    case_ids: edgeObj.case_ids || [],
+    confirmed: !!(edgeObj.confirmed !== false)
+  };
+}
+
+async function bfs(rootPersonId, options, context) {
+  var maxHops = options.max_hops;
+  if (maxHops === undefined || maxHops === null) maxHops = 2;
+  maxHops = Math.min(maxHops, MAX_ALLOWED_HOPS);
+
+  var maxNodes = options.max_nodes;
+  if (maxNodes === undefined || maxNodes === null) maxNodes = DEFAULT_MAX_NODES;
+  maxNodes = Math.min(maxNodes, ABSOLUTE_MAX_NODES);
+
+  var includeUnconfirmed = options.include_unconfirmed === true;
+  var edgeTypeFilter = options.edge_type_filter || null;
+  var minConfidence = options.min_confidence || 0;
+
+  var loadNode = context.loadNode;
+  var canAccess = context.canAccess;
+  var callerScope = context.callerScope;
+
+  var visitedNodes = {};
+  var visitedEdges = {};
+  var nodeCache = {};
   var queue = [{ personId: rootPersonId, hop: 0 }];
-  var nodes = [];
-  var edges = [];
-  var unconfirmedEdges = [];
+  var head = 0;
+
+  var resultNodes = [];
+  var resultEdges = [];
+  var resultUnconfirmedEdges = [];
   var truncated = false;
 
-  var actualHops = Math.min(maxHops || 2, 3);
-  var actualMaxNodes = Math.min(maxNodes || 50, 100);
+  function isEdgeTypeWanted(edgeType) {
+    if (!isValidEdgeType(edgeType)) return false;
+    if (edgeTypeFilter && edgeTypeFilter.indexOf(edgeType) === -1) return false;
+    return true;
+  }
 
-  var noSql = appInstance.nosql();
-  var table = await noSql.getTable('PersonMaster');
+  function meetsConfidence(edgeObj) {
+    var conf = edgeObj.confidence || 0;
+    return conf >= minConfidence;
+  }
 
-  /**
-   * Load a PersonMaster document from NoSQL by person_id.
-   */
-  async function loadDoc(personId) {
-    try {
-      var { NoSQLItem } = require('zcatalyst-sdk-node/lib/no-sql');
-      var result = await table.fetchItem({
-        keys: NoSQLItem.from({ type: 'PM', person_id: personId })
-      });
-
-      if (!result) return null;
-      var data = result.getData ? result.getData() : (result.data || []);
-      if (!data || data.length === 0) return null;
-      var first = data[0];
-      if (typeof first === 'object' && first.person_id) return first;
-      if (first.data && typeof first.data === 'object') return first.data;
-      return null;
-    } catch (err) {
-      console.error('[bfs] Error loading ' + personId + ': ' + err.message);
-      return null;
+  function canTraverseFrom(currentPersonId, edgeObj) {
+    var edgeType = edgeObj.edge_type;
+    if (isUndirected(edgeType)) return true;
+    if (isDirected(edgeType)) {
+      var sourceId = edgeObj.source_person_id || currentPersonId;
+      return sourceId === currentPersonId;
     }
+    return false;
   }
 
-  /**
-   * Build a node entry from a PersonMaster document.
-   */
-  function buildNode(doc) {
-    return {
-      person_id: doc.person_id,
-      label: (doc.name_variants || [])[0] || doc.name_normalised || doc.person_id,
-      roles_summary: doc.roles_summary || {},
-      source_records: (doc.source_records || []).map(function (sr) {
-        return { table: sr.table, case_id: sr.case_id };
-      })
-    };
+  async function getDoc(personId) {
+    if (nodeCache[personId] !== undefined) return nodeCache[personId];
+    var doc = await loadNode(personId);
+    nodeCache[personId] = doc || null;
+    return nodeCache[personId];
   }
 
-  /**
-   * Build an edge entry.
-   */
-  function buildEdge(edgeObj, fromPersonId, confirmed) {
-    return {
-      from: fromPersonId,
-      to: edgeObj.with_person_id || edgeObj.target_person_id,
-      type: edgeObj.type || edgeObj.edge_type,
-      case_ids: edgeObj.case_ids || [],
-      confirmed: confirmed,
-      confidence: confirmed ? undefined : (edgeObj.confidence || undefined)
-    };
-  }
-
-  while (queue.length > 0) {
-    var item = queue.shift();
+  while (head < queue.length) {
+    var item = queue[head++];
     var personId = item.personId;
     var hop = item.hop;
 
-    if (visited[personId]) continue;
-    if (nodes.length >= actualMaxNodes) {
+    if (visitedNodes[personId]) continue;
+
+    if (resultNodes.length >= maxNodes) {
       truncated = true;
       break;
     }
 
-    visited[personId] = true;
-
-    var doc = await loadDoc(personId);
+    var doc = await getDoc(personId);
     if (!doc) continue;
 
-    if (!callerCanAccess(doc, callerScope)) continue;
+    if (!canAccess(doc, callerScope)) continue;
 
-    nodes.push(buildNode(doc));
+    visitedNodes[personId] = true;
+    resultNodes.push(buildNodeEntry(doc));
 
-    if (hop >= actualHops) continue;
+    if (hop >= maxHops) continue;
 
-    /* -- Traverse confirmed edges -- */
-    var confirmedEdgeList = doc.confirmed_edges || [];
-    for (var cei = 0; cei < confirmedEdgeList.length; cei++) {
-      var ce = confirmedEdgeList[cei];
-      edges.push(buildEdge(ce, personId, true));
+    var confirmedEdges = doc.confirmed_edges || [];
+    for (var cei = 0; cei < confirmedEdges.length; cei++) {
+      var ce = confirmedEdges[cei];
+      if (!ce.edge_id) continue;
+      if (!ce.target_person_id && !ce.with_person_id) continue;
+      if (!isEdgeTypeWanted(ce.edge_type)) continue;
+      if (!meetsConfidence(ce)) continue;
+      if (!canTraverseFrom(personId, ce)) continue;
 
-      var neighborId = ce.with_person_id || ce.target_person_id;
-      if (neighborId && !visited[neighborId]) {
+      if (visitedEdges[ce.edge_id]) continue;
+
+      var neighborId = ce.target_person_id || ce.with_person_id;
+      if (neighborId === personId) continue;
+
+      var neighborDoc = await getDoc(neighborId);
+      if (!neighborDoc) continue;
+      if (!canAccess(neighborDoc, callerScope)) continue;
+
+      visitedEdges[ce.edge_id] = true;
+      resultEdges.push(buildEdgeEntry(ce, personId));
+
+      if (!visitedNodes[neighborId]) {
         queue.push({ personId: neighborId, hop: hop + 1 });
       }
     }
 
-    /* -- Unconfirmed edges are terminal (LLD §6.1 invariant) -- */
-    var unconfirmedEdgeList = doc.unconfirmed_edges || [];
-    for (var uei = 0; uei < unconfirmedEdgeList.length; uei++) {
-      var ue = unconfirmedEdgeList[uei];
-      unconfirmedEdges.push(buildEdge(ue, personId, false));
+    if (includeUnconfirmed) {
+      var unconfirmedEdges = doc.unconfirmed_edges || [];
+      for (var uei = 0; uei < unconfirmedEdges.length; uei++) {
+        var ue = unconfirmedEdges[uei];
+        if (!ue.edge_id) continue;
+        if (!ue.target_person_id && !ue.with_person_id) continue;
+        if (!isEdgeTypeWanted(ue.edge_type)) continue;
+        if (!meetsConfidence(ue)) continue;
+        if (!canTraverseFrom(personId, ue)) continue;
+
+        if (visitedEdges[ue.edge_id]) continue;
+
+        var uNeighborId = ue.target_person_id || ue.with_person_id;
+        if (uNeighborId === personId) continue;
+
+        var uNeighborDoc = await getDoc(uNeighborId);
+        if (!uNeighborDoc) continue;
+        if (!canAccess(uNeighborDoc, callerScope)) continue;
+
+        visitedEdges[ue.edge_id] = true;
+        var uEdgeEntry = buildEdgeEntry(ue, personId);
+        uEdgeEntry.confirmed = false;
+        resultEdges.push(uEdgeEntry);
+
+        if (!visitedNodes[uNeighborId]) {
+          queue.push({ personId: uNeighborId, hop: hop + 1 });
+        }
+      }
     }
   }
 
-  var scopeApplied = 'state';
-  if (callerScope.unit_id) scopeApplied = 'unit:' + callerScope.unit_id;
-  else if (callerScope.district_id) scopeApplied = 'district:' + callerScope.district_id;
+  for (var ei = 0; ei < resultEdges.length; ei++) {
+    var e = resultEdges[ei];
+    if (e.confirmed === false) {
+      resultUnconfirmedEdges.push(e);
+    }
+  }
 
   return {
     root_person_id: rootPersonId,
-    nodes: nodes,
-    edges: edges,
-    unconfirmed_edges: unconfirmedEdges,
+    nodes: resultNodes,
+    edges: resultEdges,
+    unconfirmed_edges: resultUnconfirmedEdges,
     truncated: truncated,
-    hops_requested: actualHops,
-    scope_applied: scopeApplied
+    hops_requested: maxHops,
+    scope_applied: 'unknown',
+    nodes_visited: Object.keys(visitedNodes).length
   };
 }
 
-module.exports = { traverseGraph: traverseGraph };
+module.exports = {
+  bfs: bfs,
+  CANONICAL_EDGE_TYPES: CANONICAL_EDGE_TYPES,
+  UNDIRECTED_EDGE_TYPES: UNDIRECTED_EDGE_TYPES,
+  DIRECTED_EDGE_TYPES: DIRECTED_EDGE_TYPES,
+  MAX_ALLOWED_HOPS: MAX_ALLOWED_HOPS,
+  DEFAULT_MAX_NODES: DEFAULT_MAX_NODES,
+  ABSOLUTE_MAX_NODES: ABSOLUTE_MAX_NODES,
+  buildNodeEntry: buildNodeEntry,
+  buildEdgeEntry: buildEdgeEntry,
+  isValidEdgeType: isValidEdgeType,
+  isUndirected: isUndirected,
+  isDirected: isDirected
+};

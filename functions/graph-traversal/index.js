@@ -3,12 +3,25 @@
 var express = require('express');
 var helmet = require('helmet');
 var catalyst = require('zcatalyst-sdk-node');
-var { traverseGraph } = require('./bfs');
+var { TraversalService } = require('./traversalService');
 var { extractCallerScope } = require('./rbacFilter');
 
 var app = express();
 app.use(helmet());
 app.use(express.json({ limit: '5mb' }));
+
+var sharedInstance = null;
+
+function getInstance() {
+  if (!sharedInstance) {
+    sharedInstance = new TraversalService();
+  }
+  return sharedInstance;
+}
+
+function resetInstance() {
+  sharedInstance = null;
+}
 
 function getAppInstance(req) {
   try {
@@ -19,34 +32,70 @@ function getAppInstance(req) {
   }
 }
 
-/**
- * POST /traverse — traverse the crime graph from a root person.
- *
- * LLD §6.3 — API handler for network queries.
- *
- * Body: { person_id, hops?, max_nodes?, caller_scope? }
- */
+function normalizeBody(body) {
+  var personId = body.person_id || body.start_person_id;
+  if (!personId) return null;
+
+  var hops;
+  if (body.hops !== undefined && body.hops !== null) {
+    hops = parseInt(body.hops, 10);
+  } else if (body.max_depth !== undefined && body.max_depth !== null) {
+    hops = parseInt(body.max_depth, 10);
+  } else {
+    hops = 2;
+  }
+
+  if (hops < 0 || isNaN(hops)) hops = 2;
+
+  var maxNodes;
+  if (body.max_nodes !== undefined && body.max_nodes !== null) {
+    maxNodes = parseInt(body.max_nodes, 10);
+    if (isNaN(maxNodes) || maxNodes < 1) maxNodes = 50;
+  } else {
+    maxNodes = 50;
+  }
+
+  return {
+    person_id: personId,
+    max_hops: hops,
+    max_nodes: maxNodes,
+    include_unconfirmed: body.include_unconfirmed === true,
+    edge_type_filter: body.edge_types || body.edge_type_filter || null,
+    min_confidence: body.min_confidence || 0,
+    caller_scope: body.caller_scope || null
+  };
+}
+
 app.post('/traverse', async function (req, res) {
   var appInstance = getAppInstance(req);
   if (!appInstance) return;
 
   var body = req.body || {};
-  var personId = body.person_id;
-  var hops = parseInt(body.hops, 10) || 2;
-  var maxNodes = parseInt(body.max_nodes, 10) || 50;
+  var normalized = normalizeBody(body);
 
-  if (!personId) {
+  if (!normalized) {
     res.status(400).json({
       status: 'error', error_code: 'MISSING_PERSON_ID',
-      message: 'person_id is required'
+      message: 'person_id or start_person_id is required'
     });
     return;
   }
 
   var callerScope = extractCallerScope(req);
 
+  var service;
   try {
-    var result = await traverseGraph(appInstance, personId, hops, maxNodes, callerScope);
+    service = getInstance();
+    service.setAppInstance(appInstance);
+
+    var result = await service.traverse(normalized.person_id, {
+      max_hops: normalized.max_hops,
+      max_nodes: normalized.max_nodes,
+      include_unconfirmed: normalized.include_unconfirmed,
+      edge_type_filter: normalized.edge_type_filter,
+      min_confidence: normalized.min_confidence,
+      caller_scope: callerScope
+    });
 
     res.status(200).json({
       status: 'ok',
@@ -61,9 +110,6 @@ app.post('/traverse', async function (req, res) {
   }
 });
 
-/**
- * GET / — health check.
- */
 app.get('/', function (req, res) {
   res.status(200).json({
     status: 'ok',
@@ -73,3 +119,6 @@ app.get('/', function (req, res) {
 });
 
 module.exports = app;
+module.exports.TraversalService = TraversalService;
+module.exports.getInstance = getInstance;
+module.exports.resetInstance = resetInstance;
