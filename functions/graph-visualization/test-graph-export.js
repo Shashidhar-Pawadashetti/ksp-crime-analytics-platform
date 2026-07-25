@@ -738,6 +738,167 @@ console.log('\n=== Graph Visualization Tests ===\n');
   });
 })();
 
+// ===============================================
+// 12. Stylesheet — class-based selectors
+// ===============================================
+(function () {
+  console.log('\n12. Stylesheet Class-Based Selectors');
+
+  test('buildStylesheet creates one selector per unique node style, not per node', function () {
+    var nodes = [
+      { data: { id: 'PM_001', classes: 'style-accused', node_style: { color: '#E53935', borderColor: '#B71C1C', icon: 'user-tie' } } },
+      { data: { id: 'PM_002', classes: 'style-accused', node_style: { color: '#E53935', borderColor: '#B71C1C', icon: 'user-tie' } } },
+      { data: { id: 'PM_003', classes: 'style-victim', node_style: { color: '#FF9800', borderColor: '#E65100', icon: 'user-injured' } } }
+    ];
+    var edges = [];
+    var ss = require('./cytoscapeFormatter').buildStylesheet(nodes, edges);
+    var nodeSelectors = ss.filter(function (s) { return s.selector.indexOf('node.') === 0; });
+    assert.strictEqual(nodeSelectors.length, 2, 'expected 2 unique node style selectors, got ' + nodeSelectors.length);
+    assert(nodeSelectors[0].selector.indexOf('node#') === -1, 'should not have ID-based selectors');
+    assert(nodeSelectors[0].selector.indexOf('style-accused') >= 0 || nodeSelectors[1].selector.indexOf('style-accused') >= 0);
+  });
+
+  test('every formatted node has data.classes matching a stylesheet selector', function () {
+    var raw = [
+      { person_id: 'PM_001', canonical_name: 'A', roles_summary: { accused_count: 1, victim_count: 0, complainant_count: 0 }, hop_distance: 0 },
+      { person_id: 'PM_002', canonical_name: 'B', roles_summary: { accused_count: 0, victim_count: 1, complainant_count: 0 }, hop_distance: 1 }
+    ];
+    var formatted = formatNodes(raw, { PM_001: 0, PM_002: 0 });
+    assert(formatted[0].data.classes);
+    assert(formatted[0].data.classes.indexOf('style-') === 0);
+    assert(formatted[1].data.classes.indexOf('style-') === 0);
+    assert.notStrictEqual(formatted[0].data.classes, formatted[1].data.classes);
+  });
+
+  test('edges get style- prefixed classes', function () {
+    var edges = formatEdges([
+      { edge_id: 'E001', from: 'PM_001', to: 'PM_002', edge_type: 'CO_ACCUSED' },
+      { edge_id: 'E002', from: 'PM_001', to: 'PM_003', edge_type: 'ACCUSED_TO_VICTIM' }
+    ]);
+    assert(edges[0].data.classes);
+    assert(edges[0].data.classes.indexOf('style-') === 0);
+    assert(edges[1].data.classes.indexOf('style-') === 0);
+    assert.notStrictEqual(edges[0].data.classes, edges[1].data.classes);
+  });
+})();
+
+// ===============================================
+// 13. hop_distance propagation
+// ===============================================
+(function () {
+  console.log('\n13. hop_distance Propagation');
+
+  test('formatNodes preserves hop_distance from traversal result', function () {
+    var nodes = formatNodes([
+      { person_id: 'PM_ROOT', canonical_name: 'Root', roles_summary: { accused_count: 1, victim_count: 0, complainant_count: 0 }, hop_distance: 0 },
+      { person_id: 'PM_NBR', canonical_name: 'Neighbour', roles_summary: { accused_count: 0, victim_count: 1, complainant_count: 0 }, hop_distance: 1 },
+      { person_id: 'PM_2HOP', canonical_name: 'Deep', roles_summary: { accused_count: 0, victim_count: 0, complainant_count: 1 }, hop_distance: 2 }
+    ], { PM_ROOT: 2, PM_NBR: 1, PM_2HOP: 0 });
+    assert.strictEqual(nodes[0].data.hop_distance, 0);
+    assert.strictEqual(nodes[1].data.hop_distance, 1);
+    assert.strictEqual(nodes[2].data.hop_distance, 2);
+  });
+
+  test('toCytoscape preserves hop_distance for root and neighbours', function () {
+    var result = toCytoscape({
+      nodes: [
+        { person_id: 'PM_ROOT', canonical_name: 'Root', roles_summary: { accused_count: 1, victim_count: 0, complainant_count: 0 }, hop_distance: 0 },
+        { person_id: 'PM_NBR', canonical_name: 'Nbr', roles_summary: { accused_count: 0, victim_count: 1, complainant_count: 0 }, hop_distance: 1 }
+      ],
+      edges: [{ edge_id: 'E001', from: 'PM_ROOT', to: 'PM_NBR', edge_type: 'CO_ACCUSED', weight: 1 }],
+      statistics: {}
+    });
+    assert.strictEqual(result.elements.nodes[0].data.hop_distance, 0);
+    assert.strictEqual(result.elements.nodes[1].data.hop_distance, 1);
+  });
+})();
+
+// ===============================================
+// 14. Edge Semantic Classes
+// ===============================================
+(function () {
+  console.log('\n14. Edge Semantic Classes');
+
+  var edgeClassForType = require('./cytoscapeFormatter').edgeClassForType;
+
+  test('CO_ACCUSED maps to style-co-accused', function () {
+    var cls = edgeClassForType('CO_ACCUSED');
+    assert.strictEqual(cls, 'style-co-accused');
+  });
+
+  test('ACCUSED_TO_VICTIM maps to style-accused-to-victim', function () {
+    var cls = edgeClassForType('ACCUSED_TO_VICTIM');
+    assert.strictEqual(cls, 'style-accused-to-victim');
+  });
+
+  test('SHARED_LOCATION maps to style-shared-location', function () {
+    var cls = edgeClassForType('SHARED_LOCATION');
+    assert.strictEqual(cls, 'style-shared-location');
+  });
+
+  test('CANDIDATE_MATCH maps to style-candidate-match', function () {
+    var cls = edgeClassForType('CANDIDATE_MATCH');
+    assert.strictEqual(cls, 'style-candidate-match');
+  });
+
+  test('no generated class name contains # character', function () {
+    var types = ['CO_ACCUSED', 'ACCUSED_TO_VICTIM', 'SHARED_LOCATION', 'CANDIDATE_MATCH'];
+    for (var ti = 0; ti < types.length; ti++) {
+      var cls = edgeClassForType(types[ti]);
+      assert.ok(cls.indexOf('#') === -1, types[ti] + ' class should not contain #');
+    }
+  });
+
+  test('two edges of same type share same semantic class value', function () {
+    var edges = formatEdges([
+      { edge_id: 'E001', from: 'PM_001', to: 'PM_002', edge_type: 'CO_ACCUSED' },
+      { edge_id: 'E002', from: 'PM_003', to: 'PM_004', edge_type: 'CO_ACCUSED' }
+    ]);
+    assert.strictEqual(edges[0].data.classes, edges[1].data.classes);
+  });
+
+  test('shared class selector styles both edges correctly', function () {
+    var rawEdges = [
+      { edge_id: 'E001', from: 'PM_001', to: 'PM_002', edge_type: 'CO_ACCUSED' },
+      { edge_id: 'E002', from: 'PM_003', to: 'PM_004', edge_type: 'CO_ACCUSED' }
+    ];
+    var formatted = formatEdges(rawEdges);
+    var ss = require('./cytoscapeFormatter').buildStylesheet([], formatted);
+    var coAccusedSelector = ss.filter(function (s) {
+      return s.selector === 'edge.style-co-accused';
+    });
+    assert.strictEqual(coAccusedSelector.length, 1, 'expected exactly 1 selector for style-co-accused');
+  });
+
+  test('CANDIDATE_MATCH is undirected', function () {
+    var edges = formatEdges([
+      { edge_id: 'E_cm', from: 'PM_001', to: 'PM_002', edge_type: 'CANDIDATE_MATCH' }
+    ]);
+    assert.strictEqual(edges[0].data.directed, false);
+  });
+
+  test('ACCUSED_TO_VICTIM remains directed', function () {
+    var edges = formatEdges([
+      { edge_id: 'E_atv', from: 'PM_001', to: 'PM_003', edge_type: 'ACCUSED_TO_VICTIM' }
+    ]);
+    assert.strictEqual(edges[0].data.directed, true);
+  });
+
+  test('hop_distance preserved (root=0, neighbour=1)', function () {
+    var nodes = formatNodes([
+      { person_id: 'PM_ROOT', canonical_name: 'Root', roles_summary: { accused_count: 1, victim_count: 0, complainant_count: 0 }, hop_distance: 0 },
+      { person_id: 'PM_NBR', canonical_name: 'Nbr', roles_summary: { accused_count: 0, victim_count: 1, complainant_count: 0 }, hop_distance: 1 }
+    ], { PM_ROOT: 1, PM_NBR: 0 });
+    assert.strictEqual(nodes[0].data.hop_distance, 0);
+    assert.strictEqual(nodes[1].data.hop_distance, 1);
+  });
+
+  test('CANDIDATE_MATCH is not UNCONFIRMED_MATCH — no legacy refs', function () {
+    var cls = edgeClassForType('CANDIDATE_MATCH');
+    assert.ok(cls.indexOf('unconfirmed') === -1, 'class should not reference unconfirmed');
+  });
+})();
+
 // All async tests collected — run them now
 Promise.all(asyncPromises).then(function () {
   console.log('\n=== Summary ===');

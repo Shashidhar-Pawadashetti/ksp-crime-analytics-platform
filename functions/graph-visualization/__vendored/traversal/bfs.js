@@ -37,12 +37,13 @@ function isValidEdgeType(edgeType) {
   return !!CANONICAL_EDGE_TYPES[edgeType.toUpperCase()];
 }
 
-function buildNodeEntry(doc) {
+function buildNodeEntry(doc, hop) {
   return {
     person_id: doc.person_id,
     canonical_name: doc.canonical_name || '',
     name_normalised: doc.name_normalised || '',
     roles_summary: doc.roles_summary || {},
+    hop_distance: hop !== undefined ? hop : 0,
     source_records: (doc.source_records || []).map(function (sr) {
       return { table: sr.table, case_id: sr.case_id };
     })
@@ -138,7 +139,7 @@ async function bfs(rootPersonId, options, context) {
     if (!canAccess(doc, callerScope)) continue;
 
     visitedNodes[personId] = true;
-    resultNodes.push(buildNodeEntry(doc));
+    resultNodes.push(buildNodeEntry(doc, hop));
 
     if (hop >= maxHops) continue;
 

@@ -20,20 +20,27 @@ var DIRECTED_EDGE_TYPES = {
   ACCUSED_TO_VICTIM: true
 };
 
+function getEdgeType(edgeObj) {
+  return (edgeObj.edge_type || edgeObj.type || '').toUpperCase();
+}
+
 var MAX_ALLOWED_HOPS = 3;
 var DEFAULT_MAX_NODES = 50;
 var ABSOLUTE_MAX_NODES = 100;
 
 function isUndirected(edgeType) {
-  return !!UNDIRECTED_EDGE_TYPES[edgeType];
+  if (!edgeType) return false;
+  return !!UNDIRECTED_EDGE_TYPES[edgeType.toUpperCase()];
 }
 
 function isDirected(edgeType) {
-  return !!DIRECTED_EDGE_TYPES[edgeType];
+  if (!edgeType) return false;
+  return !!DIRECTED_EDGE_TYPES[edgeType.toUpperCase()];
 }
 
 function isValidEdgeType(edgeType) {
-  return !!CANONICAL_EDGE_TYPES[edgeType];
+  if (!edgeType) return false;
+  return !!CANONICAL_EDGE_TYPES[edgeType.toUpperCase()];
 }
 
 function buildNodeEntry(doc) {
@@ -91,6 +98,8 @@ async function bfs(rootPersonId, options, context) {
   var truncated = false;
 
   function isEdgeTypeWanted(edgeType) {
+    if (!edgeType) return false;
+    edgeType = edgeType.toUpperCase();
     if (!isValidEdgeType(edgeType)) return false;
     if (edgeTypeFilter && edgeTypeFilter.indexOf(edgeType) === -1) return false;
     return true;
@@ -102,7 +111,7 @@ async function bfs(rootPersonId, options, context) {
   }
 
   function canTraverseFrom(currentPersonId, edgeObj) {
-    var edgeType = edgeObj.edge_type || edgeObj.type;
+    var edgeType = getEdgeType(edgeObj);
     if (isUndirected(edgeType)) return true;
     if (isDirected(edgeType)) {
       var sourceId = edgeObj.source_person_id || currentPersonId;
@@ -135,7 +144,6 @@ async function bfs(rootPersonId, options, context) {
 
     if (!canAccess(doc, callerScope)) continue;
 
-    nodes.push(buildNode(doc, hop));
     visitedNodes[personId] = true;
     resultNodes.push(buildNodeEntry(doc));
 
@@ -146,7 +154,7 @@ async function bfs(rootPersonId, options, context) {
       var ce = confirmedEdges[cei];
       if (!ce.edge_id) continue;
       if (!ce.target_person_id && !ce.with_person_id) continue;
-      if (!isEdgeTypeWanted(ce.edge_type || ce.type)) continue;
+      if (!isEdgeTypeWanted(getEdgeType(ce))) continue;
       if (!meetsConfidence(ce)) continue;
       if (!canTraverseFrom(personId, ce)) continue;
 
@@ -173,7 +181,7 @@ async function bfs(rootPersonId, options, context) {
         var ue = unconfirmedEdges[uei];
         if (!ue.edge_id) continue;
         if (!ue.target_person_id && !ue.with_person_id) continue;
-        if (!isEdgeTypeWanted(ue.edge_type || ue.type)) continue;
+        if (!isEdgeTypeWanted(getEdgeType(ue))) continue;
         if (!meetsConfidence(ue)) continue;
         if (!canTraverseFrom(personId, ue)) continue;
 
@@ -219,6 +227,7 @@ async function bfs(rootPersonId, options, context) {
 
 module.exports = {
   bfs: bfs,
+  getEdgeType: getEdgeType,
   CANONICAL_EDGE_TYPES: CANONICAL_EDGE_TYPES,
   UNDIRECTED_EDGE_TYPES: UNDIRECTED_EDGE_TYPES,
   DIRECTED_EDGE_TYPES: DIRECTED_EDGE_TYPES,
