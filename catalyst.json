@@ -15,7 +15,10 @@
       "graph-traversal",
       "personmaster-api",
       "pm-migration",
-      "sync-full-job"
+      "sync-full-job",
+      "validation",
+      "network-analysis",
+      "graph-service"
     ],
     "ignore": [],
     "source": "functions"

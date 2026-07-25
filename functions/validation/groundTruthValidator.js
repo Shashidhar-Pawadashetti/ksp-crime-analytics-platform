@@ -65,32 +65,47 @@ function parseResponse(result) {
 
 async function loadAllDocuments(appInstance) {
   var { NoSQLEnum, NoSQLMarshall } = require('zcatalyst-sdk-node/lib/no-sql');
+  var { NoSQLOperator } = NoSQLEnum;
+
   var noSql = appInstance.nosql();
   var table = await noSql.getTable(PM_TABLE);
-  var allDocs = [];
-  var nextToken = null;
 
-  for (var iter = 0; iter < 20; iter++) {
-    var queryParams = {
+  var allDocs = [];
+  var lastKey = null;
+  var hasMore = true;
+
+  while (hasMore) {
+    var queryBody = {
       key_condition: {
-        attribute: ['type'],
-        operator: NoSQLEnum.NoSQLOperator.EQUALS,
+        attribute: 'type',
+        operator: NoSQLOperator.EQUALS,
         value: NoSQLMarshall.makeString('PM')
       },
-      limit: 1000
+      limit: 100,
+      consistent_read: true
     };
-    if (nextToken) queryParams.next_token = nextToken;
 
-    var result = await table.queryTable(queryParams);
-    var docs = parseResponse(result);
-    allDocs = allDocs.concat(docs);
-
-    try {
-      nextToken = result.getNextToken();
-    } catch (e) {
-      nextToken = null;
+    if (lastKey) {
+      queryBody.start_key = lastKey;
     }
-    if (!nextToken || docs.length === 0) break;
+
+    var response = await table.queryTable(queryBody);
+    var items = response.getResponseData();
+
+    if (items && items.length > 0) {
+      for (var di = 0; di < items.length; di++) {
+        var data = items[di];
+        if (data && data.item) {
+          var doc = data.item.to();
+          if (doc && doc.person_id) {
+            allDocs.push(doc);
+          }
+        }
+      }
+    }
+
+    lastKey = response.start_key;
+    hasMore = (lastKey != null) && (items && items.length > 0);
   }
 
   return allDocs;
@@ -185,6 +200,11 @@ async function validateAgainstGroundTruth(appInstance, options) {
         recall: 0,
         f1_score: 0,
         cluster_purity: 0,
+        personmaster_documents_loaded: 0,
+        accused_source_records_seen: 0,
+        accused_ids_extracted: 0,
+        accused_ids_failed_extraction: 0,
+        duplicate_accused_ids: 0,
         limitations: [
           'Ground truth covers seeded recurring Accused identities only.',
           'Victim and Complainant cross-role entity resolution is not evaluated.'
@@ -212,6 +232,11 @@ async function validateAgainstGroundTruth(appInstance, options) {
       recall: 0,
       f1_score: 0,
       cluster_purity: 0,
+      personmaster_documents_loaded: 0,
+      accused_source_records_seen: 0,
+      accused_ids_extracted: 0,
+      accused_ids_failed_extraction: 0,
+      duplicate_accused_ids: 0,
       limitations: [
         'Ground truth covers seeded recurring Accused identities only.',
         'Victim and Complainant cross-role entity resolution is not evaluated.'
@@ -235,16 +260,66 @@ async function validateAgainstGroundTruth(appInstance, options) {
   /* Load PersonMaster documents */
   var documents = await loadAllDocuments(appInstance);
 
-  /* Build PersonMaster map: accusedMasterId -> person_id */
+  /* --- TASK 1: PersonMaster loading diagnostics --- */
+  var pmDiagnostics = {
+    personmaster_documents_loaded: documents.length,
+    sample_documents: []
+  };
+
+  if (documents.length > 0) {
+    var sampleSize = Math.min(3, documents.length);
+    for (var si = 0; si < sampleSize; si++) {
+      var doc = documents[si];
+      var srcRecords = doc.source_records || [];
+      var sampleSrc = srcRecords.slice(0, 3).map(function (sr) {
+        var allKeys = sr ? Object.keys(sr) : [];
+        var kv = {};
+        for (var ki = 0; ki < allKeys.length; ki++) {
+          kv[allKeys[ki]] = sr[allKeys[ki]];
+        }
+        return kv;
+      });
+      pmDiagnostics.sample_documents.push({
+        person_id: doc.person_id,
+        type: doc.type,
+        all_doc_keys: doc ? Object.keys(doc) : [],
+        source_records_count: srcRecords.length,
+        sample_source_records: sampleSrc
+      });
+    }
+  }
+
+  /* --- TASK 2: Build predicted map with instrumentation --- */
+  var buildDiag = {
+    accused_source_records_seen: 0,
+    accused_ids_extracted: 0,
+    accused_ids_failed_extraction: 0,
+    duplicate_accused_ids: 0,
+    failed_source_id_sample: []
+  };
+
   var accusedToPM = {};
   documents.forEach(function (doc) {
     var pid = doc.person_id;
     if (!pid) return;
     (doc.source_records || []).forEach(function (sr) {
       if (sr.table !== 'Accused') return;
-      var accusedId = extractAccusedId(sr.row_id);
-      if (accusedId != null && accusedToGT[accusedId] != null) {
-        accusedToPM[accusedId] = pid;
+      buildDiag.accused_source_records_seen++;
+      var accusedSourceId = sr.source_id ?? sr.row_id;
+      var accusedId = extractAccusedId(accusedSourceId);
+      if (accusedId != null) {
+        if (accusedToGT[accusedId] != null) {
+          if (accusedToPM[accusedId] != null) {
+            buildDiag.duplicate_accused_ids++;
+          }
+          accusedToPM[accusedId] = pid;
+          buildDiag.accused_ids_extracted++;
+        }
+      } else {
+        buildDiag.accused_ids_failed_extraction++;
+        if (buildDiag.failed_source_id_sample.length < 10) {
+          buildDiag.failed_source_id_sample.push(accusedSourceId);
+        }
       }
     });
   });
@@ -280,6 +355,13 @@ async function validateAgainstGroundTruth(appInstance, options) {
       f1_score: 0,
       cluster_purity: 0,
       message: 'Need at least 2 mapped accused records for pairwise metrics.',
+      personmaster_documents_loaded: pmDiagnostics.personmaster_documents_loaded,
+      sample_documents: pmDiagnostics.sample_documents,
+      accused_source_records_seen: buildDiag.accused_source_records_seen,
+      accused_ids_extracted: buildDiag.accused_ids_extracted,
+      accused_ids_failed_extraction: buildDiag.accused_ids_failed_extraction,
+      duplicate_accused_ids: buildDiag.duplicate_accused_ids,
+      failed_source_id_sample: buildDiag.failed_source_id_sample,
       limitations: [
         'Ground truth covers seeded recurring Accused identities only.',
         'Victim and Complainant cross-role entity resolution is not evaluated.'
@@ -322,6 +404,13 @@ async function validateAgainstGroundTruth(appInstance, options) {
     recall: round4(recall),
     f1_score: round4(f1),
     cluster_purity: round4(purityResult.average_purity),
+    personmaster_documents_loaded: pmDiagnostics.personmaster_documents_loaded,
+    sample_documents: pmDiagnostics.sample_documents,
+    accused_source_records_seen: buildDiag.accused_source_records_seen,
+    accused_ids_extracted: buildDiag.accused_ids_extracted,
+    accused_ids_failed_extraction: buildDiag.accused_ids_failed_extraction,
+    duplicate_accused_ids: buildDiag.duplicate_accused_ids,
+    failed_source_id_sample: buildDiag.failed_source_id_sample,
     limitations: [
       'Ground truth covers seeded recurring Accused identities only.',
       'Victim and Complainant cross-role entity resolution is not evaluated.'
@@ -347,5 +436,6 @@ module.exports = {
   computePairwiseMetrics: computePairwiseMetrics,
   computeClusterPurity: computeClusterPurity,
   extractAccusedId: extractAccusedId,
-  parseCSV: parseCSV
+  parseCSV: parseCSV,
+  loadAllDocuments: loadAllDocuments
 };

@@ -4,9 +4,10 @@ const express = require('express');
 const helmet = require('helmet');
 const catalyst = require('zcatalyst-sdk-node');
 
-const { route: routeRequest } = require('./routes');
+const { route: routeRequest, setAppInstance } = require('./routes');
 const { NetworkAnalysisService } = require('./networkAnalysisService');
 const validators = require('./validators');
+const { extractCallerScope } = require('./traversal/rbacFilter');
 
 const expressApp = express();
 expressApp.use(helmet());
@@ -35,27 +36,37 @@ expressApp.get('/', (req, res) => {
 });
 
 expressApp.get('/person/:personId', async (req, res) => {
-  const routeRes = await routeRequest({ url: req.originalUrl, method: req.method });
+  var appInstance = getAppInstance(req);
+  if (appInstance) setAppInstance(appInstance);
+  const routeRes = await routeRequest(req);
   res.status(routeRes.statusCode || 200).set(routeRes.headers || {}).send(routeRes.body);
 });
 
 expressApp.get('/person/:personId/associates', async (req, res) => {
-  const routeRes = await routeRequest({ url: req.originalUrl, method: req.method });
+  var appInstance = getAppInstance(req);
+  if (appInstance) setAppInstance(appInstance);
+  const routeRes = await routeRequest(req);
   res.status(routeRes.statusCode || 200).set(routeRes.headers || {}).send(routeRes.body);
 });
 
 expressApp.get('/person/:personId/co-accused', async (req, res) => {
-  const routeRes = await routeRequest({ url: req.originalUrl, method: req.method });
+  var appInstance = getAppInstance(req);
+  if (appInstance) setAppInstance(appInstance);
+  const routeRes = await routeRequest(req);
   res.status(routeRes.statusCode || 200).set(routeRes.headers || {}).send(routeRes.body);
 });
 
 expressApp.get('/person/:personId/victims', async (req, res) => {
-  const routeRes = await routeRequest({ url: req.originalUrl, method: req.method });
+  var appInstance = getAppInstance(req);
+  if (appInstance) setAppInstance(appInstance);
+  const routeRes = await routeRequest(req);
   res.status(routeRes.statusCode || 200).set(routeRes.headers || {}).send(routeRes.body);
 });
 
 expressApp.get('/person/:personId/network-summary', async (req, res) => {
-  const routeRes = await routeRequest({ url: req.originalUrl, method: req.method });
+  var appInstance = getAppInstance(req);
+  if (appInstance) setAppInstance(appInstance);
+  const routeRes = await routeRequest(req);
   res.status(routeRes.statusCode || 200).set(routeRes.headers || {}).send(routeRes.body);
 });
 
@@ -70,7 +81,10 @@ expressApp.post('/analyze', async (req, res) => {
     return res.status(400).json({ status: 'error', error_code: 'VALIDATION_ERROR', message: 'Validation failed', details: errors });
   }
 
-  const service = new NetworkAnalysisService();
+  var appInstance = getAppInstance(req);
+  var callerScope = extractCallerScope(req);
+  const service = new NetworkAnalysisService({ appInstance: appInstance });
+  service.setCallerScope(callerScope);
   try {
     const person = await service.getPerson(person_id);
     if (!person) {

@@ -31,7 +31,7 @@ GraphService.prototype.getNeighbours = async function (personId) {
 
   for (var ei = 0; ei < edges.length; ei++) {
     var e = edges[ei];
-    var otherId = e.source === personId ? e.target : e.source;
+    var otherId = e.source_person_id === personId ? e.target_person_id : e.source_person_id;
     neighbourSet[otherId] = true;
   }
 
@@ -57,6 +57,10 @@ GraphService.prototype.getDegree = async function (personId) {
 GraphService.prototype.personExists = async function (personId) {
   await this._ensureLoaded();
   return this._cache.nodeExists(personId);
+};
+
+GraphService.prototype.hasNode = async function (personId) {
+  return this.personExists(personId);
 };
 
 GraphService.prototype.getPersonsByRole = async function (role) {
@@ -96,7 +100,16 @@ GraphService.prototype.getGraphStatistics = async function () {
   await this._ensureLoaded();
   var nodes = this._cache.getNodes();
   var edges = this._cache.getEdges();
-  return computeStats(nodes, edges);
+  var diagnostics = this._cache.getDiagnostics();
+  var stats = computeStats(nodes, edges);
+  stats.diagnostics = diagnostics;
+  stats.cache_version = this._cache.getVersion();
+  stats.cache_loaded_at = this._cache.getLoadedAt();
+  return stats;
+};
+
+GraphService.prototype.getStats = async function () {
+  return this.getGraphStatistics();
 };
 
 GraphService.prototype.reload = async function () {
@@ -108,12 +121,19 @@ GraphService.prototype.clearCache = function () {
 };
 
 GraphService.prototype.getCacheInfo = function () {
-  return {
+  var info = {
     loaded: this._cache.isLoaded(),
     loadedAt: this._cache.getLoadedAt(),
+    version: this._cache.getVersion(),
+    loadErrors: this._cache.getLoadErrors(),
     nodeCount: this._cache.isLoaded() ? this._cache.getNodes().length : 0,
     edgeCount: this._cache.isLoaded() ? this._cache.getEdges().length : 0
   };
+  var diagnostics = this._cache.getDiagnostics();
+  if (diagnostics) {
+    info.diagnostics = diagnostics;
+  }
+  return info;
 };
 
 module.exports = { GraphService };

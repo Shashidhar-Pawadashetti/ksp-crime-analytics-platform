@@ -2,7 +2,7 @@
   "deployment": {
     "name": "sync-full-job",
     "stack": "node24",
-    "type": "advancedio",
+    "type": "job",
     "env_variables": {}
   },
   "execution": {

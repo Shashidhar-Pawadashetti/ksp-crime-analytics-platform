@@ -452,6 +452,9 @@ app.use(function (err, req, res, next) {
 /*  Incremental Reconciliation — Phase 4.2.3 Milestone 2               */
 /* ------------------------------------------------------------------ */
 
+var auditLog = require('../personmaster-writer/resolution-audit-log');
+var { THRESHOLD } = require('../entity-matching-engine/threshold');
+
 /* Load lazily to avoid circular dependency with incrementalResolver */
 var incrementalResolve = null;
 
@@ -476,10 +479,11 @@ app.post('/reconcile', async function (req, res) {
     return;
   }
 
-  try {
-    var runId = 'REC-' + Date.now().toString(36).toUpperCase();
-    console.log('[sync] === Reconcile Run [' + runId + '] ===');
+  var runId = 'REC-' + Date.now().toString(36).toUpperCase();
+  var t0 = Date.now();
+  console.log('[sync] === Reconcile Run [' + runId + '] ===');
 
+  try {
     /* Step 1: Run change detection */
     var changeResult = await detectChanges(appInstance);
 
@@ -487,10 +491,55 @@ app.post('/reconcile', async function (req, res) {
     var resolveFn = getIncrementalResolver();
     var resolveResult = await resolveFn(appInstance, changeResult, { runId: runId });
 
-    /* Step 3: Return combined result */
+    /* Step 3: Audit log — SUCCESS */
+    try {
+      await auditLog.createAuditRecord(appInstance, {
+        runId: runId,
+        runType: 'incremental',
+        triggerType: 'api',
+        startedAt: new Date(t0).toISOString(),
+        completedAt: new Date().toISOString(),
+        status: 'SUCCESS',
+        thresholdUsed: Number(THRESHOLD),
+        documentsCreated: resolveResult.new_documents || 0,
+        documentsUpdated: resolveResult.documents_rebuilt || 0,
+        personsProcessed: resolveResult.persons_processed || 0,
+        confirmedEdgesWritten: resolveResult.confirmed_edges_written || 0,
+        unconfirmedEdgesWritten: resolveResult.unconfirmed_edges_written || 0,
+        errorCount: (changeResult.load_errors || []).length,
+        errorMessage: ''
+      });
+    } catch (auditErr) {
+      console.error('[sync] Audit log write failed: ' + auditErr.message);
+    }
+
+    /* Step 4: Return combined result */
     res.status(200).json({ status: 'ok', data: { detection: changeResult, resolution: resolveResult } });
   } catch (err) {
     console.error('[sync] Reconcile failed: ' + err.message);
+
+    /* Audit log — FAILED (never misleading SUCCESS) */
+    try {
+      await auditLog.createAuditRecord(appInstance, {
+        runId: runId,
+        runType: 'incremental',
+        triggerType: 'api',
+        startedAt: new Date(t0).toISOString(),
+        completedAt: new Date().toISOString(),
+        status: 'FAILED',
+        thresholdUsed: Number(THRESHOLD),
+        documentsCreated: 0,
+        documentsUpdated: 0,
+        personsProcessed: 0,
+        confirmedEdgesWritten: 0,
+        unconfirmedEdgesWritten: 0,
+        errorCount: 1,
+        errorMessage: err.message
+      });
+    } catch (auditErr) {
+      console.error('[sync] Audit log write failed on error path: ' + auditErr.message);
+    }
+
     res.status(500).json({
       status: 'error',
       error_code: 'RECONCILE_FAILED',

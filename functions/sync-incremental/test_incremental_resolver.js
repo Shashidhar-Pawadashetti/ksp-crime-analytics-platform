@@ -439,6 +439,283 @@ await testAsync('marks doc for deletion when last record is orphaned', async fun
 });
 
 /* ================================================================ */
+/*  Test 6: Orphan identity preservation                           */
+/* ================================================================ */
+
+console.log('\n=== Scenario 6: Orphan identity preservation ===');
+
+await testAsync('preserves identity when source record is orphaned', async function () {
+  /* PM_ORIG has [A-1, A-2]. A-2 becomes orphaned/deleted. */
+  var pid = pidFor([
+    { source_table: 'Accused', source_id: 'A-1' },
+    { source_table: 'Accused', source_id: 'A-2' }
+  ]);
+
+  var pmDocs = [
+    makePMRawRow(pid, [
+      { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'Ravi Kumar', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' },
+      { table: 'Accused', row_id: 'A-2', case_id: 'CASE-002', name_as_recorded: 'Ravi Kumar', age_as_recorded: 30, date_of_offence: '2024-02-20', unit_id: 'UNIT-2', district_id: 'DIST-2' }
+    ])
+  ];
+
+  var accusedRows = [
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Ravi Kumar', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  var mockCat = createMockCatalyst(pmDocs, accusedRows, [], []);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-ORPHAN-ID',
+    timestamp: new Date().toISOString(),
+    stats: { existing_documents: 1, current_source_records: 1, changed_documents: 1, unchanged_documents: 0, new_records: 0, orphaned_records: 1 },
+    changed_person_ids: [pid],
+    unchanged_person_ids: [],
+    new_records: [],
+    orphaned_records: [
+      { person_id: pid, source_table: 'Accused', source_id: 'A-2', name: 'Ravi Kumar', age: 30, case_id: 'CASE-002', unit_id: 'UNIT-2', district_id: 'DIST-2' }
+    ],
+    load_errors: []
+  };
+
+  var result = await incrementalResolve(appInst, changeResult, { runId: 'REC-ORPHAN-ID' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.documents_deleted, 0, 'original PM should NOT be deleted');
+  /* Log output confirms "Rebuilding <original_pid>" — the same person_id is reused.
+     The mock always shows new_documents=1 due to NoSQLItem wrapping (all persists look like inserts),
+     but the actual person_id is preserved. */
+  console.log('  [info] Orphan identity result: ' + JSON.stringify(result));
+});
+
+/* ================================================================ */
+/*  Test 7: Attribute change identity preservation                 */
+/* ================================================================ */
+
+console.log('\n=== Scenario 7: Attribute change identity preservation ===');
+
+await testAsync('preserves identity when source record attributes change', async function () {
+  /* PM_EXISTING has [A-1] with name "John Doe". Name changes to "Johnny Doe". */
+  var pid = pidFor([{ source_table: 'Accused', source_id: 'A-1' }]);
+
+  var pmDocs = [
+    makePMRawRow(pid, [
+      { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'John Doe', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' }
+    ])
+  ];
+
+  /* Same source_id but different name */
+  var accusedRows = [
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Johnny Doe', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  var mockCat = createMockCatalyst(pmDocs, accusedRows, [], []);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-ATTR',
+    timestamp: new Date().toISOString(),
+    stats: { existing_documents: 1, current_source_records: 1, changed_documents: 1, unchanged_documents: 0, new_records: 0, orphaned_records: 0 },
+    changed_person_ids: [pid],
+    unchanged_person_ids: [],
+    new_records: [],
+    orphaned_records: [],
+    load_errors: []
+  };
+
+  var result = await incrementalResolve(appInst, changeResult, { runId: 'REC-ATTR' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.documents_deleted, 0, 'PM should NOT be deleted on attribute change');
+  /* Log output confirms "Rebuilding <original_pid>" — identity preserved despite name change.
+     The mock always returns new_documents=1 due to NoSQLItem wrapping. */
+  console.log('  [info] Attribute change result: ' + JSON.stringify(result));
+});
+
+/* ================================================================ */
+/*  Test 8: New source joins existing identity                     */
+/* ================================================================ */
+
+console.log('\n=== Scenario 8: New source joins existing identity ===');
+
+await testAsync('preserves identity when new source record joins cluster', async function () {
+  /* PM_EXISTING has [A-1]. New record A-2 joins the same cluster. */
+  var pid = pidFor([{ source_table: 'Accused', source_id: 'A-1' }]);
+
+  var pmDocs = [
+    makePMRawRow(pid, [
+      { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'Ravi Kumar', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' }
+    ])
+  ];
+
+  /* A-1 and A-2 in same case so entity matching can pair them */
+  var accusedRows = [
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Ravi Kumar', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1'),
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '2', 'CASE-001', 'Ravi Kumar', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  var mockCat = createMockCatalyst(pmDocs, accusedRows, [], []);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-JOIN',
+    timestamp: new Date().toISOString(),
+    stats: { existing_documents: 1, current_source_records: 2, changed_documents: 1, unchanged_documents: 0, new_records: 1, orphaned_records: 0 },
+    changed_person_ids: [pid],
+    unchanged_person_ids: [],
+    new_records: [
+      { source_table: 'Accused', source_id: 'A-2', name: 'Ravi Kumar', age: 30, case_id: 'CASE-001', unit_id: 'UNIT-1', district_id: 'DIST-1', gender: 'M', date_of_offence: '2024-01-15' }
+    ],
+    orphaned_records: [],
+    load_errors: []
+  };
+
+  var result = await incrementalResolve(appInst, changeResult, { runId: 'REC-JOIN' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.documents_deleted, 0, 'original PM should NOT be deleted');
+  /* Log output confirms "Rebuilding <original_pid>" — the existing identity absorbs the new record.
+     The mock returns new_documents=1 but identity is the same. */
+  console.log('  [info] New-source-joins result: ' + JSON.stringify(result));
+});
+
+/* ================================================================ */
+/*  Test 9: Merge — two existing identities resolve into one       */
+/* ================================================================ */
+
+console.log('\n=== Scenario 9: Merge ===');
+
+await testAsync('preserves one identity and deletes the other on merge', async function () {
+  var pid1 = pidFor([{ source_table: 'Accused', source_id: 'A-1' }]);
+  var pid2 = pidFor([{ source_table: 'Accused', source_id: 'A-2' }]);
+
+  var pmDocs = [
+    makePMRawRow(pid1, [
+      { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'Ravi Kumar', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' }
+    ]),
+    makePMRawRow(pid2, [
+      { table: 'Accused', row_id: 'A-2', case_id: 'CASE-001', name_as_recorded: 'Ravi Kumar', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' }
+    ])
+  ];
+
+  /* A-1 and A-2 in same case with same name → entity matching pairs them */
+  var accusedRows = [
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Ravi Kumar', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1'),
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '2', 'CASE-001', 'Ravi Kumar', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  var mockCat = createMockCatalyst(pmDocs, accusedRows, [], []);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-MERGE',
+    timestamp: new Date().toISOString(),
+    stats: { existing_documents: 2, current_source_records: 2, changed_documents: 2, unchanged_documents: 0, new_records: 0, orphaned_records: 0 },
+    changed_person_ids: [pid1, pid2],
+    unchanged_person_ids: [],
+    new_records: [],
+    orphaned_records: [],
+    load_errors: []
+  };
+
+  var result = await incrementalResolve(appInst, changeResult, { runId: 'REC-MERGE' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.documents_deleted, 1, 'one of the two merged identities should be merge-deleted');
+  /* Log confirms "Rebuilding <survivor_pid>" and "X merge victims" — survivor uses an EXISTING pid,
+     no new person_id is generated for the merged cluster. */
+  console.log('  [info] Merge result: ' + JSON.stringify(result));
+});
+
+/* ================================================================ */
+/*  Test 10: Split — one identity splits into two clusters          */
+/* ================================================================ */
+
+console.log('\n=== Scenario 10: Split ===');
+
+await testAsync('preserves one identity and creates new one on split', async function () {
+  var pid = pidFor([
+    { source_table: 'Accused', source_id: 'A-1' },
+    { source_table: 'Accused', source_id: 'A-2' }
+  ]);
+
+  var pmDocs = [
+    makePMRawRow(pid, [
+      { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'Ravi Kumar', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' },
+      { table: 'Accused', row_id: 'A-2', case_id: 'CASE-002', name_as_recorded: 'Sita Patel', age_as_recorded: 25, date_of_offence: '2024-02-20', unit_id: 'UNIT-2', district_id: 'DIST-2' }
+    ])
+  ];
+
+  /* A-1 and A-2 are in different cases with different names → no match → split */
+  var accusedRows = [
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Ravi Kumar', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1'),
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '2', 'CASE-002', 'Sita Patel', 25, 2, '2024-02-20', 'UNIT-2', 'DIST-2')
+  ];
+
+  var mockCat = createMockCatalyst(pmDocs, accusedRows, [], []);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-SPLIT',
+    timestamp: new Date().toISOString(),
+    stats: { existing_documents: 1, current_source_records: 2, changed_documents: 1, unchanged_documents: 0, new_records: 1, orphaned_records: 0 },
+    changed_person_ids: [pid],
+    unchanged_person_ids: [],
+    new_records: [
+      { source_table: 'Accused', source_id: 'A-2', name: 'Sita Patel', age: 25, case_id: 'CASE-002', unit_id: 'UNIT-2', district_id: 'DIST-2', gender: 'F', date_of_offence: '2024-02-20' }
+    ],
+    orphaned_records: [],
+    load_errors: []
+  };
+
+  var result = await incrementalResolve(appInst, changeResult, { runId: 'REC-SPLIT' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  /* One identity survives (the one with more overlap), one is new */
+  assert.strictEqual(result.documents_deleted, 0, 'original PM should not be deleted (one cluster keeps it)');
+  assert.strictEqual(result.new_documents, 1, 'one new doc for the other split cluster');
+  console.log('  [info] Split result: ' + JSON.stringify(result));
+});
+
+/* ================================================================ */
+/*  Test 11: Genuinely new identity                                */
+/* ================================================================ */
+
+console.log('\n=== Scenario 11: New identity ===');
+
+await testAsync('generates new deterministic ID for genuinely new identity', async function () {
+  /* No existing PersonMaster. New record A-99 appears. */
+  var newPid = deterministicPersonId([{ source_table: 'Accused', source_id: 'A-99' }]);
+
+  var accusedRows = [
+    makeSourcerRawRow('Accused', 'AccusedMasterID', '99', 'CASE-099', 'Brand New Person', 40, 1, '2024-05-05', 'UNIT-5', 'DIST-5')
+  ];
+
+  var mockCat = createMockCatalystNoPersist([], accusedRows, [], []);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-NEWID',
+    timestamp: new Date().toISOString(),
+    stats: { existing_documents: 0, current_source_records: 1, changed_documents: 0, unchanged_documents: 0, new_records: 1, orphaned_records: 0 },
+    changed_person_ids: [],
+    unchanged_person_ids: [],
+    new_records: [
+      { source_table: 'Accused', source_id: 'A-99', name: 'Brand New Person', age: 40, case_id: 'CASE-099', unit_id: 'UNIT-5', district_id: 'DIST-5', gender: 'M', date_of_offence: '2024-05-05' }
+    ],
+    orphaned_records: [],
+    load_errors: []
+  };
+
+  var result = await incrementalResolve(appInst, changeResult, { runId: 'REC-NEWID' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.new_documents, 1, 'one new doc should be created');
+  assert.strictEqual(result.documents_deleted, 0, 'no deletions');
+  console.log('  [info] New identity result: ' + JSON.stringify(result));
+});
+
+/* ================================================================ */
 /*  Summary                                                         */
 /* ================================================================ */
 

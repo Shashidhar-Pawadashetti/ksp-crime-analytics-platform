@@ -14,22 +14,24 @@ function computeStats(nodes, edges) {
 
   for (var ei = 0; ei < edges.length; ei++) {
     var e = edges[ei];
+    var src = e.source_person_id || e.source;
+    var tgt = e.target_person_id || e.target;
 
     if (!byType[e.edge_type]) byType[e.edge_type] = 0;
     byType[e.edge_type]++;
 
-    if (!degree[e.source]) degree[e.source] = 0;
-    degree[e.source]++;
-    if (!degree[e.target]) degree[e.target] = 0;
-    degree[e.target]++;
+    if (!degree[src]) degree[src] = 0;
+    degree[src]++;
+    if (!degree[tgt]) degree[tgt] = 0;
+    degree[tgt]++;
 
-    if (adjacency[e.source]) adjacency[e.source].push(e.target);
-    if (adjacency[e.target]) adjacency[e.target].push(e.source);
+    if (adjacency[src]) adjacency[src].push(tgt);
+    if (adjacency[tgt]) adjacency[tgt].push(src);
   }
 
-  var degreeValues = Object.keys(degree).map(function(k) { return degree[k]; });
+  var degreeValues = Object.keys(degree).map(function (k) { return degree[k]; });
   var avgDegree = degreeValues.length > 0
-    ? (degreeValues.reduce(function(a, b) { return a + b; }) / totalNodes).toFixed(2)
+    ? (degreeValues.reduce(function (a, b) { return a + b; }) / totalNodes).toFixed(2)
     : '0.00';
   var maxDegree = degreeValues.length > 0 ? Math.max.apply(null, degreeValues) : 0;
 
@@ -58,7 +60,7 @@ function computeStats(nodes, edges) {
     componentSizes.push(size);
   }
 
-  componentSizes.sort(function(a, b) { return b - a; });
+  componentSizes.sort(function (a, b) { return b - a; });
 
   return {
     totalNodes: totalNodes,

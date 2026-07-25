@@ -37,21 +37,22 @@ function mergeEdge(existing, incoming) {
 }
 
 /**
- * Get normalised name from a person document by person_id.
+ * Build O(1) person_id → name_normalised lookup.
  */
-function getPersonName(personDocs, pid) {
-  for (var i = 0; i < personDocs.length; i++) {
-    if (personDocs[i].person_id === pid) {
-      return personDocs[i].name_normalised || '';
+function buildNameIndex(personDocuments) {
+  var index = {};
+  personDocuments.forEach(function (doc) {
+    if (doc.person_id) {
+      index[doc.person_id] = doc.name_normalised || '';
     }
-  }
-  return '';
+  });
+  return index;
 }
 
-function addEdgeForPerson(edgesByPerson, src, tgt, type, caseId, personDocs) {
+function addEdgeForPerson(edgesByPerson, src, tgt, type, caseId, nameIndex) {
   if (!edgesByPerson[src]) edgesByPerson[src] = {};
 
-  var tgtName = getPersonName(personDocs, tgt);
+  var tgtName = nameIndex[tgt] || '';
 
   var edge = createEdge({
     source_person_id: src,
@@ -77,6 +78,7 @@ function generateConfirmedEdges(personDocuments) {
   }
 
   var caseIndex = buildCaseIndex(personDocuments);
+  var nameIndex = buildNameIndex(personDocuments);
   var edgesByPerson = {};
   var allEdges = {};
 
@@ -95,8 +97,8 @@ function generateConfirmedEdges(personDocuments) {
 
     for (var i = 0; i < uniqueAccused.length; i++) {
       for (var j = i + 1; j < uniqueAccused.length; j++) {
-        addEdgeForPerson(edgesByPerson, uniqueAccused[i], uniqueAccused[j], EDGE_TYPES.CO_ACCUSED, caseId, personDocuments);
-        addEdgeForPerson(edgesByPerson, uniqueAccused[j], uniqueAccused[i], EDGE_TYPES.CO_ACCUSED, caseId, personDocuments);
+        addEdgeForPerson(edgesByPerson, uniqueAccused[i], uniqueAccused[j], EDGE_TYPES.CO_ACCUSED, caseId, nameIndex);
+        addEdgeForPerson(edgesByPerson, uniqueAccused[j], uniqueAccused[i], EDGE_TYPES.CO_ACCUSED, caseId, nameIndex);
       }
     }
 
@@ -105,7 +107,7 @@ function generateConfirmedEdges(personDocuments) {
         var acc = uniqueAccused[ai];
         var vic = uniqueVictims[vi];
         if (acc === vic) continue;
-        addEdgeForPerson(edgesByPerson, acc, vic, EDGE_TYPES.ACCUSED_TO_VICTIM, caseId, personDocuments);
+        addEdgeForPerson(edgesByPerson, acc, vic, EDGE_TYPES.ACCUSED_TO_VICTIM, caseId, nameIndex);
       }
     }
   });
@@ -140,6 +142,7 @@ function generateCandidateMatchEdges(unconfirmedPairs, personIdLookup, personDoc
     return { unconfirmed_edges_by_person: {}, all_unconfirmed_edges: [] };
   }
 
+  var nameIndex = buildNameIndex(personDocuments);
   var edgesByPerson = {};
   var allEdges = {};
 
@@ -152,8 +155,8 @@ function generateCandidateMatchEdges(unconfirmedPairs, personIdLookup, personDoc
     if (!personA || !personB) return;
     if (personA === personB) return;
 
-    var bName = getPersonName(personDocuments, personB);
-    var aName = getPersonName(personDocuments, personA);
+    var bName = nameIndex[personB] || '';
+    var aName = nameIndex[personA] || '';
 
     var scoreBreakdown = pair.score_breakdown || {};
 

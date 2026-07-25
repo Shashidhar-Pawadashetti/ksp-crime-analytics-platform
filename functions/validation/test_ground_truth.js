@@ -1,6 +1,6 @@
 'use strict';
 
-var { computePairwiseMetrics, computeClusterPurity, extractAccusedId, parseCSV } = require('./groundTruthValidator');
+var { computePairwiseMetrics, computeClusterPurity, extractAccusedId, parseCSV, loadAllDocuments, validateAgainstGroundTruth } = require('./groundTruthValidator');
 
 var testsRun = 0;
 var testsPassed = 0;
@@ -175,6 +175,487 @@ assertEqual(parsed.rows[0].AccusedMasterID, '1', 'row 0 AccusedMasterID');
 assertEqual(parsed.rows[0].BaseProfileID, '124', 'row 0 BaseProfileID');
 assertEqual(parsed.rows[0].GeneratedName, 'Saul Goldner', 'row 0 GeneratedName');
 assertEqual(parsed.rows[2].AccusedMasterID, '21', 'row 2 AccusedMasterID');
+
+console.log('');
+console.log('=== Test: NoSQL query contract — attribute ===');
+(async function () {
+  var capturedQueryBody = null;
+
+  var captureTable = {
+    queryTable: async function (queryBody) {
+      capturedQueryBody = JSON.parse(JSON.stringify(queryBody));
+      return {
+        getResponseData: function () { return []; },
+        start_key: null
+      };
+    }
+  };
+
+  var captureMock = {
+    initializeApp: function () {
+      return {
+        zcql: function () { return { executeZCQLQuery: async function () { return []; } }; },
+        nosql: function () { return { getTable: async function () { return captureTable; } }; },
+        datastore: function () { return { table: function () { return { insertRow: async function () { return { ROWID: 'mock' }; } }; } }; }
+      };
+    }
+  };
+
+  var docs = await loadAllDocuments(captureMock.initializeApp());
+  assertEqual(typeof capturedQueryBody.key_condition.attribute, 'string', 'attribute is a string, not array');
+  assertEqual(capturedQueryBody.key_condition.attribute, 'type', 'attribute is "type"');
+  assertDeepEqual(Array.isArray(capturedQueryBody.key_condition.attribute) === false, true, 'attribute is NOT an array');
+})();
+
+console.log('');
+console.log('=== Test: NoSQL query contract — operator ===');
+(async function () {
+  var capturedQueryBody = null;
+
+  var captureTable = {
+    queryTable: async function (queryBody) {
+      capturedQueryBody = JSON.parse(JSON.stringify(queryBody));
+      return {
+        getResponseData: function () { return []; },
+        start_key: null
+      };
+    }
+  };
+
+  var captureMock = {
+    initializeApp: function () {
+      return {
+        zcql: function () { return { executeZCQLQuery: async function () { return []; } }; },
+        nosql: function () { return { getTable: async function () { return captureTable; } }; },
+        datastore: function () { return { table: function () { return { insertRow: async function () { return { ROWID: 'mock' }; } }; } }; }
+      };
+    }
+  };
+
+  var docs = await loadAllDocuments(captureMock.initializeApp());
+  assertEqual(capturedQueryBody.key_condition.operator, 'equals', 'operator resolves to "equals"');
+})();
+
+console.log('');
+console.log('=== Test: NoSQL query contract — marshalled value ===');
+(async function () {
+  var capturedQueryBody = null;
+
+  var captureTable = {
+    queryTable: async function (queryBody) {
+      capturedQueryBody = JSON.parse(JSON.stringify(queryBody));
+      return {
+        getResponseData: function () { return []; },
+        start_key: null
+      };
+    }
+  };
+
+  var captureMock = {
+    initializeApp: function () {
+      return {
+        zcql: function () { return { executeZCQLQuery: async function () { return []; } }; },
+        nosql: function () { return { getTable: async function () { return captureTable; } }; },
+        datastore: function () { return { table: function () { return { insertRow: async function () { return { ROWID: 'mock' }; } }; } }; }
+      };
+    }
+  };
+
+  var docs = await loadAllDocuments(captureMock.initializeApp());
+  assertDeepEqual(capturedQueryBody.key_condition.value, { S: 'PM' }, 'marshalled value is { S: "PM" }');
+})();
+
+console.log('');
+console.log('=== Test: NoSQL query contract — consistent_read ===');
+(async function () {
+  var capturedQueryBody = null;
+
+  var captureTable = {
+    queryTable: async function (queryBody) {
+      capturedQueryBody = JSON.parse(JSON.stringify(queryBody));
+      return {
+        getResponseData: function () { return []; },
+        start_key: null
+      };
+    }
+  };
+
+  var captureMock = {
+    initializeApp: function () {
+      return {
+        zcql: function () { return { executeZCQLQuery: async function () { return []; } }; },
+        nosql: function () { return { getTable: async function () { return captureTable; } }; },
+        datastore: function () { return { table: function () { return { insertRow: async function () { return { ROWID: 'mock' }; } }; } }; }
+      };
+    }
+  };
+
+  var docs = await loadAllDocuments(captureMock.initializeApp());
+  assertEqual(capturedQueryBody.consistent_read, true, 'consistent_read is true');
+})();
+
+console.log('');
+console.log('=== Test: NoSQL query contract — limit ===');
+(async function () {
+  var capturedQueryBody = null;
+
+  var captureTable = {
+    queryTable: async function (queryBody) {
+      capturedQueryBody = JSON.parse(JSON.stringify(queryBody));
+      return {
+        getResponseData: function () { return []; },
+        start_key: null
+      };
+    }
+  };
+
+  var captureMock = {
+    initializeApp: function () {
+      return {
+        zcql: function () { return { executeZCQLQuery: async function () { return []; } }; },
+        nosql: function () { return { getTable: async function () { return captureTable; } }; },
+        datastore: function () { return { table: function () { return { insertRow: async function () { return { ROWID: 'mock' }; } }; } }; }
+      };
+    }
+  };
+
+  var docs = await loadAllDocuments(captureMock.initializeApp());
+  assertEqual(capturedQueryBody.limit, 100, 'limit is 100');
+})();
+
+console.log('');
+console.log('=== Test: NoSQL pagination — multiple pages accumulated correctly ===');
+(async function () {
+  var pageCallCount = 0;
+  var pageSize = 40;
+  var totalPages = 3;
+  var totalDocs = pageSize * totalPages;
+
+  function makeDoc(index) {
+    return {
+      person_id: 'PM_PAGINATED_' + String(index).padStart(5, '0'),
+      type: 'PM',
+      source_records: []
+    };
+  }
+
+  var allTestDocs = [];
+  for (var pi = 0; pi < totalDocs; pi++) {
+    allTestDocs.push(makeDoc(pi));
+  }
+
+  var paginatedTable = {
+    queryTable: async function (queryBody) {
+      pageCallCount++;
+      var startIdx = (pageCallCount - 1) * pageSize;
+      var pageItems = allTestDocs.slice(startIdx, startIdx + pageSize).map(function (doc) {
+        return { item: { to: function () { return doc; } } };
+      });
+
+      var result = {
+        getResponseData: function () { return pageItems; }
+      };
+
+      if (pageCallCount < totalPages) {
+        result.start_key = { person_id: pageItems[pageItems.length - 1].item.to().person_id, type: 'PM' };
+      }
+
+      return result;
+    }
+  };
+
+  var paginatedMock = {
+    initializeApp: function () {
+      return {
+        zcql: function () { return { executeZCQLQuery: async function () { return []; } }; },
+        nosql: function () { return { getTable: async function () { return paginatedTable; } }; },
+        datastore: function () { return { table: function () { return { insertRow: async function () { return { ROWID: 'mock' }; } }; } }; }
+      };
+    }
+  };
+
+  var docs = await loadAllDocuments(paginatedMock.initializeApp());
+  assertEqual(docs.length, totalDocs, 'should load all ' + totalDocs + ' docs across pages');
+  assertEqual(pageCallCount, totalPages, 'should make ' + totalPages + ' queryTable calls');
+})();
+
+console.log('');
+console.log('=== Test: NoSQL query error propagates ===');
+(async function () {
+  var errorTable = {
+    queryTable: async function () {
+      throw new Error('Simulated NoSQL queryTable failure');
+    }
+  };
+
+  var errorMock = {
+    initializeApp: function () {
+      return {
+        zcql: function () { return { executeZCQLQuery: async function () { return []; } }; },
+        nosql: function () { return { getTable: async function () { return errorTable; } }; },
+        datastore: function () { return { table: function () { return { insertRow: async function () { return { ROWID: 'mock' }; } }; } }; }
+      };
+    }
+  };
+
+  var threw = false;
+  try {
+    await loadAllDocuments(errorMock.initializeApp());
+  } catch (err) {
+    threw = true;
+    assertEqual(err.message.indexOf('Simulated NoSQL queryTable failure') !== -1, true, 'error message is preserved');
+  }
+  assertEqual(threw, true, 'loadAllDocuments throws on queryTable error');
+})();
+
+console.log('');
+console.log('=== Diagnostic Tests ===');
+
+function createValidationMock(personMasterDocs) {
+  var table = {
+    queryTable: async function () {
+      var items = (personMasterDocs || []).map(function (doc) {
+        return { item: { to: function () { return doc; } } };
+      });
+      return { getResponseData: function () { return items; }, start_key: null };
+    }
+  };
+  return {
+    initializeApp: function () {
+      return {
+        zcql: function () { return { executeZCQLQuery: async function () { return []; } }; },
+        nosql: function () { return { getTable: async function () { return table; } }; },
+        datastore: function () { return { table: function () { return { insertRow: async function () { return { ROWID: 'mock' }; } }; } }; }
+      };
+    }
+  };
+}
+
+var GT_CSV = 'AccusedMasterID,CaseMasterID,BaseProfileID,GeneratedName,AgeYear\n1,1,124,Saul Goldner,40\n9,4,92,Bruce Parisian,34';
+
+console.log('');
+console.log('=== Test: Diagnostics — zero PersonMaster documents ===');
+(async function () {
+  var mock = createValidationMock([]);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.personmaster_documents_loaded, 0, 'personmaster_documents_loaded = 0');
+  assertEqual(result.accused_source_records_seen, 0, 'accused_source_records_seen = 0');
+  assertEqual(result.accused_ids_extracted, 0, 'accused_ids_extracted = 0');
+  assertEqual(result.accused_ids_failed_extraction, 0, 'accused_ids_failed_extraction = 0');
+  assertEqual(result.duplicate_accused_ids, 0, 'duplicate_accused_ids = 0');
+  assertEqual(result.mapped_records, 0, 'mapped_records = 0');
+  assertEqual(result.predicted_cluster_count, 0, 'predicted_cluster_count = 0');
+  assertEqual(result.coverage, 0, 'coverage = 0');
+})();
+
+console.log('');
+console.log('=== Test: Diagnostics — valid A-1 row_id ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Accused', row_id: 'A-1', case_id: '1' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.personmaster_documents_loaded, 1, 'personmaster_documents_loaded = 1');
+  assertEqual(result.accused_source_records_seen, 1, 'accused_source_records_seen = 1');
+  assertEqual(result.accused_ids_extracted, 1, 'accused_ids_extracted = 1');
+  assertEqual(result.accused_ids_failed_extraction, 0, 'accused_ids_failed_extraction = 0');
+  assertEqual(result.duplicate_accused_ids, 0, 'duplicate_accused_ids = 0');
+  assertEqual(result.mapped_records, 1, 'mapped_records = 1');
+  assertEqual(result.predicted_cluster_count, 1, 'predicted_cluster_count = 1');
+})();
+
+console.log('');
+console.log('=== Test: Diagnostics — invalid row_id (non-accused prefix) ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Accused', row_id: 'V-1', case_id: '1' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.personmaster_documents_loaded, 1, 'personmaster_documents_loaded = 1');
+  assertEqual(result.accused_source_records_seen, 1, 'accused_source_records_seen = 1');
+  assertEqual(result.accused_ids_extracted, 0, 'accused_ids_extracted = 0');
+  assertEqual(result.accused_ids_failed_extraction, 1, 'accused_ids_failed_extraction = 1');
+  assertEqual(result.duplicate_accused_ids, 0, 'duplicate_accused_ids = 0');
+  assertEqual(result.mapped_records, 0, 'mapped_records = 0');
+})();
+
+console.log('');
+console.log('=== Test: Diagnostics — non-Accused table record ignored ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Victim', row_id: 'V-1', case_id: '1' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.personmaster_documents_loaded, 1, 'personmaster_documents_loaded = 1');
+  assertEqual(result.accused_source_records_seen, 0, 'accused_source_records_seen = 0 (Victim record ignored)');
+  assertEqual(result.accused_ids_extracted, 0, 'accused_ids_extracted = 0');
+  assertEqual(result.accused_ids_failed_extraction, 0, 'accused_ids_failed_extraction = 0');
+  assertEqual(result.mapped_records, 0, 'mapped_records = 0');
+})();
+
+console.log('');
+console.log('=== Test: Diagnostics — multiple accused records mapped ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [
+      { table: 'Accused', row_id: 'A-1', case_id: '1' },
+      { table: 'Victim', row_id: 'V-1', case_id: '1' }
+    ]
+  }, {
+    person_id: 'PM_002',
+    type: 'PM',
+    source_records: [{ table: 'Accused', row_id: 'A-9', case_id: '4' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.personmaster_documents_loaded, 2, 'personmaster_documents_loaded = 2');
+  assertEqual(result.accused_source_records_seen, 2, 'accused_source_records_seen = 2');
+  assertEqual(result.accused_ids_extracted, 2, 'accused_ids_extracted = 2');
+  assertEqual(result.accused_ids_failed_extraction, 0, 'accused_ids_failed_extraction = 0');
+  assertEqual(result.duplicate_accused_ids, 0, 'duplicate_accused_ids = 0');
+  assertEqual(result.mapped_records, 2, 'mapped_records = 2');
+  assertEqual(result.predicted_cluster_count, 2, 'predicted_cluster_count = 2');
+})();
+
+console.log('');
+console.log('=== Test: Diagnostics — duplicate accused IDs ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Accused', row_id: 'A-1', case_id: '1' }]
+  }, {
+    person_id: 'PM_002',
+    type: 'PM',
+    source_records: [{ table: 'Accused', row_id: 'A-1', case_id: '1' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.personmaster_documents_loaded, 2, 'personmaster_documents_loaded = 2');
+  assertEqual(result.accused_source_records_seen, 2, 'accused_source_records_seen = 2');
+  assertEqual(result.accused_ids_extracted, 2, 'accused_ids_extracted = 2');
+  assertEqual(result.duplicate_accused_ids, 1, 'duplicate_accused_ids = 1 (same A-1 in both docs)');
+  assertEqual(result.mapped_records, 1, 'mapped_records = 1 (only 1 unique A-1)');
+})();
+
+console.log('');
+console.log('=== Test: Diagnostics — precision/recall/F1 unchanged by diagnostics ===');
+(async function() {
+  var PAIR_CSV = 'AccusedMasterID,CaseMasterID,BaseProfileID,GeneratedName,AgeYear\n1,1,124,Saul Goldner,40\n2,1,124,Saul Goldner,40\n3,2,92,Bruce Parisian,34\n4,2,92,Bruce Parisian,34';
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [
+      { table: 'Accused', source_id: 'A-1', case_id: '1' },
+      { table: 'Accused', source_id: 'A-2', case_id: '1' }
+    ]
+  }, {
+    person_id: 'PM_002',
+    type: 'PM',
+    source_records: [{ table: 'Accused', source_id: 'A-3', case_id: '2' }]
+  }, {
+    person_id: 'PM_003',
+    type: 'PM',
+    source_records: [{ table: 'Accused', source_id: 'A-4', case_id: '2' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: PAIR_CSV });
+  assertEqual(result.personmaster_documents_loaded, 3, 'personmaster_documents_loaded = 3');
+  assertEqual(result.mapped_records, 4, 'mapped_records = 4');
+  assertEqual(result.precision, 1, 'precision = 1 (no FP)');
+  assertEqual(Math.round(result.recall * 100), 50, 'recall = 0.5 (2/4 correct pairs)');
+  assertEqual(Math.round(result.f1_score * 100), 67, 'f1 = 0.6667');
+})();
+
+console.log('');
+console.log('=== Test: source_id — A-1 maps to AccusedMasterID 1 ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Accused', source_id: 'A-1', case_id: '1' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.personmaster_documents_loaded, 1, 'personmaster_documents_loaded = 1');
+  assertEqual(result.accused_source_records_seen, 1, 'accused_source_records_seen = 1');
+  assertEqual(result.accused_ids_extracted, 1, 'source_id A-1 -> 1 extracted');
+  assertEqual(result.accused_ids_failed_extraction, 0, 'accused_ids_failed_extraction = 0');
+  assertEqual(result.mapped_records, 1, 'mapped_records = 1');
+})();
+
+console.log('');
+console.log('=== Test: source_id — A-136 maps to AccusedMasterID 136 ===');
+(async function () {
+  var csv = 'AccusedMasterID,CaseMasterID,BaseProfileID,GeneratedName,AgeYear\n136,10,5,Cassie Wintheiser,34';
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Accused', source_id: 'A-136', case_id: '10' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: csv });
+  assertEqual(result.accused_ids_extracted, 1, 'source_id A-136 -> 136 extracted');
+  assertEqual(result.mapped_records, 1, 'mapped_records = 1');
+  assertEqual(result.mapped_accused_ids[0], 136, 'mapped accused ID = 136');
+})();
+
+console.log('');
+console.log('=== Test: source_id takes precedence over row_id ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Accused', source_id: 'A-136', row_id: 'A-1', case_id: '10' }]
+  }];
+  var csv = 'AccusedMasterID,CaseMasterID,BaseProfileID,GeneratedName,AgeYear\n136,10,5,Cassie Wintheiser,34';
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: csv });
+  assertEqual(result.accused_ids_extracted, 1, 'source_id A-136 takes precedence over row_id A-1');
+  assertEqual(result.mapped_records, 1, 'mapped_records = 1');
+  assertEqual(result.mapped_accused_ids[0], 136, 'mapped accused ID = 136 (from source_id)');
+})();
+
+console.log('');
+console.log('=== Test: row_id fallback when source_id absent ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Accused', row_id: 'A-1', case_id: '1' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.accused_ids_extracted, 1, 'row_id A-1 fallback extraction');
+  assertEqual(result.mapped_records, 1, 'mapped_records = 1');
+})();
+
+console.log('');
+console.log('=== Test: invalid source_id increments failed extraction diagnostics ===');
+(async function () {
+  var docs = [{
+    person_id: 'PM_001',
+    type: 'PM',
+    source_records: [{ table: 'Accused', source_id: 'V-99', case_id: '1' }]
+  }];
+  var mock = createValidationMock(docs);
+  var result = await validateAgainstGroundTruth(mock.initializeApp(), { ground_truth_csv: GT_CSV });
+  assertEqual(result.accused_source_records_seen, 1, 'accused_source_records_seen = 1');
+  assertEqual(result.accused_ids_extracted, 0, 'accused_ids_extracted = 0');
+  assertEqual(result.accused_ids_failed_extraction, 1, 'accused_ids_failed_extraction = 1');
+  assertEqual(result.failed_source_id_sample[0], 'V-99', 'failed_source_id_sample contains V-99');
+})();
 
 console.log('');
 console.log('=== Summary ===');

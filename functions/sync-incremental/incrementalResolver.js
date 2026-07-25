@@ -469,18 +469,209 @@ function handleOrphanedRecords(orphanedRecords, existingDocMap) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Step 5+7 — Map clusters to docs and rebuild                       */
+/*  Identity-preserving cluster-to-document mapping                   */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Convert a PersonMaster source_record entry to a record object
+ * suitable for buildPersonMaster() and identity matching.
+ */
+function existingSRToRecord(sr) {
+  return {
+    source_table: sr.table || '',
+    source_id: sr.row_id || '',
+    row_id: sr.row_id || '',
+    case_id: sr.case_id || '',
+    name: sr.name_as_recorded || '',
+    age: sr.age_as_recorded != null ? sr.age_as_recorded : null,
+    date_of_offence: sr.date_of_offence || null,
+    unit_id: sr.unit_id || null,
+    district_id: sr.district_id || null
+  };
+}
+
+/**
+ * Build a source-key set from an array of records (handles both
+ * cluster format {source_table, source_id} and existing-format {table, row_id}).
+ */
+function buildSourceKeySet(records) {
+  var keys = {};
+  records.forEach(function (r) {
+    var table = r.source_table || r.table || '';
+    var id = r.source_id || r.row_id || '';
+    if (table && id) keys[table + ':' + id] = true;
+  });
+  return keys;
+}
+
+/**
+ * Compute the set of orphaned source keys from the change result.
+ */
+function buildOrphanKeySet(orphanedRecords) {
+  var keys = {};
+  (orphanedRecords || []).forEach(function (o) {
+    var table = o.source_table || '';
+    var id = o.source_id || '';
+    if (table && id) keys[table + ':' + id] = true;
+  });
+  return keys;
+}
+
+/**
+ * Find existing PersonMaster documents whose source records overlap
+ * with the given cluster. Returns sorted candidates:
+ *   [{ person_id, overlap_count, ... }]
+ *
+ * Sort order: most overlapping records first, then lexicographic
+ * person_id as deterministic tie-breaker.
+ */
+function findExistingOwners(cluster, existingDocMap, existingRecordsIndex) {
+  var clusterKeys = buildSourceKeySet(cluster);
+
+  var overlapCounts = {};
+  Object.keys(clusterKeys).forEach(function (key) {
+    var pid = existingRecordsIndex[key];
+    if (pid) {
+      overlapCounts[pid] = (overlapCounts[pid] || 0) + 1;
+    }
+  });
+
+  var pids = Object.keys(overlapCounts);
+  var candidates = pids.map(function (pid) {
+    return {
+      person_id: pid,
+      overlap_count: overlapCounts[pid]
+    };
+  });
+
+  candidates.sort(function (a, b) {
+    if (a.overlap_count !== b.overlap_count) return b.overlap_count - a.overlap_count;
+    return a.person_id < b.person_id ? -1 : (a.person_id > b.person_id ? 1 : 0);
+  });
+
+  return candidates;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Step 5+7 — Map clusters to docs with identity preservation        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Map resolved clusters to PersonMaster documents while preserving
+ * existing identities.
+ *
+ * Identity policy (in priority order):
+ *   1. Overlap with exactly one existing doc → preserve that person_id
+ *   2. Overlap with multiple existing docs (MERGE) →
+ *      pick survivor by most overlapping records (tie = lexicographic pid)
+ *   3. Overlap with an existing doc that also overlaps other clusters (SPLIT) →
+ *      deterministic assignment: first cluster (by sorted source keys) keeps the ID
+ *   4. No overlap → deterministicPersonId() for genuinely new identity
+ *
+ * When preserving an identity, the cluster is merged with the existing
+ * doc's non-orphaned, non-cluster records (these are unchanged records
+ * from non-affected cases).
+ */
 function mapClustersToDocs(clusters, existingDocMap, existingRecordsIndex, orphanHandledDocIds, runId) {
   var rebuiltDocs = [];
-  var newDocs = [];
+  var newPersonIds = [];
   var unchangedCount = 0;
   var changedCount = 0;
 
-  clusters.forEach(function (cluster) {
-    var personId = deterministicPersonId(cluster);
+  /* ---- Phase 1: Compute overlap for every cluster ---- */
+  var clusterOverlaps = clusters.map(function (cluster) {
+    return findExistingOwners(cluster, existingDocMap, existingRecordsIndex);
+  });
 
+  /* ---- Phase 2: Assign person_ids with merge/split resolution ---- */
+  var assignedPid = {};    // person_id → cluster_index
+  var clusterPid = [];     // cluster_index → person_id (null = new)
+
+  /* Build map of which person_ids overlap which cluster indices */
+  var pidClusters = {};    // person_id → [cluster_index, ...]
+  for (var ci = 0; ci < clusterOverlaps.length; ci++) {
+    clusterPid[ci] = null;
+    var candidates = clusterOverlaps[ci];
+    for (var oi = 0; oi < candidates.length; oi++) {
+      var pid = candidates[oi].person_id;
+      if (!pidClusters[pid]) pidClusters[pid] = [];
+      if (pidClusters[pid].indexOf(ci) === -1) {
+        pidClusters[pid].push(ci);
+      }
+    }
+  }
+
+  /* For person_ids that overlap exactly one cluster: claim immediately */
+  Object.keys(pidClusters).forEach(function (pid) {
+    var clusterIndices = pidClusters[pid];
+    if (clusterIndices.length === 1) {
+      var ci = clusterIndices[0];
+      if (clusterPid[ci] === null) {
+        clusterPid[ci] = pid;
+        assignedPid[pid] = ci;
+      }
+    }
+  });
+
+  /* For person_ids that overlap multiple clusters (SPLIT):
+   * the cluster with the highest overlap count gets the ID.
+   * If tied, the cluster whose sorted source keys compare lexicographically
+   * smallest wins. */
+  Object.keys(pidClusters).forEach(function (pid) {
+    var clusterIndices = pidClusters[pid];
+    if (clusterIndices.length <= 1) return;
+    if (assignedPid[pid] !== undefined) return;
+
+    /* Score each cluster for this pid */
+    var scored = clusterIndices.map(function (ci) {
+      var candidates = clusterOverlaps[ci];
+      var overlap = 0;
+      for (var oi = 0; oi < candidates.length; oi++) {
+        if (candidates[oi].person_id === pid) {
+          overlap = candidates[oi].overlap_count;
+          break;
+        }
+      }
+      /* Deterministic tie-breaker: sorted source keys of the cluster */
+      var cluster = clusters[ci];
+      var keys = cluster.map(function (r) {
+        return (r.source_table || '') + ':' + (r.source_id || '');
+      }).sort().join('|');
+
+      return { ci: ci, overlap: overlap, tieKey: keys };
+    });
+
+    scored.sort(function (a, b) {
+      if (a.overlap !== b.overlap) return b.overlap - a.overlap;
+      return a.tieKey < b.tieKey ? -1 : (a.tieKey > b.tieKey ? 1 : 0);
+    });
+
+    /* Winner gets the pid */
+    var winner = scored[0];
+    if (clusterPid[winner.ci] === null) {
+      clusterPid[winner.ci] = pid;
+      assignedPid[pid] = winner.ci;
+    }
+  });
+
+  /* For remaining unassigned person_ids that overlap with clusters but
+   * were not assigned (merge-victims or claimed by another cluster):
+   * they are marked for merge (their ID is not preserved).
+   * These will be handled by the caller (merge victims). */
+
+  /* ---- Phase 3: Build documents with assigned identities ---- */
+  var mergeVictimPids = {};
+  Object.keys(pidClusters).forEach(function (pid) {
+    if (assignedPid[pid] === undefined) {
+      mergeVictimPids[pid] = true;
+    }
+  });
+
+  for (var ci = 0; ci < clusters.length; ci++) {
+    var cluster = clusters[ci];
+    var personId = clusterPid[ci];
+
+    /* Compute cluster confidence */
     var confidences = [];
     cluster.forEach(function (r) {
       if (r.confidence != null) confidences.push(r.confidence);
@@ -489,28 +680,58 @@ function mapClustersToDocs(clusters, existingDocMap, existingRecordsIndex, orpha
       ? Math.round((confidences.reduce(function (a, b) { return a + b; }, 0) / confidences.length) * 100) / 100
       : null;
 
+    if (personId === null) {
+      /* Genuinely new identity — no overlap with any existing doc */
+      personId = deterministicPersonId(cluster);
+      newPersonIds.push(personId);
+      changedCount++;
+
+      var doc = buildPersonMaster(cluster, {
+        person_id: personId,
+        confidence_score: clusterConfidence,
+        resolution_method: 'phonetic_weighted_score_v1',
+        resolved_by: 'sync-incremental-v1',
+        resolution_run_id: runId
+      });
+      rebuiltDocs.push(doc);
+      console.log('[incResolve] Creating new doc ' + personId);
+      continue;
+    }
+
+    /* ---- Identity preservation: merge cluster + existing non-orphan records ---- */
     var existingDoc = existingDocMap[personId];
+    var clusterKeySet = buildSourceKeySet(cluster);
+
+    /* Build the merged record set: cluster first, then existing non-cluster records */
+    var mergedRecords = cluster.slice();
 
     if (existingDoc) {
-      /* Check if cluster is actually different from existing doc:
-       * compare both source record keys AND field-level checksums */
       var existingSR = parseSourceRecords(existingDoc);
-      var clusterKeys = {};
-      cluster.forEach(function (r) {
-        clusterKeys[(r.source_table || '') + ':' + (r.source_id || '')] = true;
+      var orphanSet = buildOrphanKeySet(orphanHandledDocIds);
+
+      existingSR.forEach(function (sr) {
+        var key = (sr.table || '') + ':' + (sr.row_id || '');
+        /* Skip if already in cluster (re-resolved) or orphaned */
+        if (clusterKeySet[key]) return;
+        if (orphanSet[key]) return;
+        mergedRecords.push(existingSRToRecord(sr));
       });
-      var existingKeys = {};
+    }
+
+    /* Check if merged cluster is truly unchanged from existing doc */
+    if (existingDoc) {
+      var existingSR = parseSourceRecords(existingDoc);
+      var mergedKeySet = buildSourceKeySet(mergedRecords);
+      var existingKeySet = {};
       existingSR.forEach(function (r) {
-        existingKeys[(r.table || '') + ':' + (r.row_id || '')] = true;
+        existingKeySet[(r.table || '') + ':' + (r.row_id || '')] = true;
       });
 
-      var sameSize = Object.keys(clusterKeys).length === Object.keys(existingKeys).length;
-      var sameKeys = sameSize && Object.keys(clusterKeys).every(function (k) { return existingKeys[k]; });
+      var sameKeys = Object.keys(mergedKeySet).length === Object.keys(existingKeySet).length &&
+                     Object.keys(mergedKeySet).every(function (k) { return existingKeySet[k]; });
 
       if (sameKeys) {
-        /* Same keys — also compare field-level checksums to detect
-         * value changes (e.g., name update, age correction) */
-        var allChecksumsMatch = cluster.every(function (r) {
+        var allChecksumsMatch = mergedRecords.every(function (r) {
           var key = (r.source_table || '') + ':' + (r.source_id || '');
           var matchedExisting = existingSR.filter(function (ex) {
             return (ex.table || '') + ':' + (ex.row_id || '') === key;
@@ -537,36 +758,31 @@ function mapClustersToDocs(clusters, existingDocMap, existingRecordsIndex, orpha
 
         if (allChecksumsMatch) {
           unchangedCount++;
-          return;
+          continue;
         }
       }
-
-      changedCount++;
-      var doc = buildPersonMaster(cluster, {
-        person_id: personId,
-        confidence_score: clusterConfidence,
-        resolution_method: 'phonetic_weighted_score_v1',
-        resolved_by: 'sync-incremental-v1',
-        resolution_run_id: runId
-      });
-      rebuiltDocs.push(doc);
-      console.log('[incResolve] Rebuilding ' + personId + ' (cluster changed)');
-    } else {
-      newDocs.push(personId);
-      var doc = buildPersonMaster(cluster, {
-        person_id: personId,
-        confidence_score: clusterConfidence,
-        resolution_method: 'phonetic_weighted_score_v1',
-        resolved_by: 'sync-incremental-v1',
-        resolution_run_id: runId
-      });
-      rebuiltDocs.push(doc);
-      console.log('[incResolve] Creating new doc ' + personId);
     }
-  });
 
-  console.log('[incResolve] Clusters mapped: ' + changedCount + ' changed, ' + newDocs.length + ' new, ' + unchangedCount + ' unchanged');
-  return { rebuiltDocs: rebuiltDocs, newPersonIds: newDocs, unchangedCount: unchangedCount };
+    changedCount++;
+    var doc = buildPersonMaster(mergedRecords, {
+      person_id: personId,
+      confidence_score: clusterConfidence,
+      resolution_method: 'phonetic_weighted_score_v1',
+      resolved_by: 'sync-incremental-v1',
+      resolution_run_id: runId
+    });
+    rebuiltDocs.push(doc);
+    console.log('[incResolve] Rebuilding ' + personId + ' (cluster changed)');
+  }
+
+  console.log('[incResolve] Clusters mapped: ' + changedCount + ' changed, ' + newPersonIds.length + ' new, ' + unchangedCount + ' unchanged' +
+    (Object.keys(mergeVictimPids).length > 0 ? ', ' + Object.keys(mergeVictimPids).length + ' merge victims' : ''));
+  return {
+    rebuiltDocs: rebuiltDocs,
+    newPersonIds: newPersonIds,
+    unchangedCount: unchangedCount,
+    mergeVictimPids: Object.keys(mergeVictimPids)
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -713,10 +929,15 @@ async function incrementalResolve(appInstance, changeResult, options) {
   var unconfirmedPairs = matchedPairs.filter(function (p) { return p.classification === UNCONFIRMED; });
 
   /* ---- Step 5: Map clusters to PersonMaster docs ---- */
-  var mapped = mapClustersToDocs(clusters, existingDocMap, existingRecordsIndex, [], runId);
+  var mapped = mapClustersToDocs(clusters, existingDocMap, existingRecordsIndex, changeResult.orphaned_records || [], runId);
 
   /* ---- Step 6: Handle orphaned records ---- */
   var orphans = handleOrphanedRecords(changeResult.orphaned_records || [], existingDocMap);
+
+  /* Collect merge victims (existing person_ids whose records were
+   * merged into another surviving identity) */
+  var mergeVictimSet = {};
+  (mapped.mergeVictimPids || []).forEach(function (pid) { mergeVictimSet[pid] = true; });
 
   /* ---- Step 7-8: Merge orphan-handled docs into rebuilt docs ---- */
   var allAffectedDocs = mapped.rebuiltDocs.slice();
@@ -724,10 +945,10 @@ async function incrementalResolve(appInstance, changeResult, options) {
   var orphanHandledDocList = [];
   Object.keys(orphans.orphanHandledDocs).forEach(function (pid) {
     var doc = orphans.orphanHandledDocs[pid];
-    /* Check if this doc was also rebuilt via entity matching;
-     * if so, the rebuilt version takes precedence */
+    /* Skip if already rebuilt via entity matching (identity preserved) */
     var alreadyRebuilt = allAffectedDocs.some(function (d) { return d.person_id === pid; });
-    if (!alreadyRebuilt) {
+    /* Skip if this doc was a merge victim (another identity survived) */
+    if (!alreadyRebuilt && !mergeVictimSet[pid]) {
       orphanHandledDocList.push(doc);
     }
   });
@@ -735,7 +956,7 @@ async function incrementalResolve(appInstance, changeResult, options) {
 
   var totalRebuilt = mapped.rebuiltDocs.length;
   var totalNew = mapped.newPersonIds.length;
-  var deletedPersonIds = orphans.deletionPersonIds;
+  var deletedPersonIds = orphans.deletionPersonIds.concat(mapped.mergeVictimPids || []);
 
   console.log('[incResolve] Documents to persist: ' + allAffectedDocs.length + ' rebuilt/new, ' + deletedPersonIds.length + ' to delete');
 
@@ -777,9 +998,9 @@ async function incrementalResolve(appInstance, changeResult, options) {
     }
   });
 
-  /* Fix orphan-handled docs that weren't in allAffectedDocs */
+  /* Fix orphan-handled docs that weren't in allAffectedDocs (skip merge victims) */
   Object.keys(orphans.orphanHandledDocs).forEach(function (pid) {
-    if (!edgeDocMap[pid] && !deletedSet[pid]) {
+    if (!edgeDocMap[pid] && !deletedSet[pid] && !mergeVictimSet[pid]) {
       edgeDocs.push(orphans.orphanHandledDocs[pid]);
       edgeDocMap[pid] = orphans.orphanHandledDocs[pid];
     }

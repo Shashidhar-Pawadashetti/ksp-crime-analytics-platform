@@ -6,6 +6,13 @@ const { GraphService } = require('./graphService');
 const app = express();
 app.use(express.json());
 
+var catalyst = require('zcatalyst-sdk-node');
+
+app.use(function (req, res, next) {
+  try { catalyst.initialize(req); } catch (e) {}
+  next();
+});
+
 var sharedInstance = null;
 
 function getInstance(options) {
@@ -26,8 +33,12 @@ function getGS() {
   return getInstance();
 }
 
+app.get('/health', function (req, res) {
+  res.json({ status: 'ok', service: 'graph-service', version: '2.0.0' });
+});
+
 app.get('/', function (req, res) {
-  res.json({ status: 'ok', service: 'graph-service', version: '1.0.0' });
+  res.json({ status: 'ok', service: 'graph-service', version: '2.0.0' });
 });
 
 app.get('/person/:personId', async function (req, res) {
@@ -37,7 +48,7 @@ app.get('/person/:personId', async function (req, res) {
     if (!person) return res.status(404).json({ status: 'error', error_code: 'NOT_FOUND', message: 'Person not found' });
     res.json({ status: 'ok', data: person });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -47,7 +58,7 @@ app.get('/person/:personId/neighbours', async function (req, res) {
     var neighbours = await gs.getNeighbours(req.params.personId);
     res.json({ status: 'ok', data: neighbours });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -57,7 +68,7 @@ app.get('/person/:personId/edges', async function (req, res) {
     var edges = await gs.getEdges(req.params.personId);
     res.json({ status: 'ok', data: edges });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -67,7 +78,7 @@ app.get('/person/:personId/degree', async function (req, res) {
     var degree = await gs.getDegree(req.params.personId);
     res.json({ status: 'ok', data: { person_id: req.params.personId, degree: degree } });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -77,7 +88,7 @@ app.get('/person/:personId/exists', async function (req, res) {
     var exists = await gs.personExists(req.params.personId);
     res.json({ status: 'ok', data: { person_id: req.params.personId, exists: exists } });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -87,7 +98,7 @@ app.get('/persons/by-role/:role', async function (req, res) {
     var results = await gs.getPersonsByRole(req.params.role);
     res.json({ status: 'ok', data: results });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -98,7 +109,7 @@ app.get('/edge/:edgeId', async function (req, res) {
     if (!edge) return res.status(404).json({ status: 'error', error_code: 'NOT_FOUND', message: 'Edge not found' });
     res.json({ status: 'ok', data: edge });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -108,7 +119,17 @@ app.get('/statistics', async function (req, res) {
     var stats = await gs.getGraphStatistics();
     res.json({ status: 'ok', data: stats });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
+  }
+});
+
+app.get('/stats', async function (req, res) {
+  try {
+    var gs = getGS();
+    var stats = await gs.getGraphStatistics();
+    res.json({ status: 'ok', data: stats });
+  } catch (err) {
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -117,7 +138,17 @@ app.get('/cache/info', function (req, res) {
     var gs = getGS();
     res.json({ status: 'ok', data: gs.getCacheInfo() });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
+  }
+});
+
+app.post('/reload', async function (req, res) {
+  try {
+    var gs = getGS();
+    await gs.reload();
+    res.json({ status: 'ok', message: 'Graph reloaded' });
+  } catch (err) {
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -127,7 +158,7 @@ app.post('/cache/reload', async function (req, res) {
     await gs.reload();
     res.json({ status: 'ok', message: 'Cache reloaded' });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
@@ -137,7 +168,7 @@ app.post('/cache/clear', function (req, res) {
     gs.clearCache();
     res.json({ status: 'ok', message: 'Cache cleared' });
   } catch (err) {
-    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: 'Internal error' });
+    res.status(500).json({ status: 'error', error_code: 'INTERNAL_ERROR', message: err.message });
   }
 });
 
