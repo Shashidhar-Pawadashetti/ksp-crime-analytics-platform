@@ -1,9 +1,17 @@
 'use strict';
 
+var { PersonMasterCache } = require('./personMasterCache');
+var _globalCache = new PersonMasterCache();
+
 function PersonMasterRepository(options) {
   this._appInstance = (options && options.appInstance) || null;
   this._table = null;
+  this._cache = (options && options.cache !== undefined) ? options.cache : _globalCache;
 }
+
+PersonMasterRepository.prototype._getApp = function () {
+  return this._appInstance;
+};
 
 PersonMasterRepository.prototype._getTable = async function () {
   if (this._table) return this._table;
@@ -14,6 +22,13 @@ PersonMasterRepository.prototype._getTable = async function () {
 };
 
 PersonMasterRepository.prototype.getPerson = async function (personId) {
+  if (this._cache && this._cache.isLoaded()) {
+    return this._cache.getPerson(personId);
+  }
+  return this._fetchPersonFromNoSQL(personId);
+};
+
+PersonMasterRepository.prototype._fetchPersonFromNoSQL = async function (personId) {
   var table = await this._getTable();
   try {
     var { NoSQLItem } = require('zcatalyst-sdk-node/lib/no-sql');
@@ -44,6 +59,15 @@ PersonMasterRepository.prototype.getPerson = async function (personId) {
 PersonMasterRepository.prototype.setAppInstance = function (appInstance) {
   this._appInstance = appInstance;
   this._table = null;
+  if (this._cache && !this._cache.isLoaded() && appInstance) {
+    this._cache.loadAll(this).catch(function (err) {
+      console.error('[PersonMasterRepository] background cache load failed: ' + err.message);
+    });
+  }
+};
+
+PersonMasterRepository.prototype.getCache = function () {
+  return this._cache;
 };
 
 module.exports = { PersonMasterRepository: PersonMasterRepository };

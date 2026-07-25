@@ -1205,6 +1205,247 @@ console.log('\n=== Phase 4.4.1 Graph Service Tests ===\n');
   });
 })();
 
+// --- 26. Graph Cache Duplicate Edge & Degree Fix ---
+(function () {
+  console.log('\n26. Graph Cache — Duplicate Edge & Degree Fix');
+
+  function buildCache(nodes, edges) {
+    return new GraphCache(function () {
+      return { nodes: nodes, edges: edges, diagnostics: {} };
+    });
+  }
+
+  test('cross-doc same edge_id appears once per node in getEdges', async function () {
+    var nodes = [
+      { person_id: 'PM_A', canonical_name: 'A' },
+      { person_id: 'PM_B', canonical_name: 'B' }
+    ];
+    var edges = [
+      { edge_id: 'E001', edge_type: 'CO_ACCUSED', source_person_id: 'PM_A', target_person_id: 'PM_B', confirmed: true },
+      { edge_id: 'E001', edge_type: 'CO_ACCUSED', source_person_id: 'PM_B', target_person_id: 'PM_A', confirmed: true }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    assert.strictEqual(cache.getEdgesForNode('PM_A').length, 1, 'PM_A sees edge once');
+    assert.strictEqual(cache.getEdgesForNode('PM_B').length, 1, 'PM_B sees edge once');
+    assert.strictEqual(cache.getEdgesForNode('PM_A')[0].edge_id, 'E001');
+    assert.strictEqual(cache.getEdgesForNode('PM_B')[0].edge_id, 'E001');
+  });
+
+  test('cross-doc same edge_id degree counts unique relationships', async function () {
+    var nodes = [
+      { person_id: 'PM_A', canonical_name: 'A' },
+      { person_id: 'PM_B', canonical_name: 'B' },
+      { person_id: 'PM_C', canonical_name: 'C' }
+    ];
+    var edges = [
+      { edge_id: 'E001', edge_type: 'CO_ACCUSED', source_person_id: 'PM_A', target_person_id: 'PM_B', confirmed: true },
+      { edge_id: 'E001', edge_type: 'CO_ACCUSED', source_person_id: 'PM_B', target_person_id: 'PM_A', confirmed: true },
+      { edge_id: 'E002', edge_type: 'SHARED_LOCATION', source_person_id: 'PM_A', target_person_id: 'PM_C', confirmed: true },
+      { edge_id: 'E002', edge_type: 'SHARED_LOCATION', source_person_id: 'PM_C', target_person_id: 'PM_A', confirmed: true }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    assert.strictEqual(cache.getDegree('PM_A'), 2, 'PM_A degree = 2 (E001 + E002)');
+    assert.strictEqual(cache.getDegree('PM_B'), 1, 'PM_B degree = 1 (E001)');
+    assert.strictEqual(cache.getDegree('PM_C'), 1, 'PM_C degree = 1 (E002)');
+  });
+
+  test('same edge_id three times across docs counted once', async function () {
+    var nodes = [
+      { person_id: 'PM_X', canonical_name: 'X' },
+      { person_id: 'PM_Y', canonical_name: 'Y' }
+    ];
+    var edges = [
+      { edge_id: 'E_MULTI', edge_type: 'CO_ACCUSED', source_person_id: 'PM_X', target_person_id: 'PM_Y', confirmed: true },
+      { edge_id: 'E_MULTI', edge_type: 'CO_ACCUSED', source_person_id: 'PM_Y', target_person_id: 'PM_X', confirmed: true },
+      { edge_id: 'E_MULTI', edge_type: 'CO_ACCUSED', source_person_id: 'PM_X', target_person_id: 'PM_Y', confirmed: true }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    assert.strictEqual(cache.getEdgesForNode('PM_X').length, 1);
+    assert.strictEqual(cache.getEdgesForNode('PM_Y').length, 1);
+    assert.strictEqual(cache.getDegree('PM_X'), 1);
+    assert.strictEqual(cache.getDegree('PM_Y'), 1);
+  });
+
+  test('two distinct edge_ids between same persons remain distinct', async function () {
+    var nodes = [
+      { person_id: 'PM_A', canonical_name: 'A' },
+      { person_id: 'PM_B', canonical_name: 'B' }
+    ];
+    var edges = [
+      { edge_id: 'E_ACCUSED', edge_type: 'CO_ACCUSED', source_person_id: 'PM_A', target_person_id: 'PM_B', confirmed: true },
+      { edge_id: 'E_LOCATION', edge_type: 'SHARED_LOCATION', source_person_id: 'PM_A', target_person_id: 'PM_B', confirmed: true }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    assert.strictEqual(cache.getEdgesForNode('PM_A').length, 2, 'two distinct edges');
+    assert.strictEqual(cache.getDegree('PM_A'), 2, 'degree = 2');
+    assert.strictEqual(cache.getDegree('PM_B'), 2, 'degree = 2');
+  });
+
+  test('getEdges returns no duplicate edge_ids for any node', async function () {
+    var nodes = [
+      { person_id: 'PM_A', canonical_name: 'A' },
+      { person_id: 'PM_B', canonical_name: 'B' },
+      { person_id: 'PM_C', canonical_name: 'C' }
+    ];
+    var edges = [
+      { edge_id: 'E001', edge_type: 'CO_ACCUSED', source_person_id: 'PM_A', target_person_id: 'PM_B', confirmed: true },
+      { edge_id: 'E001', edge_type: 'CO_ACCUSED', source_person_id: 'PM_B', target_person_id: 'PM_A', confirmed: true },
+      { edge_id: 'E002', edge_type: 'CO_ACCUSED', source_person_id: 'PM_B', target_person_id: 'PM_C', confirmed: true },
+      { edge_id: 'E002', edge_type: 'CO_ACCUSED', source_person_id: 'PM_C', target_person_id: 'PM_B', confirmed: true },
+      { edge_id: 'E003', edge_type: 'ACCUSED_TO_VICTIM', source_person_id: 'PM_A', target_person_id: 'PM_C', confirmed: true },
+      { edge_id: 'E003', edge_type: 'ACCUSED_TO_VICTIM', source_person_id: 'PM_C', target_person_id: 'PM_A', confirmed: true }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    [ 'PM_A', 'PM_B', 'PM_C' ].forEach(function (pid) {
+      var edges = cache.getEdgesForNode(pid);
+      var edgeIds = edges.map(function (e) { return e.edge_id; });
+      var uniqueIds = edgeIds.filter(function (id, idx, self) { return self.indexOf(id) === idx; });
+      assert.strictEqual(edgeIds.length, uniqueIds.length, pid + ' has no duplicate edge_ids');
+    });
+    assert.strictEqual(cache.getDegree('PM_A'), 2);
+    assert.strictEqual(cache.getDegree('PM_B'), 1);
+    assert.strictEqual(cache.getDegree('PM_C'), 2);
+  });
+
+  test('directed ACCUSED_TO_VICTIM duplicate across docs deduped', async function () {
+    var nodes = [
+      { person_id: 'PM_A', canonical_name: 'Accused' },
+      { person_id: 'PM_V', canonical_name: 'Victim' }
+    ];
+    var edges = [
+      { edge_id: 'E_A2V', edge_type: 'ACCUSED_TO_VICTIM', source_person_id: 'PM_A', target_person_id: 'PM_V', confirmed: true },
+      { edge_id: 'E_A2V', edge_type: 'ACCUSED_TO_VICTIM', source_person_id: 'PM_V', target_person_id: 'PM_A', confirmed: true }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    assert.strictEqual(cache.getEdgesForNode('PM_A').length, 1);
+    assert.strictEqual(cache.getEdgesForNode('PM_V').length, 1);
+    assert.strictEqual(cache.getDegree('PM_A'), 1);
+    assert.strictEqual(cache.getDegree('PM_V'), 1);
+  });
+
+  test('CANDIDATE_MATCH duplicate across docs deduped', async function () {
+    var nodes = [
+      { person_id: 'PM_X', canonical_name: 'X' },
+      { person_id: 'PM_Y', canonical_name: 'Y' }
+    ];
+    var edges = [
+      { edge_id: 'E_CM', edge_type: 'CANDIDATE_MATCH', source_person_id: 'PM_X', target_person_id: 'PM_Y', confirmed: false },
+      { edge_id: 'E_CM', edge_type: 'CANDIDATE_MATCH', source_person_id: 'PM_Y', target_person_id: 'PM_X', confirmed: false }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    assert.strictEqual(cache.getEdgesForNode('PM_X').length, 1);
+    assert.strictEqual(cache.getEdgesForNode('PM_Y').length, 1);
+    assert.strictEqual(cache.getDegree('PM_X'), 1);
+    assert.strictEqual(cache.getDegree('PM_Y'), 1);
+  });
+
+  test('self-loop not counted in degree', async function () {
+    var nodes = [
+      { person_id: 'PM_SELF', canonical_name: 'Self' },
+      { person_id: 'PM_OTHER', canonical_name: 'Other' }
+    ];
+    var edges = [
+      { edge_id: 'E_SELF', edge_type: 'CO_ACCUSED', source_person_id: 'PM_SELF', target_person_id: 'PM_SELF', confirmed: true },
+      { edge_id: 'E_NORM', edge_type: 'CO_ACCUSED', source_person_id: 'PM_SELF', target_person_id: 'PM_OTHER', confirmed: true }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    assert.strictEqual(cache.getDegree('PM_SELF'), 1, 'self-loop excluded from degree');
+    assert.strictEqual(cache.getDegree('PM_OTHER'), 1);
+    assert.strictEqual(cache.getEdgesForNode('PM_SELF').length, 1, 'self-loop excluded from edges');
+  });
+
+  test('dangling target excluded from adjacency and degree', async function () {
+    var nodes = [
+      { person_id: 'PM_EXIST', canonical_name: 'Exists' }
+    ];
+    var edges = [
+      { edge_id: 'E_DANGLE', edge_type: 'CO_ACCUSED', source_person_id: 'PM_EXIST', target_person_id: 'PM_GHOST', confirmed: true }
+    ];
+    var cache = buildCache(nodes, edges);
+    await cache.load();
+    assert.strictEqual(cache.getEdgesForNode('PM_EXIST').length, 0, 'dangling edge excluded');
+    assert.strictEqual(cache.getDegree('PM_EXIST'), 0);
+    assert.strictEqual(cache.getEdgesForNode('PM_GHOST').length, 0);
+    assert.strictEqual(cache.getDegree('PM_GHOST'), 0);
+  });
+
+  test('cache reload preserves degree uniqueness', async function () {
+    var loadCount = 0;
+    var cache = new GraphCache(function () {
+      loadCount++;
+      return {
+        nodes: [
+          { person_id: 'PM_A', canonical_name: 'A' },
+          { person_id: 'PM_B', canonical_name: 'B' }
+        ],
+        edges: [
+          { edge_id: 'E001', edge_type: 'CO_ACCUSED', source_person_id: 'PM_A', target_person_id: 'PM_B', confirmed: true },
+          { edge_id: 'E001', edge_type: 'CO_ACCUSED', source_person_id: 'PM_B', target_person_id: 'PM_A', confirmed: true }
+        ],
+        diagnostics: {}
+      };
+    });
+    await cache.load();
+    assert.strictEqual(cache.getDegree('PM_A'), 1, 'first load degree');
+    assert.strictEqual(cache.getEdgesForNode('PM_A').length, 1, 'first load edges');
+
+    await cache.reload();
+    assert.strictEqual(cache.getDegree('PM_A'), 1, 'reloaded degree');
+    assert.strictEqual(cache.getEdgesForNode('PM_A').length, 1, 'reloaded edges');
+    assert.strictEqual(loadCount, 2, 'loader called twice');
+  });
+
+  test('duplicate_edges_skipped counter accurate across docs', async function () {
+    var docs = [
+      makePersonMasterDoc('PM_001', {
+        confirmed_edges: [
+          { edge_id: 'EDGE_D1', edge_type: 'CO_ACCUSED', target_person_id: 'PM_002', confidence: 0.9, evidence: [], case_ids: ['C1'], created_at: '2024-01-01', version: 1 }
+        ]
+      }),
+      makePersonMasterDoc('PM_002', {
+        confirmed_edges: [
+          { edge_id: 'EDGE_D1', edge_type: 'CO_ACCUSED', target_person_id: 'PM_001', confidence: 0.9, evidence: [], case_ids: ['C1'], created_at: '2024-01-01', version: 1 },
+          { edge_id: 'EDGE_D2', edge_type: 'SHARED_LOCATION', target_person_id: 'PM_003', confidence: 0.8, evidence: [], case_ids: ['C2'], created_at: '2024-01-01', version: 1 }
+        ]
+      }),
+      makePersonMasterDoc('PM_003', {
+        confirmed_edges: [
+          { edge_id: 'EDGE_D2', edge_type: 'SHARED_LOCATION', target_person_id: 'PM_002', confidence: 0.8, evidence: [], case_ids: ['C2'], created_at: '2024-01-01', version: 1 }
+        ]
+      })
+    ];
+    var mockApp = createMockAppInstance(docs);
+    var repo = new GraphRepository();
+    var result = await repo.loadGraph(mockApp);
+    assert.strictEqual(result.diagnostics.edges_loaded, 2, 'exactly 2 unique edges');
+    assert.strictEqual(result.diagnostics.duplicate_edges_skipped, 2, '2 cross-doc duplicates skipped');
+  });
+
+  test('statistics consistency totalEdges', async function () {
+    var nodes = [
+      { person_id: 'PM_001' },
+      { person_id: 'PM_002' },
+      { person_id: 'PM_003' }
+    ];
+    var edges = [
+      { edge_id: 'E1', edge_type: 'CO_ACCUSED', source_person_id: 'PM_001', target_person_id: 'PM_002' },
+      { edge_id: 'E2', edge_type: 'SHARED_LOCATION', source_person_id: 'PM_002', target_person_id: 'PM_003' }
+    ];
+    var stats = computeStats(nodes, edges);
+    assert.strictEqual(stats.totalEdges, 2);
+    assert.strictEqual(stats.edgesByType.CO_ACCUSED, 1);
+    assert.strictEqual(stats.edgesByType.SHARED_LOCATION, 1);
+  });
+})();
+
 // ============================================================
 // SUMMARY
 // ============================================================

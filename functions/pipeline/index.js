@@ -30,67 +30,118 @@ const RISK_PATTERNS = /\b(risk\s+score|high-risk|repeat\s+offender|risk\s+level|
 const FORECAST_PATTERNS = /\b(predict|forecast|next\s+month|hotspot|trend(?:s|ing)?|pattern(?:s)?|seasonal|analysis|analytics|statistics?|breakdown|compare|most\s+common|crime\s+(?:trends?|analysis|statistics?|pattern|data|overview))\b/i;
 const PM_TABLE_NAME = 'PersonMaster';
 var _pmCache = null;
+var _loadingPromise = null;
 
-async function ensurePersonMasterCache(app) {
-	if (_pmCache && _pmCache.loaded) return _pmCache;
+function escapeZCQL(value) {
+	return String(value)
+		.replace(/'/g, "''")
+		.replace(/\*/g, '[asterisk]')
+		.replace(/\?/g, '[question]');
+}
 
-	var persons = {};
-	var edges = [];
+async function _loadAllPmDocuments(app) {
+	var { NoSQLEnum, NoSQLMarshall } = require('zcatalyst-sdk-node/lib/no-sql');
+	var { NoSQLOperator } = NoSQLEnum;
+	var noSql = app.nosql();
+	var table = await noSql.getTable(PM_TABLE_NAME);
+	var allDocs = [];
+	var startKey = null;
 
-	try {
-		var noSql = app.nosql();
-		var table = await noSql.getTable(PM_TABLE_NAME);
-		var { NoSQLItem, NoSQLEnum, NoSQLMarshall } = require('zcatalyst-sdk-node/lib/no-sql');
-		var { NoSQLOperator } = NoSQLEnum;
-
-		var queryBody = {
+	while (true) {
+		var queryParams = {
 			key_condition: {
-				attribute: ['person_id'],
-				operator: NoSQLOperator.BEGINS_WITH,
-				value: NoSQLMarshall.makeString('PM_')
-			}
+				attribute: 'type',
+				operator: NoSQLOperator.EQUALS,
+				value: NoSQLMarshall.makeString('PM')
+			},
+			limit: 100,
+			consistent_read: true
 		};
+		if (startKey) {
+			queryParams.start_key = startKey;
+		}
 
-		var response = await table.queryTable(queryBody);
-		var items = response.getResponseData();
+		var result = await table.queryTable(queryParams);
+		var items;
+		try {
+			items = result.getResponseData();
+		} catch (e) {
+			throw new Error('Failed to parse NoSQL response: ' + e.message);
+		}
 
-		for (var di = 0; di < items.length; di++) {
-			var data = items[di];
-			if (data && data.item) {
-				var doc = data.item.to();
-				if (doc && doc.person_id) {
-					persons[doc.person_id] = doc;
-					if (doc.adjacency) {
-						var typeKeys = ['co_accused', 'accused_to_victim', 'shared_location', 'unconfirmed_matches'];
-						for (var ti = 0; ti < typeKeys.length; ti++) {
-							var list = doc.adjacency[typeKeys[ti]] || [];
-							for (var ei = 0; ei < list.length; ei++) {
-								edges.push({
-									edge_id: list[ei].edge_id,
-									source: doc.person_id,
-									target: list[ei].person_id,
-									edge_type: typeKeys[ti] === 'co_accused' ? 'CO_ACCUSED' :
-										typeKeys[ti] === 'accused_to_victim' ? 'ACCUSED_TO_VICTIM' :
-										typeKeys[ti] === 'shared_location' ? 'SHARED_LOCATION' : 'UNCONFIRMED_MATCH',
-									weight: list[ei].weight || 1,
-									occurrence_count: list[ei].occurrence_count || 0
-								});
-							}
-						}
+		if (items && items.length > 0) {
+			for (var di = 0; di < items.length; di++) {
+				var data = items[di];
+				if (data && data.item && typeof data.item.to === 'function') {
+					var doc = data.item.to();
+					if (doc && doc.person_id) {
+						allDocs.push(doc);
 					}
 				}
 			}
 		}
-	} catch (err) {
-		console.error('Failed to load PersonMaster cache: ' + err.message);
+
+		startKey = result.start_key;
+		if (!startKey) break;
 	}
 
-	_pmCache = { persons: persons, edges: edges, loaded: true };
-	return _pmCache;
+	return allDocs;
+}
+
+async function ensurePersonMasterCache(app) {
+	if (_pmCache && _pmCache.loaded) return _pmCache;
+	if (_loadingPromise) return _loadingPromise;
+
+	_loadingPromise = (async function() {
+		try {
+			var docs = await _loadAllPmDocuments(app);
+
+			var persons = {};
+			var edges = [];
+			for (var di = 0; di < docs.length; di++) {
+				var doc = docs[di];
+				if (doc && doc.person_id) {
+					persons[doc.person_id] = doc;
+					var confirmed = doc.confirmed_edges || [];
+					for (var ei = 0; ei < confirmed.length; ei++) {
+						var ce = confirmed[ei];
+						if (!ce || !ce.edge_id || !ce.edge_type) continue;
+						var tgtId = ce.target_person_id || ce.with_person_id;
+						if (!tgtId || tgtId === doc.person_id) continue;
+						var eType = ce.edge_type.toUpperCase();
+						if (eType === 'CO_ACCUSED' || eType === 'ACCUSED_TO_VICTIM' || eType === 'SHARED_LOCATION' || eType === 'CANDIDATE_MATCH') {
+							edges.push({
+								edge_id: ce.edge_id,
+								source: doc.person_id,
+								target: tgtId,
+								edge_type: eType,
+								weight: ce.confidence || 1,
+								occurrence_count: (ce.case_ids || []).length || 0
+							});
+						}
+					}
+				}
+			}
+
+			_pmCache = { persons: persons, edges: edges, loaded: true };
+			return _pmCache;
+		} catch (err) {
+			console.error('Failed to load PersonMaster cache: ' + err.message);
+			if (_pmCache && _pmCache.loaded) {
+				return _pmCache;
+			}
+			_pmCache = { persons: {}, edges: [], loaded: true };
+			return _pmCache;
+		} finally {
+			_loadingPromise = null;
+		}
+	})();
+
+	return _loadingPromise;
 }
 
 function computeDegreeFromEdges(personId, edges) {
-	var degree = { total: 0, CO_ACCUSED: 0, ACCUSED_TO_VICTIM: 0, SHARED_LOCATION: 0, UNCONFIRMED_MATCH: 0 };
+	var degree = { total: 0, CO_ACCUSED: 0, ACCUSED_TO_VICTIM: 0, SHARED_LOCATION: 0, CANDIDATE_MATCH: 0 };
 	for (var ei = 0; ei < edges.length; ei++) {
 		var e = edges[ei];
 		if (e.source === personId || e.target === personId) {
@@ -101,16 +152,26 @@ function computeDegreeFromEdges(personId, edges) {
 	return degree;
 }
 
-function bfsTraversePM(persons, edges, startId, maxHops) {
+function bfsTraversePM(persons, edges, startId, maxHops, maxNodes) {
+	maxNodes = maxNodes || 100;
+	var MAX_HARD_LIMIT = 500;
+	if (maxNodes > MAX_HARD_LIMIT) maxNodes = MAX_HARD_LIMIT;
+
 	var visitedNodeIds = {};
 	var visitedEdgeIds = {};
 	var resultNodes = [];
 	var resultEdges = [];
+	var truncated = false;
 
 	var queue = [{ personId: startId, hopDistance: 0 }];
 	visitedNodeIds[startId] = true;
 
 	while (queue.length > 0) {
+		if (resultNodes.length >= maxNodes) {
+			truncated = true;
+			break;
+		}
+
 		var current = queue.shift();
 		var person = persons[current.personId];
 		resultNodes.push({
@@ -127,7 +188,6 @@ function bfsTraversePM(persons, edges, startId, maxHops) {
 		for (var ei = 0; ei < edges.length; ei++) {
 			var e = edges[ei];
 			if (e.source !== current.personId && e.target !== current.personId) continue;
-			if (e.edge_type === 'UNCONFIRMED_MATCH') continue;
 			if (visitedEdgeIds[e.edge_id]) continue;
 			nodeEdges.push(e);
 		}
@@ -154,7 +214,7 @@ function bfsTraversePM(persons, edges, startId, maxHops) {
 		}
 	}
 
-	return { nodes: resultNodes, edges: resultEdges };
+	return { nodes: resultNodes, edges: resultEdges, truncated: truncated };
 }
 
 const SCHEMA_DESCRIPTION = `
@@ -503,6 +563,7 @@ function extractKeywords(query) {
 }
 
 function flatRows(rows) {
+	if (!rows || !Array.isArray(rows)) return [];
 	return rows.map(r => {
 		const flat = {};
 		for (const key of Object.keys(r)) {
@@ -559,7 +620,7 @@ const MAX_EXCERPTS = 3;
 async function searchBriefFacts(app, keywords) {
 	if (keywords.length === 0) return [];
 
-	const conditions = keywords.slice(0, 5).map(k => `cm.BriefFacts LIKE '*${k}*'`);
+	const conditions = keywords.slice(0, 5).map(k => `cm.BriefFacts LIKE '*${escapeZCQL(k)}*'`);
 	const sql = `SELECT cm.ROWID, cm.CaseMasterID, cm.CrimeNo, cm.BriefFacts, cm.IncidentFromDate, cm.CrimeMajorHeadID, d.DistrictName, ch.CrimeGroupName, u.UnitName
 FROM CaseMaster cm
 INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID
@@ -588,9 +649,9 @@ async function searchPersons(app, keywords) {
 	if (keywords.length === 0) return [];
 
 	const queries = [
-		{ sql: (kw) => `SELECT CaseMasterID, AccusedName FROM Accused WHERE AccusedName LIKE '*${kw}*' LIMIT 15`, role: 'ACCUSED' },
-		{ sql: (kw) => `SELECT CaseMasterID, VictimName FROM Victim WHERE VictimName LIKE '*${kw}*' LIMIT 15`, role: 'VICTIM' },
-		{ sql: (kw) => `SELECT CaseMasterID, ComplainantName FROM ComplainantDetails WHERE ComplainantName LIKE '*${kw}*' LIMIT 15`, role: 'COMPLAINANT' },
+		{ sql: (kw) => `SELECT CaseMasterID, AccusedName FROM Accused WHERE AccusedName LIKE '*${escapeZCQL(kw)}*' LIMIT 15`, role: 'ACCUSED' },
+		{ sql: (kw) => `SELECT CaseMasterID, VictimName FROM Victim WHERE VictimName LIKE '*${escapeZCQL(kw)}*' LIMIT 15`, role: 'VICTIM' },
+		{ sql: (kw) => `SELECT CaseMasterID, ComplainantName FROM ComplainantDetails WHERE ComplainantName LIKE '*${escapeZCQL(kw)}*' LIMIT 15`, role: 'COMPLAINANT' },
 	];
 
 	const caseRowIds = new Set();
@@ -669,10 +730,10 @@ WHERE a.CaseMasterID IN (${ids})`;
 	let sectionRows = [];
 	try {
 		enrichRows = flatRows(await app.zcql().executeZCQLQuery(enrichSql));
-	} catch {}
+	} catch (err) { console.error('[pipeline] enrichMatches case status failed:', err.message); }
 	try {
 		sectionRows = flatRows(await app.zcql().executeZCQLQuery(sectionSql));
-	} catch {}
+	} catch (err) { console.error('[pipeline] enrichMatches sections failed:', err.message); }
 
 	const enrichMap = new Map(enrichRows.map(r => [r.ROWID, r]));
 	const sectionMap = new Map();
@@ -994,10 +1055,11 @@ async function handleRisk(app, query) {
 		return { intent: 'risk', answer: 'Please specify a person name (e.g. "risk score of Ravi").', risk_score: null, factors: [], source_refs: [] };
 	}
 
+	var safeName = escapeZCQL(name);
 	const accusedRows = zcqlRows(await app.zcql().executeZCQLQuery(
 		`SELECT a.ROWID, a.AccusedName, a.CaseMasterID, cm.CrimeRegisteredDate, ch.CrimeGroupName
 FROM Accused a INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID
-WHERE a.AccusedName LIKE '*${name}*' LIMIT 100`
+WHERE a.AccusedName LIKE '*${safeName}*' LIMIT 100`
 	).catch(() => []));
 
 	if (accusedRows.length === 0) {
@@ -1119,10 +1181,10 @@ async function handleAnalyticalFallback(app, query) {
 
 	const whereClauses = [];
 	if (location) {
-		whereClauses.push(`d.DistrictName LIKE '*${location}*'`);
+		whereClauses.push(`d.DistrictName LIKE '*${escapeZCQL(location)}*'`);
 	}
 	if (period) {
-		whereClauses.push(`cm.CrimeRegisteredDate >= '${period.since}'`);
+		whereClauses.push(`cm.CrimeRegisteredDate >= '${escapeZCQL(period.since)}'`);
 	}
 
 	const whereSQL = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
@@ -1286,7 +1348,7 @@ async function requireAuth(app) {
 	}
 }
 
-module.exports = async (req, res) => {
+var handler = async (req, res) => {
 	let app;
 	try {
 		app = catalyst.initialize(req);
@@ -1447,3 +1509,15 @@ module.exports = async (req, res) => {
 		sendError(res, 500, 'PIPELINE_ERROR', err.message || 'Pipeline execution failed');
 	}
 };
+
+handler.escapeZCQL = escapeZCQL;
+handler.bfsTraversePM = bfsTraversePM;
+handler.computeDegreeFromEdges = computeDegreeFromEdges;
+handler.ensurePersonMasterCache = ensurePersonMasterCache;
+handler.extractPersonName = extractPersonName;
+handler.extractKeywords = extractKeywords;
+handler.classifyByKeyword = classifyByKeyword;
+handler.flatRows = flatRows;
+handler.zcqlRows = zcqlRows;
+handler._resetPersonMasterCache = function() { _pmCache = null; _loadingPromise = null; };
+module.exports = handler;
