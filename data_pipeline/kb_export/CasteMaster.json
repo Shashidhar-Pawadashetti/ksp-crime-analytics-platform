@@ -1,0 +1,110 @@
+{
+  "table": "CasteMaster",
+  "columns": [
+    "ROWID",
+    "caste_master_id",
+    "caste_master_name"
+  ],
+  "rows": [
+    {
+      "ROWID": "47995000000333172",
+      "caste_master_id": "1",
+      "caste_master_name": "Brahmin"
+    },
+    {
+      "ROWID": "47995000000333173",
+      "caste_master_id": "2",
+      "caste_master_name": "Kshatriya"
+    },
+    {
+      "ROWID": "47995000000333174",
+      "caste_master_id": "3",
+      "caste_master_name": "Vokkaliga"
+    },
+    {
+      "ROWID": "47995000000333175",
+      "caste_master_id": "4",
+      "caste_master_name": "Lingayat"
+    },
+    {
+      "ROWID": "47995000000333176",
+      "caste_master_id": "5",
+      "caste_master_name": "Kuruba"
+    },
+    {
+      "ROWID": "47995000000333177",
+      "caste_master_id": "6",
+      "caste_master_name": "Scheduled Caste"
+    },
+    {
+      "ROWID": "47995000000333178",
+      "caste_master_id": "7",
+      "caste_master_name": "Scheduled Tribe"
+    },
+    {
+      "ROWID": "47995000000333179",
+      "caste_master_id": "8",
+      "caste_master_name": "Muslim"
+    },
+    {
+      "ROWID": "47995000000333180",
+      "caste_master_id": "9",
+      "caste_master_name": "Christian"
+    },
+    {
+      "ROWID": "47995000000333181",
+      "caste_master_id": "10",
+      "caste_master_name": "Jain"
+    },
+    {
+      "ROWID": "47995000000333182",
+      "caste_master_id": "11",
+      "caste_master_name": "Maratha"
+    },
+    {
+      "ROWID": "47995000000333183",
+      "caste_master_id": "12",
+      "caste_master_name": "Dalit"
+    },
+    {
+      "ROWID": "47995000000333184",
+      "caste_master_id": "13",
+      "caste_master_name": "Nayaka"
+    },
+    {
+      "ROWID": "47995000000333185",
+      "caste_master_id": "14",
+      "caste_master_name": "Lambani"
+    },
+    {
+      "ROWID": "47995000000333186",
+      "caste_master_id": "15",
+      "caste_master_name": "Other Backward Class"
+    },
+    {
+      "ROWID": "47995000000333187",
+      "caste_master_id": "16",
+      "caste_master_name": "Ediga"
+    },
+    {
+      "ROWID": "47995000000333188",
+      "caste_master_id": "17",
+      "caste_master_name": "Bestha"
+    },
+    {
+      "ROWID": "47995000000333189",
+      "caste_master_id": "18",
+      "caste_master_name": "Uppara"
+    },
+    {
+      "ROWID": "47995000000333190",
+      "caste_master_id": "19",
+      "caste_master_name": "Kumbara"
+    },
+    {
+      "ROWID": "47995000000333191",
+      "caste_master_id": "20",
+      "caste_master_name": "Ganiga"
+    }
+  ]
+}

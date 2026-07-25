@@ -1,0 +1,544 @@
+{
+  "table": "CrimeSubHead",
+  "columns": [
+    "ROWID",
+    "CrimeSubHeadID",
+    "CrimeHeadID",
+    "CrimeHeadName",
+    "SeqID"
+  ],
+  "rows": [
+    {
+      "ROWID": "47995000000334138",
+      "CrimeSubHeadID": "1",
+      "CrimeHeadID": "47995000000334113",
+      "CrimeHeadName": "Murder with Deadly Weapon",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334139",
+      "CrimeSubHeadID": "2",
+      "CrimeHeadID": "47995000000334113",
+      "CrimeHeadName": "Murder of Government Servant",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334140",
+      "CrimeSubHeadID": "3",
+      "CrimeHeadID": "47995000000334113",
+      "CrimeHeadName": "Murder for Gain",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334141",
+      "CrimeSubHeadID": "4",
+      "CrimeHeadID": "47995000000334113",
+      "CrimeHeadName": "Attempted Murder",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334142",
+      "CrimeSubHeadID": "5",
+      "CrimeHeadID": "47995000000334113",
+      "CrimeHeadName": "Murder by Poison",
+      "SeqID": "5"
+    },
+    {
+      "ROWID": "47995000000334143",
+      "CrimeSubHeadID": "6",
+      "CrimeHeadID": "47995000000334114",
+      "CrimeHeadName": "Attempt to Murder with Firearm",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334144",
+      "CrimeSubHeadID": "7",
+      "CrimeHeadID": "47995000000334114",
+      "CrimeHeadName": "Attempt to Murder by Poison",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334145",
+      "CrimeSubHeadID": "8",
+      "CrimeHeadID": "47995000000334114",
+      "CrimeHeadName": "Attempt to Murder by Strangulation",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334146",
+      "CrimeSubHeadID": "9",
+      "CrimeHeadID": "47995000000334115",
+      "CrimeHeadName": "Culpable Homicide not amounting to Murder",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334147",
+      "CrimeSubHeadID": "10",
+      "CrimeHeadID": "47995000000334115",
+      "CrimeHeadName": "Culpable Homicide by Rash Driving",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334148",
+      "CrimeSubHeadID": "11",
+      "CrimeHeadID": "47995000000334115",
+      "CrimeHeadName": "Culpable Homicide by Negligence",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334149",
+      "CrimeSubHeadID": "12",
+      "CrimeHeadID": "47995000000334116",
+      "CrimeHeadName": "Rape of Major",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334150",
+      "CrimeSubHeadID": "13",
+      "CrimeHeadID": "47995000000334116",
+      "CrimeHeadName": "Rape of Minor",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334151",
+      "CrimeSubHeadID": "14",
+      "CrimeHeadID": "47995000000334116",
+      "CrimeHeadName": "Gang Rape",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334152",
+      "CrimeSubHeadID": "15",
+      "CrimeHeadID": "47995000000334116",
+      "CrimeHeadName": "Rape by Relative",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334153",
+      "CrimeSubHeadID": "16",
+      "CrimeHeadID": "47995000000334117",
+      "CrimeHeadName": "Kidnapping for Ransom",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334154",
+      "CrimeSubHeadID": "17",
+      "CrimeHeadID": "47995000000334117",
+      "CrimeHeadName": "Kidnapping of Minor",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334155",
+      "CrimeSubHeadID": "18",
+      "CrimeHeadID": "47995000000334117",
+      "CrimeHeadName": "Abduction of Woman",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334156",
+      "CrimeSubHeadID": "19",
+      "CrimeHeadID": "47995000000334117",
+      "CrimeHeadName": "Kidnapping for Murder",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334157",
+      "CrimeSubHeadID": "20",
+      "CrimeHeadID": "47995000000334118",
+      "CrimeHeadName": "Armed Robbery",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334158",
+      "CrimeSubHeadID": "21",
+      "CrimeHeadID": "47995000000334118",
+      "CrimeHeadName": "Robbery on Highway",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334159",
+      "CrimeSubHeadID": "22",
+      "CrimeHeadID": "47995000000334118",
+      "CrimeHeadName": "Robbery at Residence",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334160",
+      "CrimeSubHeadID": "23",
+      "CrimeHeadID": "47995000000334118",
+      "CrimeHeadName": "Robbery of Valuables",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334161",
+      "CrimeSubHeadID": "24",
+      "CrimeHeadID": "47995000000334119",
+      "CrimeHeadName": "Armed Dacoity",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334162",
+      "CrimeSubHeadID": "25",
+      "CrimeHeadID": "47995000000334119",
+      "CrimeHeadName": "Dacoity on Highway",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334163",
+      "CrimeSubHeadID": "26",
+      "CrimeHeadID": "47995000000334119",
+      "CrimeHeadName": "Dacoity with Murder",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334164",
+      "CrimeSubHeadID": "27",
+      "CrimeHeadID": "47995000000334119",
+      "CrimeHeadName": "Dacoity at Residence",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334165",
+      "CrimeSubHeadID": "28",
+      "CrimeHeadID": "47995000000334120",
+      "CrimeHeadName": "Burglary at Night",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334166",
+      "CrimeSubHeadID": "29",
+      "CrimeHeadID": "47995000000334120",
+      "CrimeHeadName": "Burglary at Residence",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334167",
+      "CrimeSubHeadID": "30",
+      "CrimeHeadID": "47995000000334120",
+      "CrimeHeadName": "Burglary of Shop",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334168",
+      "CrimeSubHeadID": "31",
+      "CrimeHeadID": "47995000000334120",
+      "CrimeHeadName": "Burglary of Godown",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334169",
+      "CrimeSubHeadID": "32",
+      "CrimeHeadID": "47995000000334121",
+      "CrimeHeadName": "Theft of Motor Vehicle",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334170",
+      "CrimeSubHeadID": "33",
+      "CrimeHeadID": "47995000000334121",
+      "CrimeHeadName": "Theft of Mobile Phone",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334171",
+      "CrimeSubHeadID": "34",
+      "CrimeHeadID": "47995000000334121",
+      "CrimeHeadName": "Theft of Valuables",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334172",
+      "CrimeSubHeadID": "35",
+      "CrimeHeadID": "47995000000334121",
+      "CrimeHeadName": "Theft from Vehicle",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334173",
+      "CrimeSubHeadID": "36",
+      "CrimeHeadID": "47995000000334122",
+      "CrimeHeadName": "Rioting with Deadly Weapon",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334174",
+      "CrimeSubHeadID": "37",
+      "CrimeHeadID": "47995000000334122",
+      "CrimeHeadName": "Rioting causing Hurt",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334175",
+      "CrimeSubHeadID": "38",
+      "CrimeHeadID": "47995000000334122",
+      "CrimeHeadName": "Rioting with Destruction of Property",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334176",
+      "CrimeSubHeadID": "39",
+      "CrimeHeadID": "47995000000334122",
+      "CrimeHeadName": "Unlawful Assembly",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334177",
+      "CrimeSubHeadID": "40",
+      "CrimeHeadID": "47995000000334123",
+      "CrimeHeadName": "Cheating by Impersonation",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334178",
+      "CrimeSubHeadID": "41",
+      "CrimeHeadID": "47995000000334123",
+      "CrimeHeadName": "Cheating by False Pretence",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334179",
+      "CrimeSubHeadID": "42",
+      "CrimeHeadID": "47995000000334123",
+      "CrimeHeadName": "Cheating by Ponzi Scheme",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334180",
+      "CrimeSubHeadID": "43",
+      "CrimeHeadID": "47995000000334123",
+      "CrimeHeadName": "Online Fraud",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334181",
+      "CrimeSubHeadID": "44",
+      "CrimeHeadID": "47995000000334124",
+      "CrimeHeadName": "Criminal Breach of Trust by Public Servant",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334182",
+      "CrimeSubHeadID": "45",
+      "CrimeHeadID": "47995000000334124",
+      "CrimeHeadName": "Criminal Breach of Trust by Agent",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334183",
+      "CrimeSubHeadID": "46",
+      "CrimeHeadID": "47995000000334124",
+      "CrimeHeadName": "Criminal Breach of Trust by Bailee",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334184",
+      "CrimeSubHeadID": "47",
+      "CrimeHeadID": "47995000000334125",
+      "CrimeHeadName": "Counterfeiting of Currency",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334185",
+      "CrimeSubHeadID": "48",
+      "CrimeHeadID": "47995000000334125",
+      "CrimeHeadName": "Counterfeiting of Stamps",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334186",
+      "CrimeSubHeadID": "49",
+      "CrimeHeadID": "47995000000334125",
+      "CrimeHeadName": "Counterfeiting of Documents",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334187",
+      "CrimeSubHeadID": "50",
+      "CrimeHeadID": "47995000000334125",
+      "CrimeHeadName": "Possession of Counterfeit Instrument",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334188",
+      "CrimeSubHeadID": "51",
+      "CrimeHeadID": "47995000000334126",
+      "CrimeHeadName": "Mischief by Fire",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334189",
+      "CrimeSubHeadID": "52",
+      "CrimeHeadID": "47995000000334126",
+      "CrimeHeadName": "Mischief by Explosive",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334190",
+      "CrimeSubHeadID": "53",
+      "CrimeHeadID": "47995000000334126",
+      "CrimeHeadName": "Arson of Dwelling House",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334191",
+      "CrimeSubHeadID": "54",
+      "CrimeHeadID": "47995000000334126",
+      "CrimeHeadName": "Arson of Public Building",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334192",
+      "CrimeSubHeadID": "55",
+      "CrimeHeadID": "47995000000334127",
+      "CrimeHeadName": "Grievous Hurt by Weapon",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334193",
+      "CrimeSubHeadID": "56",
+      "CrimeHeadID": "47995000000334127",
+      "CrimeHeadName": "Grievous Hurt by Poison",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334194",
+      "CrimeSubHeadID": "57",
+      "CrimeHeadID": "47995000000334127",
+      "CrimeHeadName": "Simple Hurt",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334195",
+      "CrimeSubHeadID": "58",
+      "CrimeHeadID": "47995000000334127",
+      "CrimeHeadName": "Hurt by Rash Driving",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334196",
+      "CrimeSubHeadID": "59",
+      "CrimeHeadID": "47995000000334128",
+      "CrimeHeadName": "Extortion by Threat",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334197",
+      "CrimeSubHeadID": "60",
+      "CrimeHeadID": "47995000000334128",
+      "CrimeHeadName": "Extortion by Public Servant",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334198",
+      "CrimeSubHeadID": "61",
+      "CrimeHeadID": "47995000000334128",
+      "CrimeHeadName": "Extortion by Intimidation",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334199",
+      "CrimeSubHeadID": "62",
+      "CrimeHeadID": "47995000000334129",
+      "CrimeHeadName": "House Trespass",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334200",
+      "CrimeSubHeadID": "63",
+      "CrimeHeadID": "47995000000334129",
+      "CrimeHeadName": "House Trespass by Night",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334201",
+      "CrimeSubHeadID": "64",
+      "CrimeHeadID": "47995000000334129",
+      "CrimeHeadName": "Lurking House Trespass",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334202",
+      "CrimeSubHeadID": "65",
+      "CrimeHeadID": "47995000000334129",
+      "CrimeHeadName": "Criminal Trespass by Public Servant",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334203",
+      "CrimeSubHeadID": "66",
+      "CrimeHeadID": "47995000000334130",
+      "CrimeHeadName": "Assault with Intent to Outrage Modesty",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334204",
+      "CrimeSubHeadID": "67",
+      "CrimeHeadID": "47995000000334130",
+      "CrimeHeadName": "Sexual Harassment",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334205",
+      "CrimeSubHeadID": "68",
+      "CrimeHeadID": "47995000000334130",
+      "CrimeHeadName": "Voyeurism",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334206",
+      "CrimeSubHeadID": "69",
+      "CrimeHeadID": "47995000000334130",
+      "CrimeHeadName": "Stalking",
+      "SeqID": "4"
+    },
+    {
+      "ROWID": "47995000000334207",
+      "CrimeSubHeadID": "70",
+      "CrimeHeadID": "47995000000334131",
+      "CrimeHeadName": "Dowry Death by Burning",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334208",
+      "CrimeSubHeadID": "71",
+      "CrimeHeadID": "47995000000334131",
+      "CrimeHeadName": "Dowry Death by Poison",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334209",
+      "CrimeSubHeadID": "72",
+      "CrimeHeadID": "47995000000334131",
+      "CrimeHeadName": "Dowry Death by Harassment",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334210",
+      "CrimeSubHeadID": "73",
+      "CrimeHeadID": "47995000000334132",
+      "CrimeHeadName": "Hacking",
+      "SeqID": "1"
+    },
+    {
+      "ROWID": "47995000000334211",
+      "CrimeSubHeadID": "74",
+      "CrimeHeadID": "47995000000334132",
+      "CrimeHeadName": "Identity Theft",
+      "SeqID": "2"
+    },
+    {
+      "ROWID": "47995000000334212",
+      "CrimeSubHeadID": "75",
+      "CrimeHeadID": "47995000000334132",
+      "CrimeHeadName": "Cyber Stalking",
+      "SeqID": "3"
+    },
+    {
+      "ROWID": "47995000000334213",
+      "CrimeSubHeadID": "76",
+      "CrimeHeadID": "47995000000334132",
+      "CrimeHeadName": "Data Theft",
+      "SeqID": "4"
+    }
+  ]
+}

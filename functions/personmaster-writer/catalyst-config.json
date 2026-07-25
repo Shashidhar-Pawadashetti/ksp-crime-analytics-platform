@@ -1,11 +1,11 @@
 {
-	"deployment": {
-		"name": "personmaster-writer",
-		"stack": "node24",
-		"type": "advancedio",
-		"env_variables": {}
-	},
-	"execution": {
-		"main": "index.js"
-	}
+  "deployment": {
+    "name": "personmaster-writer",
+    "stack": "node24",
+    "type": "advancedio",
+    "env_variables": {}
+  },
+  "execution": {
+    "main": "index.js"
+  }
 }

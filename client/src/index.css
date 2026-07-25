@@ -1,0 +1,86 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* UI-SPEC approved palette */
+@theme {
+  --color-dominant: #F8FAFC;
+  --color-secondary: #E9EEF6;
+  --color-accent: #1E40AF;
+  --color-accent-hover: #3B82F6;
+  --color-cta: #D97706;
+  --color-foreground: #1E3A8A;
+  --color-border: #DBEAFE;
+  --color-destructive: #DC2626;
+  --color-input-bg: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --font-heading: 'Fira Code', monospace;
+  --font-body: 'Fira Sans', sans-serif;
+}
+
+/* View fade transition */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Chart skeleton shimmer — wider variant for 3:2 chart card aspect ratio */
+@keyframes chart-skeleton-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Message appear animation */
+@keyframes message-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Map skeleton tile pulse */
+@keyframes map-tile-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Leaflet container sizing (full height/width within parent) */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; }
+}
+
+:root {
+  --radius: 0.625rem;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-dominant text-foreground;
+  }
+  html {
+    @apply font-body;
+  }
+}

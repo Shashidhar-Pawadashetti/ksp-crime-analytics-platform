@@ -30,34 +30,28 @@ async function loadPersonDocument(appInstance, table, personId) {
   var { NoSQLItem } = require('zcatalyst-sdk-node/lib/no-sql');
 
   try {
-    var result = await table.getItems({
+    var result = await table.fetchItem({
       keys: NoSQLItem.from({ type: 'PM', person_id: personId })
     });
 
-    if (!result || !result.data || result.data.length === 0) {
+    if (!result) {
+      console.log('[edgePersist] No response for: ' + personId);
+      return null;
+    }
+
+    var items;
+    try { items = result.getResponseData(); } catch (e) { items = null; }
+
+    if (!items || items.length === 0) {
       console.log('[edgePersist] Document not found: ' + personId);
       return null;
     }
 
-    var firstItem = result.data[0];
+    var firstItem = items[0];
+    var doc = firstItem && firstItem.item ? firstItem.item.to() : firstItem;
 
-    /* -- Catalyst NoSQL returns items directly with person_id -- */
-    if (typeof firstItem === 'object' && firstItem.person_id) {
-      return firstItem;
-    }
-
-    /* -- Some Catalyst SDK versions nest under { data: ... } -- */
-    if (firstItem.data && typeof firstItem.data === 'object') {
-      return firstItem.data;
-    }
-
-    /* -- Fallback: try the first object value that has person_id -- */
-    var keys = Object.keys(firstItem);
-    for (var ki = 0; ki < keys.length; ki++) {
-      var val = firstItem[keys[ki]];
-      if (val && typeof val === 'object' && val.person_id) {
-        return val;
-      }
+    if (doc && doc.person_id) {
+      return doc;
     }
 
     console.log('[edgePersist] Unexpected document format for ' + personId);

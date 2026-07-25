@@ -30,7 +30,7 @@ The token authenticates deployed functions to call the LLM Serving endpoint. Eac
 4. Click **Generate Code** → copy the authorization code immediately
 5. Exchange it for an access token. Open a terminal:
    ```bash
-   curl -X POST "https://accounts.zoho.in/oauth/v2/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&grant_type=authorization_code&code={CODE1000.25d5f32e60667873ddcbc7dd3fbc1e47.b735e77fd3bc59595312d71af396f868}"
+   curl -X POST "https://accounts.zoho.in/oauth/v2/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&grant_type=authorization_code&code={}"
    ```
 6. Copy the `access_token` from the JSON response (starts with `1000.`)
 

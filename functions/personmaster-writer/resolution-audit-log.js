@@ -28,35 +28,26 @@ function resetRunId() {
 async function createAuditRecord(app, record) {
 	try {
 		var now = new Date();
-		var fmtDateTime = now.getFullYear() + '-' +
-			String(now.getMonth() + 1).padStart(2, '0') + '-' +
-			String(now.getDate()).padStart(2, '0') + ' ' +
-			String(now.getHours()).padStart(2, '0') + ':' +
-			String(now.getMinutes()).padStart(2, '0') + ':' +
-			String(now.getSeconds()).padStart(2, '0');
+		var fmtDateTime = now.toISOString().replace('T', ' ').replace(/\.\d+Z/, '');
 
-		function esc(v) { return "'" + String(v).replace(/'/g, "\\'") + "'"; }
+		var row = {
+			RunID: record.runId || getCurrentRunId(),
+			RunType: record.runType || 'unknown',
+			TriggeredBy: record.triggerType || 'manual',
+			StartedAt: record.startedAt || fmtDateTime,
+			CompletedAt: record.completedAt || fmtDateTime,
+			Status: record.status || 'SUCCESS',
+			ThresholdUsed: Number(record.thresholdUsed) || 0.78,
+			DocumentsCreated: Number(record.documentsCreated) || 0,
+			DocumentsUpdated: Number(record.documentsUpdated) || 0,
+			PersonsProcessed: Number(record.personsProcessed) || 0,
+			ConfirmedEdgesWritten: Number(record.confirmedEdgesWritten) || 0,
+			UnconfirmedEdgesWritten: Number(record.unconfirmedEdgesWritten) || 0,
+			ErrorCount: Number(record.errorCount) || 0
+		};
 
-		var runId = esc(record.runId || getCurrentRunId());
-		var runType = esc(record.runType || 'unknown');
-		var triggeredBy = esc(record.triggerType || 'manual');
-		var startedAt = esc(record.startedAt ? record.startedAt.replace('T', ' ').replace(/\.\d+Z/, '') : fmtDateTime);
-		var completedAt = esc(record.completedAt ? record.completedAt.replace('T', ' ').replace(/\.\d+Z/, '') : fmtDateTime);
-		var status = esc(record.status || 'SUCCESS');
-		var thresholdUsed = Number(record.thresholdUsed) || 0.78;
-		var docsCreated = Number(record.documentsCreated) || 0;
-		var docsUpdated = Number(record.documentsUpdated) || 0;
-		var personsProcessed = Number(record.personsProcessed) || 0;
-		var confirmedEdges = Number(record.confirmedEdgesWritten) || 0;
-		var unconfirmedEdges = Number(record.unconfirmedEdgesWritten) || 0;
-		var errorCount = Number(record.errorCount) || 0;
-
-		var sql = 'INSERT INTO ' + AUDIT_TABLE + ' (RunID, RunType, TriggeredBy, StartedAt, CompletedAt, Status, ThresholdUsed, DocumentsCreated, DocumentsUpdated, PersonsProcessed, ConfirmedEdgesWritten, UnconfirmedEdgesWritten, ErrorCount) VALUES (' +
-			runId + ', ' + runType + ', ' + triggeredBy + ', ' + startedAt + ', ' + completedAt + ', ' + status + ', ' +
-			thresholdUsed + ', ' + docsCreated + ', ' + docsUpdated + ', ' + personsProcessed + ', ' +
-			confirmedEdges + ', ' + unconfirmedEdges + ', ' + errorCount + ')';
-
-		var result = await app.zcql().executeZCQLQuery(sql);
+		var table = app.datastore().table(AUDIT_TABLE);
+		var result = await table.insertRow(row);
 		return result;
 	} catch (err) {
 		console.error('Audit log insert failed: ' + err.message);

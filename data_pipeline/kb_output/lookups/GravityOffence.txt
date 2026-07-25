@@ -1,0 +1,5 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== GravityOffence (2 records) ===
+
+  ROWID: 47995000000332156, GravityOffenceID: 1, LookupValue: Cognizable & Bailable
+  ROWID: 47995000000332157, GravityOffenceID: 2, LookupValue: Non-Cognizable & Non-Bailable

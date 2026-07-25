@@ -1,0 +1,11 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== ReligionMaster (8 records) ===
+
+  ROWID: 47995000000333159, ReligionID: 1, ReligionName: Hindu
+  ROWID: 47995000000333160, ReligionID: 2, ReligionName: Muslim
+  ROWID: 47995000000333161, ReligionID: 3, ReligionName: Christian
+  ROWID: 47995000000333162, ReligionID: 4, ReligionName: Sikh
+  ROWID: 47995000000333163, ReligionID: 5, ReligionName: Jain
+  ROWID: 47995000000333164, ReligionID: 6, ReligionName: Buddhist
+  ROWID: 47995000000333165, ReligionID: 7, ReligionName: Parsi
+  ROWID: 47995000000333166, ReligionID: 8, ReligionName: Other

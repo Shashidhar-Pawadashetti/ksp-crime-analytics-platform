@@ -1,0 +1,5 @@
+{
+  "app_name": "crime-analytics-ui",
+  "node_version": "20",
+  "framework": "react"
+}

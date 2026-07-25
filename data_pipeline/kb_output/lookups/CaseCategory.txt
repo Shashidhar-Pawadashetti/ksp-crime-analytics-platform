@@ -1,0 +1,8 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== CaseCategory (5 records) ===
+
+  ROWID: 47995000000332109, CaseCategoryID: 1, LookupValue: Cognizable
+  ROWID: 47995000000332110, CaseCategoryID: 2, LookupValue: Non-Cognizable
+  ROWID: 47995000000332111, CaseCategoryID: 3, LookupValue: Warrant
+  ROWID: 47995000000332112, CaseCategoryID: 4, LookupValue: Summons
+  ROWID: 47995000000332113, CaseCategoryID: 5, LookupValue: CLA

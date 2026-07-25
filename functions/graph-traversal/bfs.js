@@ -1,5 +1,8 @@
 'use strict';
 
+var { callerCanAccess } = require('./rbacFilter');
+
+
 var CANONICAL_EDGE_TYPES = {
   CO_ACCUSED: true,
   ACCUSED_TO_VICTIM: true,
@@ -132,6 +135,7 @@ async function bfs(rootPersonId, options, context) {
 
     if (!canAccess(doc, callerScope)) continue;
 
+    nodes.push(buildNode(doc, hop));
     visitedNodes[personId] = true;
     resultNodes.push(buildNodeEntry(doc));
 

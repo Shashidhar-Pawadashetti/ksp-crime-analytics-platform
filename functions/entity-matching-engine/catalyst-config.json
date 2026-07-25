@@ -1,11 +1,11 @@
 {
 	"deployment": {
 		"name": "entity-matching-engine",
-		"stack": "node20",
+		"stack": "node24",
 		"type": "advancedio",
 		"env_variables": {}
 	},
 	"execution": {
-		"main": "dist/index.js"
+		"main": "index.js"
 	}
 }

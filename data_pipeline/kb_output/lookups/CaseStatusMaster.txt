@@ -1,0 +1,10 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== CaseStatusMaster (7 records) ===
+
+  ROWID: 47995000000334101, CaseStatusID: 1, CaseStatusName: Under Investigation
+  ROWID: 47995000000334102, CaseStatusID: 2, CaseStatusName: Charge Sheet Filed
+  ROWID: 47995000000334103, CaseStatusID: 3, CaseStatusName: Trial in Progress
+  ROWID: 47995000000334104, CaseStatusID: 4, CaseStatusName: Convicted
+  ROWID: 47995000000334105, CaseStatusID: 5, CaseStatusName: Acquitted
+  ROWID: 47995000000334106, CaseStatusID: 6, CaseStatusName: Closed as Mistake of Fact
+  ROWID: 47995000000334107, CaseStatusID: 7, CaseStatusName: Closed as Mistake of Law

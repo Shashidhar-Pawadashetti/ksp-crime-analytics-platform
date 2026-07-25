@@ -1,0 +1,9 @@
+=== KSP CRIME DATABASE LOOKUP ===
+=== Act (6 records) ===
+
+  ROWID: 47995000000332168, ActCode: IPC, ActDescription: Indian Penal Code, ShortName: IPC, Active: true
+  ROWID: 47995000000332169, ActCode: CRPC, ActDescription: Code of Criminal Procedure, ShortName: CrPC, Active: true
+  ROWID: 47995000000332170, ActCode: IEA, ActDescription: Indian Evidence Act, ShortName: IEA, Active: true
+  ROWID: 47995000000332171, ActCode: NDPS, ActDescription: Narcotic Drugs and Psychotropic Substances Act, ShortName: NDPS, Active: true
+  ROWID: 47995000000332172, ActCode: ARMS, ActDescription: Arms Act, ShortName: Arms Act, Active: true
+  ROWID: 47995000000332173, ActCode: ITACT, ActDescription: Information Technology Act, ShortName: IT Act, Active: true
