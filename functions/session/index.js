@@ -174,6 +174,67 @@ module.exports = async (req, res) => {
 	const method = req.method.toUpperCase();
 
 	try {
+		if (method === 'GET' && path === '/list') {
+			const employeeId = params.employee_id;
+			if (!employeeId) {
+				sendError(res, 400, 'MISSING_EMPLOYEE_ID', 'employee_id is required');
+				return;
+			}
+
+			const seg = app.cache().segment(CACHE_SEGMENT);
+			const indexKey = 'sessions:index:' + employeeId;
+			let sessions = [];
+			try {
+				const raw = await seg.getValue(indexKey);
+				if (raw) sessions = JSON.parse(raw);
+			} catch {
+				// Cache miss or error — treat as empty
+			}
+
+			sendJson(res, 200, { status: 'ok', data: sessions });
+			return;
+		}
+
+		if (method === 'GET' && path.startsWith('/messages/')) {
+			const sessionId = path.slice('/messages/'.length);
+			if (!sessionId) {
+				sendError(res, 400, 'MISSING_SESSION_ID', 'sessionId is required');
+				return;
+			}
+
+			const seg = app.cache().segment(CACHE_SEGMENT);
+			const cacheKey = 's:' + sessionId;
+			let raw;
+			try {
+				raw = await seg.getValue(cacheKey);
+			} catch {
+				raw = null;
+			}
+
+			if (!raw) {
+				sendError(res, 404, 'SESSION_NOT_FOUND', 'Session not found or expired');
+				return;
+			}
+
+			let session;
+			try {
+				session = JSON.parse(raw);
+			} catch {
+				sendError(res, 500, 'PARSE_ERROR', 'Failed to parse session data');
+				return;
+			}
+
+			sendJson(res, 200, {
+				status: 'ok',
+				data: {
+					session_id: sessionId,
+					messages: session.turns || [],
+					title: session.title || null
+				}
+			});
+			return;
+		}
+
 		if (method === 'GET' && path === '/') {
 			const employeeId = params.employee_id;
 			const sessionId = params.session_id || uuid();

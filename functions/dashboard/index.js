@@ -78,12 +78,14 @@ const ENDPOINTS = {
   '/dashboard/breakdown': async function (app, body) {
     const sql = breakdownQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return normalizeChartRows(zcqlRows(rows), 'CrimeGroupName', 'COUNT(CaseMasterID)');
+    const data = normalizeChartRows(zcqlRows(rows), 'CrimeGroupName', 'COUNT(CaseMasterID)');
+    return data.sort(function (a, b) { return b.value - a.value; });
   },
   '/dashboard/location': async function (app, body) {
     const sql = locationQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return normalizeChartRows(zcqlRows(rows), 'DistrictName', 'COUNT(CaseMasterID)');
+    const data = normalizeChartRows(zcqlRows(rows), 'DistrictName', 'COUNT(CaseMasterID)');
+    return data.sort(function (a, b) { return b.value - a.value; });
   },
   '/dashboard/hotspots': async function (app, body) {
     const sql = hotspotsQuery(body.filters || {});
@@ -93,12 +95,12 @@ const ENDPOINTS = {
   '/dashboard/risk-ranked': async function (app, body) {
     const sql = riskRankedQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return normalizeChartRows(zcqlRows(rows), 'AccusedName', 'case_count');
+    return normalizeChartRows(zcqlRows(rows), 'AccusedName', 'COUNT(CaseMasterID)');
   },
   '/dashboard/riskRanked': async function (app, body) {
     const sql = riskRankedQuery(body.filters || {});
     const rows = await app.zcql().executeZCQLQuery(sql);
-    return normalizeChartRows(zcqlRows(rows), 'AccusedName', 'case_count');
+    return normalizeChartRows(zcqlRows(rows), 'AccusedName', 'COUNT(CaseMasterID)');
   },
   '/dashboard/seasonal': async function (app, body) {
     const sql = seasonalQuery(body.filters || {});

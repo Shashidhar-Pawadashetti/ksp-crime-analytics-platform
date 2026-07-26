@@ -11,6 +11,7 @@ import { useChat } from '../../hooks/useChat';
 import { useAuth } from '../../hooks/useAuth';
 import * as session from '../../services/session';
 import MessageBubble from './MessageBubble';
+import SessionDropdown from './SessionDropdown';
 import ChatInput from './ChatInput';
 import LoadingSkeleton from './LoadingSkeleton';
 import EmptyState from './EmptyState';
@@ -21,7 +22,7 @@ import ErrorMessage from './ErrorMessage';
  * Manages scroll position, auto-scroll behavior, and user input submission.
  */
 function ChatArea() {
-  const { messages, isLoading, error, sessionId, sendMessage, dispatch } = useChat();
+  const { messages, isLoading, error, sessionId, sessions, sessionsLoading, sendMessage, dispatch, createNewSession, switchSession, loadSessions } = useChat();
   const { employee, sessionToken, isAuthenticated } = useAuth();
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
@@ -33,6 +34,13 @@ function ChatArea() {
       session.saveSession({ sessionId, employee });
     }
   }, [sessionId, employee]);
+
+  // Load session list on mount when employee is available
+  useEffect(() => {
+    if (employee?.employee_id) {
+      loadSessions(employee.employee_id);
+    }
+  }, [employee?.employee_id, loadSessions]);
 
   // Scroll anchor detection: is user within 100px of bottom?
   const handleScroll = useCallback(() => {
@@ -65,6 +73,15 @@ function ChatArea() {
 
   return (
     <div className="flex h-full flex-col">
+      {/* Session header with New Chat button and dropdown */}
+      <div className="flex items-center justify-between border-b border-border px-4 py-2">
+        <SessionDropdown
+          sessions={sessions}
+          activeSessionId={sessionId}
+          onSwitch={switchSession}
+          onNewChat={createNewSession}
+        />
+      </div>
       {/* Message list */}
       <div
         ref={containerRef}

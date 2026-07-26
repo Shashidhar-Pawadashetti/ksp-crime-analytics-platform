@@ -114,4 +114,83 @@ describe('ChatContext', () => {
       expect(state).toBe(initialState);
     });
   });
+
+  describe('multi-session reducer actions', () => {
+    test('initialState includes sessions array and sessionsLoading false', () => {
+      expect(Array.isArray(initialState.sessions)).toBe(true);
+      expect(initialState.sessions).toEqual([]);
+      expect(initialState.sessionsLoading).toBe(false);
+    });
+
+    test('SET_SESSIONS populates sessions list and clears loading', () => {
+      const mockSessions = [
+        { session_id: 's1', title: 'Query 1', created_at: '2026-07-25T10:00:00Z', last_activity: '2026-07-25T10:30:00Z', message_count: 3 },
+        { session_id: 's2', title: 'Query 2', created_at: '2026-07-25T11:00:00Z', last_activity: '2026-07-25T11:30:00Z', message_count: 1 }
+      ];
+      const state = chatReducer(
+        { ...initialState, sessionsLoading: true },
+        { type: 'SET_SESSIONS', payload: mockSessions }
+      );
+      expect(state.sessions).toHaveLength(2);
+      expect(state.sessions).toEqual(mockSessions);
+      expect(state.sessionsLoading).toBe(false);
+    });
+
+    test('SET_SESSIONS with null payload defaults to empty array', () => {
+      const state = chatReducer(initialState, { type: 'SET_SESSIONS', payload: null });
+      expect(state.sessions).toEqual([]);
+    });
+
+    test('SET_SESSIONS_LOADING sets loading to true', () => {
+      const state = chatReducer(initialState, { type: 'SET_SESSIONS_LOADING' });
+      expect(state.sessionsLoading).toBe(true);
+    });
+
+    test('SET_SESSIONS_LOADING with payload false sets loading to false', () => {
+      const state = chatReducer(
+        { ...initialState, sessionsLoading: true },
+        { type: 'SET_SESSIONS_LOADING', payload: false }
+      );
+      expect(state.sessionsLoading).toBe(false);
+    });
+
+    test('CREATE_NEW_SESSION clears messages and sessionId, preserves sessions list', () => {
+      const beforeState = {
+        ...initialState,
+        messages: [{ id: 'm1', role: 'user', content: 'Hello' }],
+        sessionId: 'sess_old',
+        sessions: [{ session_id: 'sess_old', title: 'Hello' }]
+      };
+      const state = chatReducer(beforeState, { type: 'CREATE_NEW_SESSION' });
+      expect(state.messages).toEqual([]);
+      expect(state.sessionId).toBeNull();
+      expect(state.sessions).toHaveLength(1);
+      expect(state.error).toBeNull();
+    });
+
+    test('SWITCH_SESSION populates messages and sets sessionId', () => {
+      const payload = {
+        messages: [{ id: 'm1', role: 'user', content: 'Loaded query' }],
+        sessionId: 'sess_loaded'
+      };
+      const state = chatReducer(initialState, { type: 'SWITCH_SESSION', payload });
+      expect(state.messages).toEqual(payload.messages);
+      expect(state.sessionId).toBe('sess_loaded');
+      expect(state.isLoading).toBe(false);
+      expect(state.error).toBeNull();
+    });
+
+    test('SWITCH_SESSION handles empty messages array', () => {
+      const payload = { messages: [], sessionId: 'sess_empty' };
+      const state = chatReducer(initialState, { type: 'SWITCH_SESSION', payload });
+      expect(state.messages).toEqual([]);
+      expect(state.sessionId).toBe('sess_empty');
+    });
+
+    test('SWITCH_SESSION defaults messages to empty array if payload missing', () => {
+      const state = chatReducer(initialState, { type: 'SWITCH_SESSION', payload: { sessionId: 'sess_x' } });
+      expect(state.messages).toEqual([]);
+      expect(state.sessionId).toBe('sess_x');
+    });
+  });
 });

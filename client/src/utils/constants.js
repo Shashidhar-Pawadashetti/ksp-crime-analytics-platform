@@ -17,6 +17,9 @@ export const DASHBOARD_ENDPOINT = `${API_BASE}/server/dashboard/query`;
 // Graph API endpoint — entity relationship graph visualization
 export const GRAPH_API_ENDPOINT = `${API_BASE}/server/graph-service-api`;
 
+// Session API endpoint — multi-session management (listing, history)
+export const SESSION_ENDPOINT = `${API_BASE}/server/session`;
+
 // Request timeout: 35s > 30s Catalyst hard timeout, allowing buffer for GLM response
 export const TIMEOUT_MS = 35000;
 

@@ -8,19 +8,21 @@
 // Exports both the provider and the reducer for standalone testing (used in Plan 01-05).
 
 import { createContext, useReducer, useCallback, useEffect } from 'react';
-import { queryPipeline } from '../services/api';
+import { queryPipeline, fetchSessionList, fetchSessionMessages } from '../services/api';
 
 const MESSAGES_KEY = 'ksp_chat_messages';
 
 /** @type {import('react').Context<*>} */
 export const ChatContext = createContext(null);
 
-/** @type {{ messages: Array, isLoading: boolean, error: string|null, sessionId: string|null }} */
+/** @type {{ messages: Array, isLoading: boolean, error: string|null, sessionId: string|null, sessions: Array, sessionsLoading: boolean }} */
 export const initialState = {
   messages: [],     // { id, role, content, intent, data, source_refs, citations, trends, risk_score, confidence, severity, factors, fallback, timestamp, isLoading, isError }
   isLoading: false,
   error: null,
-  sessionId: null
+  sessionId: null,
+  sessions: [],
+  sessionsLoading: false
 };
 
 let messageIdCounter = 0;
@@ -131,6 +133,24 @@ export function chatReducer(state, action) {
     case 'RESTORE_MESSAGES':
       return { ...state, messages: action.payload || [] };
 
+    case 'SET_SESSIONS':
+      return { ...state, sessions: action.payload || [], sessionsLoading: false };
+
+    case 'SET_SESSIONS_LOADING':
+      return { ...state, sessionsLoading: action.payload !== false };
+
+    case 'CREATE_NEW_SESSION':
+      return { ...state, messages: [], sessionId: null, error: null };
+
+    case 'SWITCH_SESSION':
+      return {
+        ...state,
+        messages: action.payload.messages || [],
+        sessionId: action.payload.sessionId,
+        isLoading: false,
+        error: null
+      };
+
     default:
       return state;
   }
@@ -166,12 +186,13 @@ export function ChatProvider({ children }) {
   useEffect(() => {
     if (state.messages.length > 0) {
       try {
-        localStorage.setItem(MESSAGES_KEY, JSON.stringify(state.messages));
+        const key = state.sessionId ? MESSAGES_KEY + ':' + state.sessionId : MESSAGES_KEY;
+        localStorage.setItem(key, JSON.stringify(state.messages));
       } catch {
         // Storage full or unavailable - ignore
       }
     }
-  }, [state.messages]);
+  }, [state.messages, state.sessionId]);
 
   /**
    * Send a user message and get an assistant response.
@@ -222,7 +243,43 @@ export function ChatProvider({ children }) {
     }
   }, []);
 
-  const value = { ...state, dispatch, sendMessage };
+  const createNewSession = useCallback(() => {
+    dispatch({ type: 'CREATE_NEW_SESSION' });
+  }, []);
+
+  const switchSession = useCallback(async (targetSessionId) => {
+    if (!targetSessionId || targetSessionId === state.sessionId) return;
+    dispatch({ type: 'SET_LOADING' });
+    try {
+      const data = await fetchSessionMessages(targetSessionId);
+      dispatch({ type: 'SWITCH_SESSION', payload: { messages: data.messages, sessionId: targetSessionId } });
+      try {
+        localStorage.setItem(MESSAGES_KEY + ':' + targetSessionId, JSON.stringify(data.messages));
+      } catch {}
+    } catch (err) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: { message: err.message, fallback: 'Failed to load session messages.' }
+      });
+    }
+  }, [state.sessionId]);
+
+  const loadSessions = useCallback(async (employeeId) => {
+    dispatch({ type: 'SET_SESSIONS_LOADING' });
+    try {
+      const list = await fetchSessionList(employeeId);
+      dispatch({ type: 'SET_SESSIONS', payload: list });
+      try { localStorage.setItem('ksp_session_list', JSON.stringify(list)); } catch {}
+    } catch {
+      try {
+        const cached = localStorage.getItem('ksp_session_list');
+        if (cached) dispatch({ type: 'SET_SESSIONS', payload: JSON.parse(cached) });
+      } catch {}
+      dispatch({ type: 'SET_SESSIONS_LOADING', payload: false });
+    }
+  }, []);
+
+  const value = { ...state, dispatch, sendMessage, createNewSession, switchSession, loadSessions };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }

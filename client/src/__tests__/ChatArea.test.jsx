@@ -23,8 +23,14 @@ const mockChat = {
   ],
   isLoading: false,
   error: null,
+  sessionId: null,
+  sessions: [],
+  sessionsLoading: false,
   sendMessage: vi.fn(),
-  dispatch: vi.fn()
+  dispatch: vi.fn(),
+  createNewSession: vi.fn(),
+  switchSession: vi.fn(),
+  loadSessions: vi.fn()
 };
 
 const mockUI = {

@@ -10,57 +10,37 @@ function escapeSingleQuotes(val) {
   return val.replace(/'/g, "''");
 }
 
-function buildWhere(filters) {
+function filterDateConditions(filters) {
   const clauses = [];
-
-  if (filters.district) {
-    if (!isSafeValue(filters.district)) {
-      throw new Error('Invalid district value: only alphanumeric characters and spaces allowed');
-    }
-    clauses.push(`d.DistrictName LIKE '*${escapeSingleQuotes(filters.district)}*'`);
-  }
-
-  if (filters.crimeType) {
-    if (!isSafeValue(filters.crimeType)) {
-      throw new Error('Invalid crimeType value: only alphanumeric characters and spaces allowed');
-    }
-    clauses.push(`ch.CrimeGroupName LIKE '*${escapeSingleQuotes(filters.crimeType)}*'`);
-  }
-
-  if (filters.startDate) {
-    clauses.push(`cm.CrimeRegisteredDate >= '${escapeSingleQuotes(filters.startDate)}'`);
-  }
-
-  if (filters.endDate) {
-    clauses.push(`cm.CrimeRegisteredDate <= '${escapeSingleQuotes(filters.endDate)}'`);
-  }
-
-  return clauses.length > 0 ? 'WHERE ' + clauses.join(' AND ') : '';
-}
-
-function buildFilterSubqueries(filters) {
-  const clauses = [];
-  if (filters.district) {
-    clauses.push(`cm.PoliceStationID IN (SELECT u.ROWID FROM Unit u INNER JOIN District d ON u.DistrictID = d.ROWID WHERE d.DistrictName LIKE '*${escapeSingleQuotes(filters.district)}*')`);
-  }
-  if (filters.crimeType) {
-    clauses.push(`cm.CrimeMajorHeadID IN (SELECT ch.ROWID FROM CrimeHead ch WHERE ch.CrimeGroupName LIKE '*${escapeSingleQuotes(filters.crimeType)}*')`);
-  }
+  if (filters.startDate) clauses.push(`cm.CrimeRegisteredDate >= '${escapeSingleQuotes(filters.startDate)}'`);
+  if (filters.endDate) clauses.push(`cm.CrimeRegisteredDate <= '${escapeSingleQuotes(filters.endDate)}'`);
   return clauses;
 }
 
 function trendQuery(filters) {
-  const filterClauses = buildFilterSubqueries(filters);
-  const dateFilters = [];
-  if (filters.startDate) dateFilters.push(`cm.CrimeRegisteredDate >= '${escapeSingleQuotes(filters.startDate)}'`);
-  if (filters.endDate) dateFilters.push(`cm.CrimeRegisteredDate <= '${escapeSingleQuotes(filters.endDate)}'`);
+  const joins = [];
+  const conditions = filterDateConditions(filters);
 
-  const allConditions = filterClauses.concat(dateFilters);
-  const where = allConditions.length > 0 ? 'WHERE ' + allConditions.join(' AND ') : '';
+  if (filters.district) {
+    if (!isSafeValue(filters.district)) throw new Error('Invalid district value');
+    joins.push('INNER JOIN Unit filter_unit ON cm.PoliceStationID = filter_unit.ROWID');
+    joins.push('INNER JOIN District filter_dist ON filter_unit.DistrictID = filter_dist.ROWID');
+    conditions.push(`filter_dist.DistrictName LIKE '*${escapeSingleQuotes(filters.district)}*'`);
+  }
+
+  if (filters.crimeType) {
+    if (!isSafeValue(filters.crimeType)) throw new Error('Invalid crimeType value');
+    joins.push('INNER JOIN CrimeHead filter_crime ON cm.CrimeMajorHeadID = filter_crime.ROWID');
+    conditions.push(`filter_crime.CrimeGroupName LIKE '*${escapeSingleQuotes(filters.crimeType)}*'`);
+  }
+
+  const joinClause = joins.join('\n');
+  const where = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
 
   return `
     SELECT cm.CrimeRegisteredDate, COUNT(cm.CaseMasterID)
     FROM CaseMaster cm
+    ${joinClause}
     ${where}
     GROUP BY cm.CrimeRegisteredDate
     ORDER BY cm.CrimeRegisteredDate ASC
@@ -69,61 +49,91 @@ function trendQuery(filters) {
 }
 
 function breakdownQuery(filters) {
-  const filterClauses = buildFilterSubqueries(filters);
-  const dateFilters = [];
-  if (filters.startDate) dateFilters.push(`cm.CrimeRegisteredDate >= '${escapeSingleQuotes(filters.startDate)}'`);
-  if (filters.endDate) dateFilters.push(`cm.CrimeRegisteredDate <= '${escapeSingleQuotes(filters.endDate)}'`);
+  const joins = [];
+  const conditions = filterDateConditions(filters);
 
-  const allConditions = filterClauses.concat(dateFilters);
-  const where = allConditions.length > 0 ? 'WHERE ' + allConditions.join(' AND ') : '';
+  if (filters.district) {
+    if (!isSafeValue(filters.district)) throw new Error('Invalid district value');
+    joins.push('INNER JOIN Unit filter_unit ON cm.PoliceStationID = filter_unit.ROWID');
+    joins.push('INNER JOIN District filter_dist ON filter_unit.DistrictID = filter_dist.ROWID');
+    conditions.push(`filter_dist.DistrictName LIKE '*${escapeSingleQuotes(filters.district)}*'`);
+  }
+
+  if (filters.crimeType) {
+    if (!isSafeValue(filters.crimeType)) throw new Error('Invalid crimeType value');
+    conditions.push(`ch.CrimeGroupName LIKE '*${escapeSingleQuotes(filters.crimeType)}*'`);
+  }
+
+  const joinClause = joins.join('\n');
+  const where = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
 
   return `
     SELECT ch.CrimeGroupName, COUNT(cm.CaseMasterID)
     FROM CaseMaster cm
     INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID
+    ${joinClause}
     ${where}
     GROUP BY ch.CrimeGroupName
-    ORDER BY COUNT(cm.CaseMasterID) DESC
-    LIMIT 15
+    LIMIT 100
   `;
 }
 
 function locationQuery(filters) {
-  const filterClauses = buildFilterSubqueries(filters);
-  const dateFilters = [];
-  if (filters.startDate) dateFilters.push(`cm.CrimeRegisteredDate >= '${escapeSingleQuotes(filters.startDate)}'`);
-  if (filters.endDate) dateFilters.push(`cm.CrimeRegisteredDate <= '${escapeSingleQuotes(filters.endDate)}'`);
+  const joins = [];
+  const conditions = filterDateConditions(filters);
 
-  const allConditions = filterClauses.concat(dateFilters);
-  const where = allConditions.length > 0 ? 'WHERE ' + allConditions.join(' AND ') : '';
+  if (filters.district) {
+    if (!isSafeValue(filters.district)) throw new Error('Invalid district value');
+    conditions.push(`d.DistrictName LIKE '*${escapeSingleQuotes(filters.district)}*'`);
+  }
+
+  if (filters.crimeType) {
+    if (!isSafeValue(filters.crimeType)) throw new Error('Invalid crimeType value');
+    joins.push('INNER JOIN CrimeHead filter_crime ON cm.CrimeMajorHeadID = filter_crime.ROWID');
+    conditions.push(`filter_crime.CrimeGroupName LIKE '*${escapeSingleQuotes(filters.crimeType)}*'`);
+  }
+
+  const joinClause = joins.join('\n');
+  const where = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
 
   return `
     SELECT d.DistrictName, COUNT(cm.CaseMasterID)
     FROM CaseMaster cm
     INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID
     INNER JOIN District d ON u.DistrictID = d.ROWID
+    ${joinClause}
     ${where}
     GROUP BY d.DistrictName
-    ORDER BY COUNT(cm.CaseMasterID) DESC
-    LIMIT 20
+    LIMIT 100
   `;
 }
 
 function hotspotsQuery(filters) {
-  const filterClauses = buildFilterSubqueries(filters);
-  const dateFilters = [];
-  if (filters.startDate) dateFilters.push(`cm.CrimeRegisteredDate >= '${escapeSingleQuotes(filters.startDate)}'`);
-  if (filters.endDate) dateFilters.push(`cm.CrimeRegisteredDate <= '${escapeSingleQuotes(filters.endDate)}'`);
+  const joins = [];
+  const conditions = filterDateConditions(filters);
 
-  const allConditions = filterClauses.concat(dateFilters);
+  if (filters.district) {
+    if (!isSafeValue(filters.district)) throw new Error('Invalid district value');
+    joins.push('INNER JOIN Unit filter_unit ON cm.PoliceStationID = filter_unit.ROWID');
+    joins.push('INNER JOIN District filter_dist ON filter_unit.DistrictID = filter_dist.ROWID');
+    conditions.push(`filter_dist.DistrictName LIKE '*${escapeSingleQuotes(filters.district)}*'`);
+  }
+
+  if (filters.crimeType) {
+    if (!isSafeValue(filters.crimeType)) throw new Error('Invalid crimeType value');
+    conditions.push(`ch.CrimeGroupName LIKE '*${escapeSingleQuotes(filters.crimeType)}*'`);
+  }
+
+  const joinClause = joins.join('\n');
   const latLngCondition = 'cm.Latitude IS NOT NULL AND cm.Longitude IS NOT NULL';
-  const conditions = [latLngCondition].concat(allConditions);
-  const where = 'WHERE ' + conditions.join(' AND ');
+  const allConditions = [latLngCondition].concat(conditions);
+  const where = 'WHERE ' + allConditions.join(' AND ');
 
   return `
     SELECT cm.CaseMasterID, cm.Latitude, cm.Longitude, ch.CrimeGroupName, cm.CrimeRegisteredDate
     FROM CaseMaster cm
     INNER JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.ROWID
+    ${joinClause}
     ${where}
     LIMIT 200
   `;
@@ -131,27 +141,38 @@ function hotspotsQuery(filters) {
 
 function riskRankedQuery() {
   return `
-    SELECT a.AccusedName, COUNT(DISTINCT a.CaseMasterID) AS case_count
+    SELECT a.AccusedName, COUNT(a.CaseMasterID)
     FROM Accused a
     GROUP BY a.AccusedName
-    HAVING COUNT(DISTINCT a.CaseMasterID) >= 1
-    ORDER BY COUNT(DISTINCT a.CaseMasterID) DESC
+    ORDER BY COUNT(a.CaseMasterID) DESC
     LIMIT 50
   `;
 }
 
 function seasonalQuery(filters) {
-  const filterClauses = buildFilterSubqueries(filters);
-  const dateFilters = [];
-  if (filters.startDate) dateFilters.push(`cm.CrimeRegisteredDate >= '${escapeSingleQuotes(filters.startDate)}'`);
-  if (filters.endDate) dateFilters.push(`cm.CrimeRegisteredDate <= '${escapeSingleQuotes(filters.endDate)}'`);
+  const joins = [];
+  const conditions = filterDateConditions(filters);
 
-  const allConditions = filterClauses.concat(dateFilters);
-  const where = allConditions.length > 0 ? 'WHERE ' + allConditions.join(' AND ') : '';
+  if (filters.district) {
+    if (!isSafeValue(filters.district)) throw new Error('Invalid district value');
+    joins.push('INNER JOIN Unit filter_unit ON cm.PoliceStationID = filter_unit.ROWID');
+    joins.push('INNER JOIN District filter_dist ON filter_unit.DistrictID = filter_dist.ROWID');
+    conditions.push(`filter_dist.DistrictName LIKE '*${escapeSingleQuotes(filters.district)}*'`);
+  }
+
+  if (filters.crimeType) {
+    if (!isSafeValue(filters.crimeType)) throw new Error('Invalid crimeType value');
+    joins.push('INNER JOIN CrimeHead filter_crime ON cm.CrimeMajorHeadID = filter_crime.ROWID');
+    conditions.push(`filter_crime.CrimeGroupName LIKE '*${escapeSingleQuotes(filters.crimeType)}*'`);
+  }
+
+  const joinClause = joins.join('\n');
+  const where = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
 
   return `
     SELECT cm.CrimeRegisteredDate, COUNT(cm.CaseMasterID)
     FROM CaseMaster cm
+    ${joinClause}
     ${where}
     GROUP BY cm.CrimeRegisteredDate
     ORDER BY cm.CrimeRegisteredDate ASC
@@ -181,6 +202,5 @@ module.exports = {
   hotspotsQuery,
   riskRankedQuery,
   seasonalQuery,
-  personSearchQuery,
-  buildWhere
+  personSearchQuery
 };

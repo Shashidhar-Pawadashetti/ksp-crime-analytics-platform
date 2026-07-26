@@ -5,7 +5,7 @@
 // The frontend calls backend Catalyst functions directly via their function URLs
 // with CORS headers handling cross-origin requests (see docs/api-architecture-decision.md).
 
-import { PIPELINE_ENDPOINT, DASHBOARD_ENDPOINT, GRAPH_API_ENDPOINT, TIMEOUT_MS } from '../utils/constants';
+import { PIPELINE_ENDPOINT, DASHBOARD_ENDPOINT, GRAPH_API_ENDPOINT, SESSION_ENDPOINT, TIMEOUT_MS } from '../utils/constants';
 
 /**
  * Custom error class for API errors from the pipeline backend.
@@ -158,4 +158,74 @@ export async function fetchGraph(personId, hops, signal) {
   }
 
   return json.data;
+}
+
+/**
+ * Fetch session list for an employee from the session function.
+ * GET /list?employee_id=X
+ *
+ * @param {string} employeeId - Employee ID from auth context
+ * @returns {Promise<Array>} Array of session metadata objects [{session_id, title, created_at, last_activity, message_count}]
+ * @throws {ApiError} On backend error
+ */
+export async function fetchSessionList(employeeId) {
+  const response = await fetch(SESSION_ENDPOINT + '/list?employee_id=' + encodeURIComponent(employeeId), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new ApiError(
+      errorBody.error_code || 'HTTP_ERROR',
+      errorBody.message || 'HTTP ' + response.status,
+      errorBody.fallback_answer || null
+    );
+  }
+
+  const json = await response.json();
+
+  if (json.status === 'error') {
+    throw new ApiError(
+      json.error_code || 'SERVER_ERROR',
+      json.message || 'Unknown server error',
+      json.fallback_answer || null
+    );
+  }
+
+  return json.data || [];
+}
+
+/**
+ * Fetch full message history for a specific session.
+ * GET /messages/:sessionId
+ *
+ * @param {string} sessionId - The session UUID to load messages for
+ * @returns {Promise<{session_id: string, messages: Array, title: string|null}>} Session data with messages array
+ * @throws {ApiError} On backend error or session not found
+ */
+export async function fetchSessionMessages(sessionId) {
+  const response = await fetch(SESSION_ENDPOINT + '/messages/' + encodeURIComponent(sessionId), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new ApiError(
+      errorBody.error_code || 'HTTP_ERROR',
+      errorBody.message || 'HTTP ' + response.status,
+      errorBody.fallback_answer || null
+    );
+  }
+
+  const json = await response.json();
+
+  if (json.status === 'error') {
+    throw new ApiError(
+      json.error_code || 'SERVER_ERROR',
+      json.message || 'Unknown server error',
+      json.fallback_answer || null
+    );
+  }
+
+  return json.data || { session_id: sessionId, messages: [], title: null };
 }

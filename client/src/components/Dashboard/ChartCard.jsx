@@ -1,20 +1,29 @@
-// ksp-crime-analytics-platform/client/src/components/Dashboard/ChartCard.jsx
-//
-// Card wrapper for dashboard chart components.
-// Shows title, loading skeleton, error state with retry, or the chart children.
-
+import { useEffect, useRef } from 'react';
+import { createScope, animate } from 'animejs';
 import ChartSkeleton from './ChartSkeleton';
 import DashboardErrorMessage from './DashboardErrorMessage';
 
-/**
- * Chart card wrapper with title, skeleton, error, and content states.
- *
- * @param {{ title: string, loading: boolean, error: string|null, onRetry: function, children: import('react').ReactNode }} props
- * @returns {import('react').ReactElement}
- */
 export default function ChartCard({ title, loading, error, onRetry, children }) {
+  const cardRef = useRef(null);
+  const prevLoadingRef = useRef(loading);
+
+  useEffect(() => {
+    if (prevLoadingRef.current && !loading && !error && children && cardRef.current) {
+      const scope = createScope({ root: cardRef.current }).add(() => {
+        animate(cardRef.current, {
+          scale: [0.96, 1],
+          opacity: [0, 1],
+          duration: 300,
+          ease: 'out(2)',
+        });
+      });
+      return () => scope.revert();
+    }
+    prevLoadingRef.current = loading;
+  }, [loading, error, children]);
+
   return (
-    <div className="flex flex-col rounded-lg border border-border bg-surface p-4">
+    <div ref={cardRef} className="flex flex-col rounded-lg border border-border bg-surface p-4">
       <h3 className="font-heading text-base font-semibold text-foreground mb-3">
         {title}
       </h3>
