@@ -21,7 +21,10 @@
       "graph-service",
       "dashboard",
       "graph-service-api",
-      "graph-visualization"
+      "graph-visualization",
+      "feature-derivation-engine",
+      "risk-scoring",
+      "forecasting"
     ],
     "ignore": [],
     "source": "functions"
