@@ -781,6 +781,329 @@ test('UNCONFIRMED_MATCH not in VALID_EDGE_TYPES export', function () {
 });
 
 // ============================================================
+// 8. PERSON MASTER CACHE TESTS
+// ============================================================
+
+console.log('\n8. PersonMasterCache');
+
+var { PersonMasterCache } = require('./repository/personMasterCache');
+
+function makeNoSqlItem(doc) {
+  return { item: { to: function () { return doc; } } };
+}
+
+function makeNoSqlResponse(items, nextKey) {
+  return {
+    getResponseData: function () { return items; },
+    start_key: nextKey || null
+  };
+}
+
+function createCacheMockApp(pages) {
+  var pageIndex = 0;
+  return {
+    nosql: function () {
+      return {
+        getTable: async function (name) {
+          return {
+            queryTable: async function (params) {
+              var currentPage = pages[pageIndex] || [];
+              var hasMore = pageIndex < pages.length - 1;
+              pageIndex++;
+              return makeNoSqlResponse(
+                currentPage.map(makeNoSqlItem),
+                hasMore ? 'key_page_' + pageIndex : null
+              );
+            }
+          };
+        }
+      };
+    }
+  };
+}
+
+function createCacheMockRepo(pages) {
+  var mockApp = createCacheMockApp(pages);
+  return {
+    _getApp: function () { return mockApp; }
+  };
+}
+
+var cachePmBase = [
+  makePM('PM_CACHE_001', {
+    canonical_name: 'Cache Person 1',
+    source_records: [{ table: 'Accused', case_id: 'C1', district_id: 'DIST_1' }],
+    confirmed_edges: [makeEdge('E_C_01', 'CO_ACCUSED', 'PM_CACHE_002')]
+  }),
+  makePM('PM_CACHE_002', {
+    canonical_name: 'Cache Person 2',
+    source_records: [{ table: 'Accused', case_id: 'C2', district_id: 'DIST_1' }],
+    confirmed_edges: [makeEdge('E_C_02', 'CO_ACCUSED', 'PM_CACHE_001')]
+  }),
+  makePM('PM_CACHE_003', {
+    canonical_name: 'Cache Person 3',
+    source_records: [{ table: 'Victim', case_id: 'C3', district_id: 'DIST_2' }],
+    confirmed_edges: []
+  }),
+  makePM('PM_CACHE_004', {
+    canonical_name: 'Cache Person 4',
+    source_records: [{ table: 'Accused', case_id: 'C4', district_id: 'DIST_1' }],
+    confirmed_edges: [
+      makeEdge('E_C_03', 'CO_ACCUSED', 'PM_CACHE_005'),
+      makeEdge('E_C_04', 'ACCUSED_TO_VICTIM', 'PM_CACHE_006')
+    ]
+  }),
+  makePM('PM_CACHE_005', {
+    canonical_name: 'Cache Person 5',
+    source_records: [{ table: 'Accused', case_id: 'C5', district_id: 'DIST_1' }],
+    confirmed_edges: []
+  }),
+  makePM('PM_CACHE_006', {
+    canonical_name: 'Cache Victim 6',
+    source_records: [{ table: 'Victim', case_id: 'C6', district_id: 'DIST_1' }],
+    confirmed_edges: []
+  })
+];
+
+test('cache starts unloaded', function () {
+  var c = new PersonMasterCache();
+  assert.strictEqual(c.isLoaded(), false);
+  assert.strictEqual(c.getPerson('PM_000001'), null);
+  assert.strictEqual(c.getEdges('PM_000001').length, 0);
+  assert.strictEqual(c.getDegree('PM_000001'), 0);
+});
+
+test('empty dataset — cache loads 0 docs, remains ready', async function () {
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([[]]);
+  await c.loadAll(repo);
+  assert.strictEqual(c.isLoaded(), true);
+  assert.strictEqual(c.getPerson('PM_000001'), null);
+  assert.strictEqual(Object.keys(c.getNodeIndex()).length, 0);
+});
+
+test('single page — correctly loaded', async function () {
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([cachePmBase]);
+  await c.loadAll(repo);
+  assert.strictEqual(c.isLoaded(), true);
+  assert(c.getPerson('PM_CACHE_001'));
+  assert(c.getPerson('PM_CACHE_006'));
+  assert.strictEqual(c.getPerson('PM_CACHE_001').canonical_name, 'Cache Person 1');
+  assert.strictEqual(c.getPerson('PM_NONEXIST'), null);
+});
+
+test('exactly 100 documents boundary', async function () {
+  var docs = [];
+  for (var i = 1; i <= 100; i++) {
+    var pid = 'PM_BOUNDARY_' + String(i).padStart(6, '0');
+    var edgeTarget = i < 100 ? 'PM_BOUNDARY_' + String(i + 1).padStart(6, '0') : null;
+    var edges = edgeTarget ? [makeEdge('E_B_' + i, 'CO_ACCUSED', edgeTarget)] : [];
+    docs.push(makePM(pid, {
+      canonical_name: 'Boundary ' + i,
+      source_records: [{ table: 'Accused', case_id: 'C' + i, district_id: 'DIST_1' }],
+      confirmed_edges: edges
+    }));
+  }
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([docs]);
+  await c.loadAll(repo);
+  assert.strictEqual(c.isLoaded(), true);
+  assert.strictEqual(Object.keys(c.getNodeIndex()).length, 100);
+  assert(c.getPerson('PM_BOUNDARY_000001'));
+  assert(c.getPerson('PM_BOUNDARY_000100'));
+});
+
+test('250 documents across 3 pages — all loaded', async function () {
+  var page1 = [];
+  var page2 = [];
+  var page3 = [];
+  for (var i = 1; i <= 100; i++) {
+    page1.push(makePM('PM_PAGE1_' + String(i).padStart(6, '0'), {
+      source_records: [{ table: 'Accused', case_id: 'C' + i, district_id: 'DIST_1' }]
+    }));
+  }
+  for (var i = 1; i <= 100; i++) {
+    page2.push(makePM('PM_PAGE2_' + String(i).padStart(6, '0'), {
+      source_records: [{ table: 'Accused', case_id: 'C' + (100 + i), district_id: 'DIST_1' }]
+    }));
+  }
+  for (var i = 1; i <= 50; i++) {
+    page3.push(makePM('PM_PAGE3_' + String(i).padStart(6, '0'), {
+      source_records: [{ table: 'Accused', case_id: 'C' + (200 + i), district_id: 'DIST_1' }]
+    }));
+  }
+  var c = new PersonMasterCache();
+  c._loadCount = 0;
+  var repo = createCacheMockRepo([page1, page2, page3]);
+  await c.loadAll(repo);
+  assert.strictEqual(c.isLoaded(), true);
+  assert.strictEqual(Object.keys(c.getNodeIndex()).length, 250);
+  assert(c.getPerson('PM_PAGE1_000001'));
+  assert(c.getPerson('PM_PAGE3_000050'));
+});
+
+test('getPerson is O(1) from cache', async function () {
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([cachePmBase]);
+  await c.loadAll(repo);
+  var start = Date.now();
+  for (var i = 0; i < 10000; i++) {
+    c.getPerson('PM_CACHE_001');
+    c.getPerson('PM_CACHE_003');
+    c.getPerson('PM_NONEXIST');
+  }
+  var elapsed = Date.now() - start;
+  assert(elapsed < 100, '10000 lookups took ' + elapsed + 'ms (expected < 100ms)');
+});
+
+test('getEdges returns confirmed_edges only', async function () {
+  var pmWithUnconfirmed = makePM('PM_UC_001', {
+    source_records: [{ table: 'Accused', case_id: 'C1', district_id: 'DIST_1' }],
+    confirmed_edges: [makeEdge('E_UC_01', 'CO_ACCUSED', 'PM_UC_002')],
+    unconfirmed_edges: [makeEdge('E_UC_02', 'CANDIDATE_MATCH', 'PM_UC_003', { confirmed: false })]
+  });
+  var pmEdgeTarget = makePM('PM_UC_002', {
+    source_records: [{ table: 'Accused', case_id: 'C2', district_id: 'DIST_1' }],
+    confirmed_edges: []
+  });
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([[pmWithUnconfirmed, pmEdgeTarget]]);
+  await c.loadAll(repo);
+  var edges = c.getEdges('PM_UC_001');
+  assert.strictEqual(edges.length, 1);
+  assert.strictEqual(edges[0].edge_id, 'E_UC_01');
+});
+
+test('getDegree returns correct count', async function () {
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([cachePmBase]);
+  await c.loadAll(repo);
+  assert.strictEqual(c.getDegree('PM_CACHE_001'), 1);
+  assert.strictEqual(c.getDegree('PM_CACHE_003'), 0);
+  assert.strictEqual(c.getDegree('PM_CACHE_004'), 2);
+  assert.strictEqual(c.getDegree('PM_NONEXIST'), 0);
+});
+
+test('getAdjacency returns full adjacency map', async function () {
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([cachePmBase]);
+  await c.loadAll(repo);
+  var adj = c.getAdjacency();
+  assert(Array.isArray(adj['PM_CACHE_001']));
+  assert(Array.isArray(adj['PM_CACHE_004']));
+  assert.strictEqual(adj['PM_CACHE_003'], undefined);
+});
+
+test('concurrent requests — only one load', async function () {
+  var loadCount = 0;
+  var c = new PersonMasterCache();
+  var origDoLoad = c._doLoad.bind(c);
+  c._doLoad = async function (repo) {
+    loadCount++;
+    await new Promise(function (r) { setTimeout(r, 20); });
+    return origDoLoad(repo);
+  };
+  var repo = createCacheMockRepo([cachePmBase]);
+  var p1 = c.loadAll(repo);
+  var p2 = c.loadAll(repo);
+  var p3 = c.loadAll(repo);
+  await Promise.all([p1, p2, p3]);
+  assert.strictEqual(loadCount, 1, 'expected exactly one load, got ' + loadCount);
+});
+
+test('reset clears cache', async function () {
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([cachePmBase]);
+  await c.loadAll(repo);
+  assert.strictEqual(c.isLoaded(), true);
+  c.reset();
+  assert.strictEqual(c.isLoaded(), false);
+  assert.strictEqual(c.getPerson('PM_CACHE_001'), null);
+  assert.strictEqual(c.getEdges('PM_CACHE_001').length, 0);
+  assert.strictEqual(c.getDegree('PM_CACHE_001'), 0);
+});
+
+test('BFS uses cache — zero repository fetchItem calls during traversal', async function () {
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([cachePmBase]);
+  await c.loadAll(repo);
+
+  var fetchCount = 0;
+  var cacheAwareRepo = {
+    getPerson: async function (personId) {
+      fetchCount++;
+      return c.getPerson(personId);
+    },
+    setAppInstance: function () {},
+    getCache: function () { return c; }
+  };
+
+  var bfsSvc = new TraversalService({ repository: cacheAwareRepo });
+  var result = await bfsSvc.traverse('PM_CACHE_001', { max_hops: 2, caller_scope: { state_wide: true } });
+  assert(result.nodes.length > 0);
+});
+
+test('network-summary uses cache via shared repository', async function () {
+  var c = new PersonMasterCache();
+  var repo = createCacheMockRepo([cachePmBase]);
+  await c.loadAll(repo);
+
+  var cacheAwareRepo = {
+    getPerson: async function (personId) {
+      return c.getPerson(personId);
+    },
+    setAppInstance: function () {},
+    getCache: function () { return c; }
+  };
+
+  var svc = new NetworkAnalysisService({
+    repository: cacheAwareRepo,
+    traversalService: new TraversalService({ repository: cacheAwareRepo })
+  });
+  svc.setCallerScope({ state_wide: true });
+  var result = await svc.getNetworkSummary('PM_CACHE_001');
+  assert(result);
+  assert(result.person);
+  assert(typeof result.degree === 'number');
+  assert(typeof result.known_associates === 'number');
+});
+
+test('max_nodes still enforced after cache', async function () {
+  var c = new PersonMasterCache();
+  var manyDocs = [];
+  for (var i = 1; i <= 10; i++) {
+    var pid = 'PM_MANY_' + String(i).padStart(6, '0');
+    var edges = [];
+    for (var j = 1; j <= 10; j++) {
+      if (j !== i) {
+        edges.push(makeEdge('E_M_' + i + '_' + j, 'CO_ACCUSED', 'PM_MANY_' + String(j).padStart(6, '0')));
+      }
+    }
+    manyDocs.push(makePM(pid, {
+      source_records: [{ table: 'Accused', case_id: 'C' + i, district_id: 'DIST_1' }],
+      confirmed_edges: edges
+    }));
+  }
+  var repo = createCacheMockRepo([manyDocs]);
+  await c.loadAll(repo);
+
+  var fetchCount = 0;
+  var awareRepo = {
+    getPerson: async function (pid) { fetchCount++; return c.getPerson(pid); },
+    setAppInstance: function () {}
+  };
+
+  var svc = createService([]);
+  svc._personMasterRepository = awareRepo;
+  svc._traversalService = new TraversalService({ repository: awareRepo });
+  svc.setCallerScope({ state_wide: true });
+  var result = await svc.getKnownAssociates('PM_MANY_000001', { max_hops: 2, max_nodes: 3 });
+  assert(result.truncated === true, 'expected truncated=true');
+  assert(result.associates.length <= 3, 'expected <= 3 associates');
+});
+
+// ============================================================
 // RUN
 // ============================================================
 

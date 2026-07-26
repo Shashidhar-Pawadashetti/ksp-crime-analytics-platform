@@ -20,7 +20,8 @@
       "network-analysis",
       "graph-service",
       "dashboard",
-      "graph-service-api"
+      "graph-service-api",
+      "graph-visualization"
     ],
     "ignore": [],
     "source": "functions"

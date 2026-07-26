@@ -2,6 +2,11 @@
 
 var styleHints = require('./styleHints');
 
+function edgeClassForType(edgeType) {
+  if (!edgeType) return 'style-unknown';
+  return 'style-' + edgeType.toLowerCase().replace(/_/g, '-');
+}
+
 function formatNodes(traversalNodes, degrees) {
   var nodes = [];
 
@@ -13,6 +18,7 @@ function formatNodes(traversalNodes, degrees) {
       data: {
         id: n.person_id,
         label: n.canonical_name,
+        classes: 'style-' + nodeStyle.key,
         roles_summary: n.roles_summary,
         degree: degrees[n.person_id] || 0,
         hop_distance: n.hop_distance !== undefined ? n.hop_distance : 0,
@@ -35,11 +41,16 @@ function formatEdges(traversalEdges) {
     var e = traversalEdges[ei];
     var edgeStyle = styleHints.getEdgeStyle(e.edge_type);
 
+    var directed = e.edge_type === 'ACCUSED_TO_VICTIM';
+    var eClass = edgeClassForType(e.edge_type);
+
     edges.push({
       data: {
         id: e.edge_id,
-        source: e.source,
-        target: e.target,
+        source: e.from || e.source,
+        target: e.to || e.target,
+        classes: eClass,
+        directed: directed,
         edge_type: e.edge_type,
         label: edgeStyle.label,
         weight: e.weight || 1,
@@ -64,12 +75,12 @@ function buildStylesheet(nodes, edges) {
   for (var ni = 0; ni < nodes.length; ni++) {
     var nd = nodes[ni].data;
     var style = nd.node_style;
-    var roleKey = style.color + '-' + style.icon;
-    if (seenRoles[roleKey]) continue;
-    seenRoles[roleKey] = true;
+    var className = nd.classes;
+    if (seenRoles[className]) continue;
+    seenRoles[className] = true;
 
     styles.push({
-      selector: 'node#' + nd.id,
+      selector: 'node.' + className,
       css: {
         'background-color': style.color,
         'border-color': style.borderColor,
@@ -93,12 +104,12 @@ function buildStylesheet(nodes, edges) {
   for (var ei = 0; ei < edges.length; ei++) {
     var ed = edges[ei].data;
     var eStyle = ed.edge_style;
-    var eKey = eStyle.color + '-' + eStyle.style;
-    if (seenEdgeTypes[eKey]) continue;
-    seenEdgeTypes[eKey] = true;
+    var eClass = ed.classes;
+    if (seenEdgeTypes[eClass]) continue;
+    seenEdgeTypes[eClass] = true;
 
     styles.push({
-      selector: 'edge#' + ed.id,
+      selector: 'edge.' + eClass,
       css: {
         'line-color': eStyle.color,
         'width': eStyle.width,
@@ -130,10 +141,12 @@ function toCytoscape(traversalResult) {
   var degrees = {};
   for (var ei = 0; ei < traversalResult.edges.length; ei++) {
     var e = traversalResult.edges[ei];
-    if (!degrees[e.source]) degrees[e.source] = 0;
-    degrees[e.source]++;
-    if (!degrees[e.target]) degrees[e.target] = 0;
-    degrees[e.target]++;
+    var src = e.from || e.source;
+    var tgt = e.to || e.target;
+    if (!degrees[src]) degrees[src] = 0;
+    degrees[src]++;
+    if (!degrees[tgt]) degrees[tgt] = 0;
+    degrees[tgt]++;
   }
 
   var nodes = formatNodes(traversalResult.nodes, degrees);
@@ -154,5 +167,6 @@ module.exports = {
   formatNodes: formatNodes,
   formatEdges: formatEdges,
   buildStylesheet: buildStylesheet,
-  toCytoscape: toCytoscape
+  toCytoscape: toCytoscape,
+  edgeClassForType: edgeClassForType
 };

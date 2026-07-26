@@ -1,10 +1,9 @@
 'use strict';
 
 var { GraphExportService } = require('./graphExportService');
-var responseFormatter = require('../network-analysis/responseFormatter');
-var validators = require('../network-analysis/validators');
-
-var exportService = new GraphExportService();
+var responseFormatter = require('./responseFormatter');
+var validators = require('./validators');
+var { extractCallerScope } = require('./__vendored/traversal/rbacFilter');
 
 var VALID_FORMATS = ['cytoscape', 'compact', 'debug'];
 
@@ -39,7 +38,7 @@ function matchRoute(pathname) {
   return null;
 }
 
-function handleGraph(req, res, params, query) {
+async function handleGraph(req, res, params, query, graphService) {
   var errors = validators.validatePersonId(params.personId);
   if (errors.length > 0) return responseFormatter.validationError(errors);
 
@@ -57,22 +56,26 @@ function handleGraph(req, res, params, query) {
   var filterErrors = validators.validateEdgeTypeFilter(query.edge_type_filter);
   if (filterErrors.length > 0) return responseFormatter.validationError(filterErrors);
 
+  var callerScope = extractCallerScope(req);
+
   var options = {
-    max_hops: validators.parseMaxHops(query.max_hops),
+    hops: validators.parseMaxHops(query.max_hops),
     include_unconfirmed: validators.parseIncludeUnconfirmed(query.include_unconfirmed),
-    edge_type_filter: validators.parseEdgeTypeFilter(query.edge_type_filter)
+    edge_type_filter: validators.parseEdgeTypeFilter(query.edge_type_filter),
+    max_nodes: parseInt(query.max_nodes, 10) || 100,
+    caller_scope: callerScope
   };
 
   var result;
   switch (format) {
     case 'cytoscape':
-      result = exportService.toCytoscape(params.personId, options);
+      result = await graphService.toCytoscape(params.personId, options);
       break;
     case 'compact':
-      result = exportService.toCompact(params.personId, options);
+      result = await graphService.toCompact(params.personId, options);
       break;
     case 'debug':
-      result = exportService.toDebug(params.personId, options);
+      result = await graphService.toDebug(params.personId, options);
       break;
   }
 
@@ -100,7 +103,8 @@ function handleHome(req, res, params, query) {
       format: { type: 'string', values: ['cytoscape', 'compact', 'debug'], default: 'cytoscape' },
       max_hops: { type: 'integer', min: 1, max: 3, default: 2 },
       include_unconfirmed: { type: 'boolean', default: false },
-      edge_type_filter: { type: 'string', description: 'Comma-separated edge types' }
+      edge_type_filter: { type: 'string', description: 'Comma-separated edge types' },
+      max_nodes: { type: 'integer', description: 'Maximum nodes (default 100)', default: 100 }
     }
   });
 }
@@ -110,7 +114,7 @@ var routeHandlers = {
   'home': handleHome
 };
 
-function route(req) {
+async function route(req, graphService) {
   var parsed = parsePath(req.url);
   var match = matchRoute(parsed.pathname);
 
@@ -124,7 +128,7 @@ function route(req) {
   }
 
   req.query = parsed.query;
-  return handler(req, null, match.params, parsed.query);
+  return await handler(req, null, match.params, parsed.query, graphService);
 }
 
-module.exports = { route: route, matchRoute: matchRoute, parsePath: parsePath };
+module.exports = { route: route, matchRoute: matchRoute, parsePath: parsePath, handleGraph: handleGraph, handleHome: handleHome };

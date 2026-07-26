@@ -253,6 +253,19 @@ GraphRepository.prototype.loadGraph = async function (appInstance) {
     combinedDiagnostics.malformed_edges_skipped += result.diagnostics.malformed_edges_skipped;
   }
 
+  var globalEdgeIds = {};
+  var dedupedEdges = [];
+  for (var ei = 0; ei < allEdges.length; ei++) {
+    var e = allEdges[ei];
+    if (globalEdgeIds[e.edge_id]) {
+      combinedDiagnostics.duplicate_edges_skipped++;
+    } else {
+      globalEdgeIds[e.edge_id] = true;
+      dedupedEdges.push(e);
+    }
+  }
+  allEdges = dedupedEdges;
+
   combinedDiagnostics.edges_loaded = allEdges.length;
 
   return {

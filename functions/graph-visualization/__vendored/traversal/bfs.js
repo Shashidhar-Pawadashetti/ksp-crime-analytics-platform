@@ -1,8 +1,5 @@
 'use strict';
 
-var { callerCanAccess } = require('./rbacFilter');
-
-
 var CANONICAL_EDGE_TYPES = {
   CO_ACCUSED: true,
   ACCUSED_TO_VICTIM: true,
@@ -20,35 +17,33 @@ var DIRECTED_EDGE_TYPES = {
   ACCUSED_TO_VICTIM: true
 };
 
-function getEdgeType(edgeObj) {
-  return (edgeObj.edge_type || edgeObj.type || '').toUpperCase();
-}
-
 var MAX_ALLOWED_HOPS = 3;
 var DEFAULT_MAX_NODES = 50;
 var ABSOLUTE_MAX_NODES = 100;
 
+function getEdgeType(edgeObj) {
+  return (edgeObj.edge_type || edgeObj.type || '').toUpperCase();
+}
+
 function isUndirected(edgeType) {
-  if (!edgeType) return false;
   return !!UNDIRECTED_EDGE_TYPES[edgeType.toUpperCase()];
 }
 
 function isDirected(edgeType) {
-  if (!edgeType) return false;
   return !!DIRECTED_EDGE_TYPES[edgeType.toUpperCase()];
 }
 
 function isValidEdgeType(edgeType) {
-  if (!edgeType) return false;
   return !!CANONICAL_EDGE_TYPES[edgeType.toUpperCase()];
 }
 
-function buildNodeEntry(doc) {
+function buildNodeEntry(doc, hop) {
   return {
     person_id: doc.person_id,
     canonical_name: doc.canonical_name || '',
     name_normalised: doc.name_normalised || '',
     roles_summary: doc.roles_summary || {},
+    hop_distance: hop !== undefined ? hop : 0,
     source_records: (doc.source_records || []).map(function (sr) {
       return { table: sr.table, case_id: sr.case_id };
     })
@@ -98,7 +93,6 @@ async function bfs(rootPersonId, options, context) {
   var truncated = false;
 
   function isEdgeTypeWanted(edgeType) {
-    if (!edgeType) return false;
     edgeType = edgeType.toUpperCase();
     if (!isValidEdgeType(edgeType)) return false;
     if (edgeTypeFilter && edgeTypeFilter.indexOf(edgeType) === -1) return false;
@@ -145,7 +139,7 @@ async function bfs(rootPersonId, options, context) {
     if (!canAccess(doc, callerScope)) continue;
 
     visitedNodes[personId] = true;
-    resultNodes.push(buildNodeEntry(doc));
+    resultNodes.push(buildNodeEntry(doc, hop));
 
     if (hop >= maxHops) continue;
 
@@ -227,7 +221,6 @@ async function bfs(rootPersonId, options, context) {
 
 module.exports = {
   bfs: bfs,
-  getEdgeType: getEdgeType,
   CANONICAL_EDGE_TYPES: CANONICAL_EDGE_TYPES,
   UNDIRECTED_EDGE_TYPES: UNDIRECTED_EDGE_TYPES,
   DIRECTED_EDGE_TYPES: DIRECTED_EDGE_TYPES,

@@ -46,11 +46,11 @@ var EDGE_STYLES = {
     style: 'solid',
     label: 'Accused → Victim'
   },
-  'UNCONFIRMED_MATCH': {
+  'CANDIDATE_MATCH': {
     color: '#9E9E9E',
     width: 1,
     style: 'dashed',
-    label: 'Unconfirmed'
+    label: 'Candidate'
   },
   'SHARED_LOCATION': {
     color: '#2196F3',
@@ -67,16 +67,16 @@ var EDGE_STYLES = {
 };
 
 function getNodeStyle(rolesSummary) {
-  if (!rolesSummary) return NODE_STYLES.default;
+  if (!rolesSummary) return { key: 'default', ...NODE_STYLES.default };
 
   var counts = [];
   if (rolesSummary.accused_count > 0) counts.push('accused');
   if (rolesSummary.victim_count > 0) counts.push('victim');
   if (rolesSummary.complainant_count > 0) counts.push('complainant');
 
-  if (counts.length === 0) return NODE_STYLES.default;
-  if (counts.length === 1) return NODE_STYLES[counts[0]];
-  return NODE_STYLES.mixed;
+  if (counts.length === 0) return { key: 'default', ...NODE_STYLES.default };
+  if (counts.length === 1) return { key: counts[0], ...NODE_STYLES[counts[0]] };
+  return { key: 'mixed', ...NODE_STYLES.mixed };
 }
 
 function getPrimaryRole(rolesSummary) {
@@ -113,7 +113,8 @@ function getPrimaryRole(rolesSummary) {
 }
 
 function getEdgeStyle(edgeType) {
-  return EDGE_STYLES[edgeType] || EDGE_STYLES.default;
+  var style = EDGE_STYLES[edgeType] || EDGE_STYLES.default;
+  return { key: edgeType || 'default', ...style };
 }
 
 module.exports = {

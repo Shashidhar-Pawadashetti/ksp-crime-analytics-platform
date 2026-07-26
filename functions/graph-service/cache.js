@@ -37,13 +37,20 @@ GraphCache.prototype._buildIndexes = function () {
 
     if (!inAdj[e.target_person_id]) inAdj[e.target_person_id] = {};
     inAdj[e.target_person_id][e.edge_id] = true;
+  }
 
+  var degreeEdgeSets = {};
+  for (var ei = 0; ei < this._edges.length; ei++) {
+    var e = this._edges[ei];
     if (e.source_person_id !== e.target_person_id) {
-      if (!degreeIdx[e.source_person_id]) degreeIdx[e.source_person_id] = 0;
-      degreeIdx[e.source_person_id]++;
-      if (!degreeIdx[e.target_person_id]) degreeIdx[e.target_person_id] = 0;
-      degreeIdx[e.target_person_id]++;
+      if (!degreeEdgeSets[e.source_person_id]) degreeEdgeSets[e.source_person_id] = {};
+      degreeEdgeSets[e.source_person_id][e.edge_id] = true;
+      if (!degreeEdgeSets[e.target_person_id]) degreeEdgeSets[e.target_person_id] = {};
+      degreeEdgeSets[e.target_person_id][e.edge_id] = true;
     }
+  }
+  for (var pid in degreeEdgeSets) {
+    degreeIdx[pid] = Object.keys(degreeEdgeSets[pid]).length;
   }
 
   this._nodeIndex = nodeIndex;
@@ -114,13 +121,20 @@ GraphCache.prototype.reload = async function () {
 
       if (!newInAdj[e.target_person_id]) newInAdj[e.target_person_id] = {};
       newInAdj[e.target_person_id][e.edge_id] = true;
+    }
 
+    var newDegreeEdgeSets = {};
+    for (var ei = 0; ei < newEdges.length; ei++) {
+      var e = newEdges[ei];
       if (e.source_person_id !== e.target_person_id) {
-        if (!newDegreeIdx[e.source_person_id]) newDegreeIdx[e.source_person_id] = 0;
-        newDegreeIdx[e.source_person_id]++;
-        if (!newDegreeIdx[e.target_person_id]) newDegreeIdx[e.target_person_id] = 0;
-        newDegreeIdx[e.target_person_id]++;
+        if (!newDegreeEdgeSets[e.source_person_id]) newDegreeEdgeSets[e.source_person_id] = {};
+        newDegreeEdgeSets[e.source_person_id][e.edge_id] = true;
+        if (!newDegreeEdgeSets[e.target_person_id]) newDegreeEdgeSets[e.target_person_id] = {};
+        newDegreeEdgeSets[e.target_person_id][e.edge_id] = true;
       }
+    }
+    for (var pid in newDegreeEdgeSets) {
+      newDegreeIdx[pid] = Object.keys(newDegreeEdgeSets[pid]).length;
     }
 
     this._nodes = newNodes;
@@ -223,7 +237,17 @@ GraphCache.prototype.getInEdgesForNode = function (personId) {
 GraphCache.prototype.getEdgesForNode = function (personId) {
   var outEdges = this.getOutEdgesForNode(personId);
   var inEdges = this.getInEdgesForNode(personId);
-  return outEdges.concat(inEdges);
+  var seen = {};
+  var result = [];
+  var combined = outEdges.concat(inEdges);
+  for (var ei = 0; ei < combined.length; ei++) {
+    var e = combined[ei];
+    if (!seen[e.edge_id]) {
+      seen[e.edge_id] = true;
+      result.push(e);
+    }
+  }
+  return result;
 };
 
 GraphCache.prototype.getDegree = function (personId) {

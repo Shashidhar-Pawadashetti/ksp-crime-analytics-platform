@@ -8,6 +8,7 @@ app.use(express.json({ limit: '5mb' }));
 
 var PM_TABLE = 'PersonMaster';
 var BATCH_SIZE = 10;
+var CANDIDATE_EDGE_TYPE = 'candidate_match';
 
 function getAppInstance(req) {
   try { return catalyst.initialize(req); }
@@ -33,32 +34,30 @@ function parseResponse(result) {
 
 async function loadAllDocuments(appInstance) {
   var { NoSQLEnum, NoSQLMarshall } = require('zcatalyst-sdk-node/lib/no-sql');
+  var { NoSQLOperator } = NoSQLEnum;
   var noSql = appInstance.nosql();
   var table = await noSql.getTable(PM_TABLE);
   var allDocs = [];
-  var nextToken = null;
+  var startKey = null;
 
-  for (var iter = 0; iter < 20; iter++) {
+  while (true) {
     var queryParams = {
       key_condition: {
-        attribute: ['type'],
-        operator: NoSQLEnum.NoSQLOperator.EQUALS,
+        attribute: 'type',
+        operator: NoSQLOperator.EQUALS,
         value: NoSQLMarshall.makeString('PM')
       },
-      limit: 1000
+      limit: 100,
+      consistent_read: true
     };
-    if (nextToken) {
-      queryParams.next_token = nextToken;
+    if (startKey) {
+      queryParams.start_key = startKey;
     }
     var result = await table.queryTable(queryParams);
     var docs = parseResponse(result);
     allDocs = allDocs.concat(docs);
-    try {
-      nextToken = result.getNextToken();
-    } catch (e) {
-      nextToken = null;
-    }
-    if (!nextToken || docs.length === 0) break;
+    startKey = result.start_key;
+    if (!startKey) break;
   }
 
   return allDocs;
@@ -159,6 +158,89 @@ function migrateV2toV3(doc) {
   }
 
   return changed;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Candidate Edge Legacy Migration (Phase 4.7)                       */
+/* ------------------------------------------------------------------ */
+
+function isLegacyCandidateEdge(edge) {
+  return edge && edge.with_person_id != null && !edge.edge_type && !edge.type;
+}
+
+function isCanonicalCandidateEdge(edge) {
+  return edge && edge.edge_type != null && edge.target_person_id != null;
+}
+
+function isSemiCanonicalEdge(edge) {
+  return edge && edge.with_person_id != null && edge.type != null && !edge.edge_type;
+}
+
+function generateEdgeId(personIdA, personIdB, edgeType, caseIds) {
+  var ids = [personIdA, personIdB].sort();
+  var parts = [ids[0], ids[1], edgeType];
+  if (Array.isArray(caseIds) && caseIds.length > 0) {
+    parts.push(caseIds.slice().sort().join('|'));
+  }
+  var seed = parts.join('|');
+  var hash = 0xCBF29CE484222325;
+  for (var i = 0; i < seed.length; i++) {
+    hash ^= seed.charCodeAt(i);
+    hash = Math.imul(hash, 0x100000001B3);
+    hash = hash >>> 0;
+  }
+  return 'E-' + hash.toString(16).padStart(12, '0').slice(0, 8).toUpperCase();
+}
+
+function convertLegacyEdge(edge, personId) {
+  var targetPersonId = edge.with_person_id;
+  var edgeId = generateEdgeId(personId, targetPersonId, CANDIDATE_EDGE_TYPE);
+  var confidence = edge.confidence != null ? edge.confidence : 0.5;
+  var now = new Date().toISOString();
+
+  return {
+    edge_id: edgeId,
+    edge_type: CANDIDATE_EDGE_TYPE,
+    target_person_id: targetPersonId,
+    confidence: confidence,
+    evidence: [{
+      type: 'MATCH_SCORE',
+      confidence: confidence,
+      score_breakdown: edge.score_breakdown || {},
+      weight: 1
+    }],
+    case_ids: edge.case_ids || [],
+    created_at: now,
+    version: 1
+  };
+}
+
+function convertSemiCanonicalEdge(edge, personId) {
+  var targetPersonId = edge.with_person_id;
+  var edgeId = edge.edge_id || generateEdgeId(personId, targetPersonId, CANDIDATE_EDGE_TYPE);
+  var confidence = edge.confidence != null ? edge.confidence : 0.5;
+  var now = new Date().toISOString();
+
+  var evidence = edge.evidence;
+  if (!evidence || !Array.isArray(evidence) || evidence.length === 0) {
+    evidence = [{
+      type: 'MATCH_SCORE',
+      confidence: confidence,
+      score_breakdown: edge.score_breakdown || {},
+      weight: 1
+    }];
+  }
+
+  return {
+    edge_id: edgeId,
+    edge_type: CANDIDATE_EDGE_TYPE,
+    target_person_id: targetPersonId,
+    confidence: confidence,
+    evidence: evidence,
+    case_ids: edge.case_ids || [],
+    created_at: edge.created_at || now,
+    version: edge.version || 1
+  };
 }
 
 async function updateDocument(appInstance, doc) {
@@ -276,8 +358,153 @@ app.post('/migrate', async function (req, res) {
   }
 });
 
+app.post('/migrate-candidates', async function (req, res) {
+  var appInstance = getAppInstance(req);
+  if (!appInstance) { res.status(500).json({ status: 'error', error_code: 'INIT_FAILED' }); return; }
+
+  var dryRun = req.body && req.body.dryRun !== false;
+
+  console.log('[pm-migration] Starting candidate edge migration (dryRun=' + dryRun + ')');
+
+  try {
+    var documents = await loadAllDocuments(appInstance);
+    console.log('[pm-migration] Loaded ' + documents.length + ' documents');
+
+    var docsNeedingMigration = 0;
+    var legacyEdgeCount = 0;
+    var semiCanonicalCount = 0;
+    var canonicalCount = 0;
+    var invalidCount = 0;
+    var samples = [];
+    var errors = [];
+
+    for (var di = 0; di < documents.length; di++) {
+      var doc = documents[di];
+      var edges = doc.unconfirmed_edges;
+      if (!Array.isArray(edges) || edges.length === 0) continue;
+
+      var docChanged = false;
+      var convertedEdges = [];
+
+      for (var ei = 0; ei < edges.length; ei++) {
+        var edge = edges[ei];
+
+        if (isCanonicalCandidateEdge(edge)) {
+          convertedEdges.push(edge);
+          canonicalCount++;
+          continue;
+        }
+
+        if (isLegacyCandidateEdge(edge)) {
+          var converted = convertLegacyEdge(edge, doc.person_id);
+          convertedEdges.push(converted);
+          legacyEdgeCount++;
+          docChanged = true;
+
+          if (samples.length < 3 && docsNeedingMigration < 3) {
+            samples.push({
+              person_id: doc.person_id,
+              before: { with_person_id: edge.with_person_id, confidence: edge.confidence, score_breakdown: edge.score_breakdown },
+              after: converted
+            });
+          }
+          continue;
+        }
+
+        if (isSemiCanonicalEdge(edge)) {
+          var converted = convertSemiCanonicalEdge(edge, doc.person_id);
+          convertedEdges.push(converted);
+          semiCanonicalCount++;
+          docChanged = true;
+
+          if (samples.length < 3 && docsNeedingMigration < 3) {
+            samples.push({
+              person_id: doc.person_id,
+              before: { edge_id: edge.edge_id, type: edge.type, with_person_id: edge.with_person_id, confidence: edge.confidence },
+              after: converted
+            });
+          }
+          continue;
+        }
+
+        invalidCount++;
+      }
+
+      if (docChanged) {
+        docsNeedingMigration++;
+
+        if (!dryRun) {
+          try {
+            var updatedDoc = JSON.parse(JSON.stringify(doc));
+            updatedDoc.unconfirmed_edges = convertedEdges;
+            await updateDocument(appInstance, updatedDoc);
+          } catch (err) {
+            errors.push({ person_id: doc.person_id, error: err.message });
+          }
+        }
+      }
+    }
+
+    var totalConvertible = legacyEdgeCount + semiCanonicalCount;
+
+    console.log('[pm-migration] Complete — scanned: ' + documents.length +
+      ', needing migration: ' + docsNeedingMigration +
+      ', legacy: ' + legacyEdgeCount +
+      ', semi-canonical: ' + semiCanonicalCount +
+      ', canonical: ' + canonicalCount +
+      ', invalid: ' + invalidCount +
+      ', errors: ' + errors.length);
+
+    if (dryRun) {
+      res.status(200).json({
+        status: 'ok',
+        data: {
+          mode: 'dry-run',
+          documents_scanned: documents.length,
+          documents_needing_migration: docsNeedingMigration,
+          legacy_edges_found: legacyEdgeCount,
+          edges_convertible: totalConvertible,
+          already_canonical_edges: canonicalCount,
+          invalid_edges: invalidCount,
+          semi_canonical_edges_found: semiCanonicalCount,
+          duplicate_edges_removed: 0,
+          documents_that_would_update: docsNeedingMigration,
+          samples: samples
+        }
+      });
+    } else {
+      res.status(200).json({
+        status: 'ok',
+        data: {
+          mode: 'apply',
+          documents_scanned: documents.length,
+          documents_updated: docsNeedingMigration,
+          legacy_edges_migrated: legacyEdgeCount,
+          semi_canonical_edges_migrated: semiCanonicalCount,
+          already_canonical_edges_preserved: canonicalCount,
+          invalid_edges_skipped: invalidCount,
+          errors: errors
+        }
+      });
+    }
+  } catch (err) {
+    console.error('[pm-migration] Fatal error: ' + err.message);
+    res.status(500).json({
+      status: 'error',
+      error_code: 'MIGRATION_FAILED',
+      message: err.message
+    });
+  }
+});
+
+app.get('/migrate-candidates', async function (req, res) {
+  req.body = { dryRun: true };
+  app._router.handle(req, res, function () {});
+});
+
 app.get('/', function (req, res) {
   res.status(200).json({ status: 'ok', service: 'pm-migration', description: 'PersonMaster schema migration tool (Phase 4.6)' });
 });
 
+app.loadAllDocuments = loadAllDocuments;
 module.exports = app;
