@@ -19,7 +19,8 @@ A conversational AI platform that lets investigators, analysts, and policymakers
 
 ```
 ksp-crime-analytics-platform/
-|-- catalyst.json              # Deployment targets (7 functions)
+|-- catalyst.json              # Deployment targets (21 functions)
+|-- catalyst_ci.json           # CI deployment manifest
 |-- AGENTS.md                  # THIS FILE -- agent onboarding context
 |-- CHANGELOG.md               # Version history
 |-- ONBOARDING.md              # Human team onboarding guide
@@ -28,67 +29,67 @@ ksp-crime-analytics-platform/
 |-- README.md                  # Project overview
 |-- .env                       # Local secrets (gitignored)
 |-- .env.example               # Template for .env
+|-- knowlede.md                # Knowledge base
 |
-|-- functions/                 # 7 Catalyst Functions
+|-- functions/                 # 21 Catalyst Functions
 |   |-- classifier/            # Intent classifier (deployed, working)
-|   |   |-- index.js
-|   |   |-- catalyst-config.json
-|   |   |-- package.json
 |   |-- nl_sql/                # NL-to-ZCQL (deployed, working)
-|   |   |-- index.js
-|   |   |-- catalyst-config.json
-|   |   |-- package.json
 |   |-- rag/                   # RAG dispatcher (deployed, working)
-|   |   |-- index.js
-|   |   |-- catalyst-config.json
-|   |   |-- package.json
 |   |-- pipeline/              # Orchestrator (deployed, working)
-|   |   |-- index.js
-|   |   |-- catalyst-config.json
-|   |   |-- package.json
 |   |-- session/               # Session manager (deployed)
-|   |   |-- index.js
-|   |   |-- catalyst-config.json
-|   |   |-- package.json
 |   |-- query_exec/            # ZCQL executor (deployed)
-|   |   |-- index.js
-|   |   |-- catalyst-config.json
-|   |   |-- package.json
+|   |-- dashboard/             # Analytics aggregation queries
 |   |-- test/                  # Health check (deployed)
-|   |   |-- index.js
-|   |   |-- catalyst-config.json
-|   |   |-- package.json
+|   |-- entity-matching-engine/ # Person dedup library modules
+|   |-- graph-service/         # Graph data structure (nodes, edges)
+|   |-- graph-traversal/       # BFS traversal (max 3 hops)
+|   |-- graph-visualization/   # Cytoscape.js export helpers
+|   |-- graph-service-api/     # Graph REST API (Cytoscape format)
+|   |-- network-analysis/      # Network analysis REST API
+|   |-- personmaster-writer/   # PersonMaster NoSQL batch writer
+|   |-- personmaster-api/      # PersonMaster HTTP endpoint
+|   |-- pm-migration/          # Data migration tooling
+|   |-- validation/            # Ground truth validation
+|   |-- sync-full/             # Full graph rebuild pipeline
+|   |-- sync-full-job/         # Scheduled cron trigger
+|   |-- sync-incremental/      # Incremental entity signal processing
 |
 |-- data_pipeline/             # Synthetic data generation & import
 |   |-- ...
 |-- docs/                      # Documentation
 |   |-- production-auth.md
-|-- knowlede.md                # Knowledge base
 ```
 
 ---
 
-## 3. Architecture — 7 Catalyst Functions
+## 3. Architecture — 21 Catalyst Functions
 
-All functions are **Node.js 24, AdvancedIO** deployed on Catalyst. They communicate via the Catalyst Data Store (ZCQL), Cache, and QuickML (GLM LLM).
+All functions are **Node.js 24, AdvancedIO** deployed on Catalyst. They communicate via the Catalyst Data Store (ZCQL), Cache, NoSQL (PersonMaster), and QuickML (GLM LLM).
 
 ```
-User query
-  |
-  v
-pipeline/query ---> classifier (inline)
-                         |  keyword match -> instant
-                         |  ambiguous     -> GLM LLM
-                         v
-              +-- structured -> GLM SQL gen -> ZCQL execute -> rows
-              +-- narrative  -> BriefFacts LIKE search -> GLM answer
-              +-- network    -> Accused/Victim/Complainant search -> graph
-              +-- risk       -> Accused count -> recidivism score
-              +-- analytical -> 3 aggregation queries -> trends
-                         |
-                         v
-              Format JSON response -> append turn to session (Cache, 1hr TTL)
+                     User query (chat UI)
+                        |
+                        v
+            pipeline/query (orchestrator)
+                        |
+                classifier (inline)
+                /    |    |    |    \
+          struct narr network risk analytical
+                |    |    |    |    |
+                v    v    v    v    v
+            ZCQL  GLM  NoSQL Score  ZCQL
+             SQL  RAG   BFS  Calc  Aggr
+                |    |    |    |    |
+                v    v    v    v    v
+         Data Store / NoSQL / Cache / QuickML
+
+           sync-incremental/detect
+           sync-incremental/reconcile
+           sync-full (cron rebuild)
+           personmaster-api (search, repeat-offenders, profile, network)
 ```
+
+### Core 7 — Conversational AI
 
 | # | Function | Role | Calls GLM? | Calls ZCQL? |
 |---|----------|------|-----------|-------------|
@@ -99,6 +100,35 @@ pipeline/query ---> classifier (inline)
 | 5 | **pipeline** | Full orchestrator (inline handlers) | Yes (SQL gen, classifier fallback, narrative) | Yes |
 | 6 | **session** | Conversation memory (Cache CRUD) | No | Yes (Employee hierarchy) |
 | 7 | **query_exec** | Raw ZCQL executor with safety validation | No | Yes |
+
+### Entity Resolution & Graph — 7 Functions
+
+| # | Function | Role |
+|---|----------|------|
+| 8 | **entity-matching-engine** | Pure-library: normalise, phonetic, block, score, threshold |
+| 9 | **personmaster-writer** | Batch NoSQL writer for PersonMaster + edges |
+| 10 | **pm-migration** | Data migration tooling (V1→V2 schema) |
+| 11 | **graph-service** | In-memory graph data structure (nodes, edges, degree index) |
+| 12 | **graph-traversal** | BFS traversal (max 3 hops) with edge-type filter |
+| 13 | **graph-visualization** | Cytoscape.js export helpers (nodes, edges, styles) |
+| 14 | **graph-service-api** | Graph REST API returning Cytoscape JSON |
+
+### PersonMaster API — 1 Function
+
+| # | Function | Endpoints |
+|---|----------|-----------|
+| 15 | **personmaster-api** | `GET /personmaster/search`, `GET /personmaster/repeat-offenders`, `GET /personmaster/:person_id`, `GET /personmaster/:person_id/network` |
+
+### Sync & Validation — 6 Functions
+
+| # | Function | Role |
+|---|----------|------|
+| 16 | **sync-incremental** | Change detection (`/detect`) + incremental reconciliation (`/reconcile`) |
+| 17 | **sync-full** | Full graph rebuild pipeline (authoritative mode) |
+| 18 | **sync-full-job** | Scheduled cron trigger for full sync |
+| 19 | **network-analysis** | Person profile, associates, co-accused, victims, summary |
+| 20 | **validation** | Ground truth identity validation (precision/recall/F1) |
+| 21 | **dashboard** | Analytics aggregation queries for the dashboard |
 
 ---
 
@@ -412,6 +442,130 @@ Safety validation: blocks DDL/DML (DROP, DELETE, INSERT, UPDATE, etc.). Only SEL
 
 ---
 
+### 8.8 sync-incremental — `POST /sync-incremental/detect`, `POST /sync-incremental/reconcile`
+
+**Phase 4.2.3** — Incremental change detection and identity re-resolution.
+
+#### `POST /detect`
+**Input:** `{}` (no body required)
+**Output:** `{"status": "ok", "data": {"run_id", "timestamp", "stats": {...}, "changed_person_ids": [...], "new_records": [...], "orphaned_records": [...], "identity_diagnostics": {...}}}`
+
+**Logic:**
+1. Load all existing PersonMaster documents via NoSQL (V2 pagination with `start_key`)
+2. Build `buildSourceToPersonIndex` — maps each source record to its owning person_id, tracking duplicate/cross-person ownership
+3. Load current source records from Data Store (Accused, Victim, ComplainantDetails) via ZCQL with pagination
+4. Compare checksums per PersonMaster: if any source record changed (name, age, case_id, unit_id, district_id), mark person_id as changed
+5. Detect orphaned records (in PersonMaster but not in current Data Store)
+6. Detect new records (in Data Store but not in any PersonMaster)
+7. Return `identity_diagnostics` structure:
+
+```json
+{
+  "identity_diagnostics": {
+    "current_total": 10487,
+    "existing_indexed_keys": 10480,
+    "source_record_elements_total": 10487,
+    "duplicate_ownership": {
+      "total_references": 10480,
+      "unique_keys": 10470,
+      "duplicate_keys": 10,
+      "same_person_duplicates": 8,
+      "cross_person_keys": 2,
+      "cross_person_duplicates": 4,
+      "max_persons_per_key": 2,
+      "ownership_distribution": {
+        "single_person_keys": 10468,
+        "two_person_keys": 2,
+        "multi_person_keys": 0
+      },
+      "samples": [
+        {
+          "source_key": "Accused:A-12345",
+          "person_ids": ["PM_abc123", "PM_def456"],
+          "occurrence_count": 2,
+          "persons_per_key": 2
+        }
+      ]
+    },
+    "current_side": {
+      "total_references": 10487,
+      "unique_keys": 10487,
+      "duplicate_references_extra": 0
+    },
+    "set_arithmetic": {
+      "historical_unique_keys": 10480,
+      "current_unique_keys": 10487,
+      "intersection": 10470,
+      "historical_minus_current": 10,
+      "current_minus_historical": 17
+    }
+  }
+}
+```
+
+#### `POST /reconcile`
+**Input:** `{}`
+**Output:** `{"status": "ok", "data": {"detection": {...}, "resolution": {...}}}`
+
+**Logic:**
+1. Runs `detectChanges()` first
+2. For changed/new records: loads affected source records (by case IDs), runs entity matching (normalise → phonetic → block → score → threshold), forms clusters via Union-Find
+3. Maps clusters to PersonMaster documents with identity preservation:
+   - **Identity preservation:** Overlap with one existing doc → keep that person_id
+   - **Merge:** Overlap with multiple docs → survivor by overlap count + deterministic tie-breaker
+   - **Split:** Overlap with doc that also overlaps other clusters → deterministic assignment
+   - **New:** No overlap → `deterministicPersonId()` via CRC32 of sorted source keys
+4. Handles orphaned records (removes from doc, marks doc for deletion if no records remain)
+5. Regenerates confirmed/unconfirmed edges for affected + shared-case persons
+6. Persists via NoSQL upsert (insert or PUT update)
+
+**Key helpers:**
+- `parseSourceRecords(doc)` — handles native arrays, stringified JSON arrays, mixed arrays of objects/strings
+- `getSourceRecordTable(sr)` — resolves table name from `sr.table`, `sr.source_table`, or `sr.role` via `ROLE_TO_TABLE` fallback
+- `buildSourceRecordKey(sr)` — returns `"{table}:{source_id}"` or `null` if identity cannot be resolved
+
+---
+
+### 8.9 sync-full — Full Graph Rebuild Pipeline
+
+**Role:** Authoritative full-sync pipeline that rebuilds the entire PersonMaster graph from scratch.
+
+**Triggered by:** `sync-full-job` cron, manual API call, or scheduled Catalyst job `full-reconciliation`.
+
+**Key behaviors:**
+- Loads ALL source records from Data Store (Accused, Victim, ComplainantDetails)
+- Runs entity matching across all records
+- Builds PersonMaster documents, confirmed edges, unconfirmed edges
+- **Merge-victim deletion:** After identity resolution, documents whose records were absorbed into a surviving identity are explicitly deleted (separate phase from stale-orphan cleanup)
+- **Stale-orphan deletion:** Records in the graph but not in current Data Store are removed only in FULL authoritative mode
+- **`deleteOneDoc` idempotency:** Handles 404 gracefully (no-op if already deleted)
+
+---
+
+### 8.10 personmaster-api — PersonMaster HTTP Endpoints
+
+**Base path:** `/personmaster-api/personmaster`
+
+#### `GET /search?name=chandrika`
+Searches PersonMaster documents by name. Uses `name_variants` array for fuzzy matching with scoring (exact=1.0, substring=0.8, partial-token=0.5). Supports filters: `gender`, `min_age`, `max_age`, `limit`.
+**Output:** `{"results": [{"person_id", "name_normalised", "confidence", "roles_summary", "match_reason"}], "total": N}`
+
+#### `GET /repeat-offenders?limit=20`
+Returns persons with `accused_count >= 2`, sorted by count descending. Supports scoping: `unit_id`, `district_id`.
+**Output:** `{"repeat_offenders": [...], "scope_applied": "state|unit:X|district:Y", "total": N}`
+
+#### `GET /:person_id`
+Returns the full PersonMaster document for a single person.
+**Output:** Single PersonMaster JSON document.
+**Error:** `{"error": "person_not_found", "person_id": "..."}` (404)
+
+#### `GET /:person_id/network?hops=2&max_nodes=50`
+BFS traversal from the given person, returning a network graph structure.
+**Input query params:** `hops` (1-3, default 2), `max_nodes` (1-100, default 50)
+**Output:** `{"nodes": [...], "edges": [...], "stats": {...}}`
+
+---
+
 ## 9. Key Implementation Decisions
 
 1. **`enable_thinking: false` is MANDATORY** on every GLM call. Without it, the model does chain-of-thought and won't output JSON.
@@ -457,6 +611,10 @@ Safety validation: blocks DDL/DML (DROP, DELETE, INSERT, UPDATE, etc.). Only SEL
 | **No parameterized queries** | ZCQL doesn't support them | Inline values with safety validation |
 | **"returnErrorResponse" 500** | Corrupted Console function registration | Delete function from Console → recreate → redeploy → re-add env vars |
 | **Cross-function code duplication** | Each function has own GLM helper | Accepted trade-off for independent deployment |
+| **sync-incremental merge-victim cleanup** | Merge victims (documents absorbed into survivor) must be explicitly deleted after sync | sync-full separates merge-victim deletion from stale-orphan cleanup |
+| **sync-incremental `parseSourceRecords` fragility** | v0 PersonMaster records stored as stringified JSON with `role` instead of `table` | Hardened parser handles all JSON representations + ROLE_TO_TABLE fallback |
+| **sync-incremental identity diagnostics** | Duplicate source keys across persons indicate cross-person identity leakage | `identity_diagnostics.duplicate_ownership` in `/detect` response tracks this |
+| **PersonMaster NoSQL V2 pagination** | V2 uses `start_key` field, not `last_evaluated_key` | Pipeline and sync-incremental both updated to V2 pagination pattern |
 
 ---
 

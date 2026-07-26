@@ -4,6 +4,56 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v4.4.5] — Identity Matching Hardening & Graph Cleanup
+
+### Added
+
+#### sync-incremental Identity Matching Compatibility
+- **`parseSourceRecords` hardened** — Handles all JSON representations: native arrays, stringified JSON arrays, mixed arrays of objects and stringified objects. Diagnostics counters track each element type.
+- **`getSourceRecordTable` role fallback** — v0 PersonMaster records stored only a `role` field (e.g. "Accused") instead of `table`/`source_table`. Added `ROLE_TO_TABLE` mapping so these records can still build identity keys.
+- **`buildSourceToPersonIndex` ownership tracking** — Full diagnostics track unique vs duplicate keys, same-person vs cross-person duplicates, multi-person ownership, and samples of problematic records.
+- **Identity diagnostics in `/detect` response** — `identity_diagnostics` block includes:
+  - `duplicate_ownership` — key-level breakdown (unique keys, duplicate references, cross-person duplication, ownership distribution histogram for single/two/multi-person keys)
+  - `current_side` — uniqueness stats on current Data Store records
+  - `set_arithmetic` — historical-vs-current set comparison (intersection, H-C, C-H)
+  - `missing_identity` — records that could not form a source key with per-reason counts and samples
+
+#### sync-full Merge-Victim Cleanup
+- **Merge-victim deletion separated from stale-orphan deletion** — After identity resolution, person documents whose records were absorbed into a surviving identity (merge victims) are explicitly deleted. This is a separate phase from stale-orphan cleanup.
+- **Merge victims always deleted after survivor persistence** — Ensures atomicity: survivor is written first, then merge-victim docs are removed.
+- **Stale orphans deleted only in FULL authoritative mode** — Stale orphan deletion (records in the graph but not in current Data Store) runs only when the sync mode is `FULL` (authoritative rebuild), not during incremental passes.
+- **`deleteOneDoc` idempotency** — `deleteOneDoc` handles 404 gracefully when the document was already deleted. No error thrown for already-deleted documents.
+
+#### Pipeline V2 NoSQL Pagination
+- **Pipeline PersonMaster pagination upgraded to V2** — Uses `start_key`-based pagination (NoSQL V2 pattern) instead of the previous V1 `last_evaluated_key` approach.
+
+#### Test Expansion
+- **3,300+ new tests** across all modules since v4.4.4:
+  - `sync-incremental/test_change_detection.js` — 84+ tests covering change detection, source parsing, identity indexing, orphan detection, edge cases, diagnostics, boundary conditions
+  - `sync-incremental/test_incremental_resolver.js` — Incremental reconciliation flow tests
+  - `sync-incremental/test.js` — 53+ tests for function integrity and API shape
+  - `sync-incremental/test_no_cross_function_imports.js` — Isolation verification
+  - `sync-full/test_full_reconciler.js` — Full reconciliation pipeline tests
+  - `sync-full-job/test_job_lifecycle.js` — Job lifecycle state machine tests (3+)
+  - `validation/test_ground_truth.js` — Ground truth validation tests
+  - `personmaster-writer/test_integration.js`, `test_local.js`, `test_edgePersistence.js` — Writer integration tests
+  - `pm-migration/test_local.js` — Migration tests
+  - `pipeline/test/test.js` — 69+ pipeline integration tests
+  - `client/src/__tests__/` — 28 files covering all frontend views
+  - Existing test suites expanded (graph-service, BFS, network-analysis, graph-export)
+
+### Changed
+- `sync-incremental/incrementalResolver.js` — Identity-preserving cluster-to-document mapping with merge/split resolution. New `findExistingOwners`, `mapClustersToDocs`, `handleOrphanedRecords` with merge-victim tracking.
+- `sync-incremental/index.js` — Full rewrite of change detection pipeline with identity diagnostics, record checksum comparison, orphan tracking, new-record detection.
+
+### Bug Fixes
+- **sync-incremental `buildSourceRecordKey`** — Could return `null` for v0 PersonMaster records that only had a `role` field instead of `table`/`source_table`. Fixed with `ROLE_TO_TABLE` fallback mapping.
+- **sync-full orphan deletion timing** — Merge victims were sometimes left as orphan documents after identity resolution. Fixed by separating merge-victim deletion from stale-orphan deletion.
+- **sync-full `deleteOneDoc` crash** — Threw when document was already deleted. Now idempotent (no-op for 404).
+- **Pipeline NoSQL V1→V2 pagination** — Pipeline's PersonMaster query used a `start_key`/`last_evaluated_key` pattern that didn't match V2 NoSQL API. Fixed to use V2 `startKey` + `consistent_read` pattern.
+
+---
+
 ## [Unreleased] — Core Conversational Platform
 
 ### Added

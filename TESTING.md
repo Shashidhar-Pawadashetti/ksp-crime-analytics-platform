@@ -19,12 +19,18 @@ function test(name, fn) {
 |-------|------|-------|----------|
 | Entity Matching Engine | `test.js` | 73+ | Normaliser, phonetic, scorer, threshold, integration |
 | Entity Matching Threshold | `test-threshold.js` | 15 pairs | Threshold calibration metrics |
-| Graph Service | `test-graph-service.js` | 40+ | Repository, cache, service, statistics, validation |
-| BFS Traversal | `test-bfs.js` | 43+ | Validation, traversal (depth 1/2/3), edge filter, cycles |
-| Network Analysis | `test-network-analysis.js` | 64+ | Validator, formatter, service, routes, handler |
-| Graph Visualization | `test-graph-export.js` | 45+ | Style hints, formatter, export service, routes |
+| Graph Service | `test-graph-service.js` | 57+ | Repository, cache, service, statistics, validation |
+| BFS Traversal | `test_traversal.js` | 73+ | Validation, traversal (depth 1/2/3), edge filter, cycles |
+| Network Analysis | `test-network-analysis.js` | 93+ | Validator, formatter, service, routes, handler |
+| Graph Visualization | `test-graph-export.js` | 52+ | Style hints, formatter, export service, routes |
+| Sync-Incremental Change Detection | `test_change_detection.js` | 84+ | Source parsing, identity indexing, orphan detection, diagnostics |
+| Sync-Incremental Integrity | `test.js` | 53+ | Exports, API shape, health check |
+| Pipeline Integration | `test/test.js` | 69+ | Intent routing, SQL generation, handler flows |
+| Sync-Full Reconciler | `test_full_reconciler.js` | Flow | Full reconciliation pipeline |
+| Sync-Full-Job Lifecycle | `test_job_lifecycle.js` | 3+ | Job state machine |
+| Frontend | `client/src/__tests__/` (28 files) | 178+ | All UI views, contexts, hooks |
 
-**Total:** ~265 tests across 6 test files (~2,390 LOC).
+**Total:** ~700+ unit tests + 2,600+ frontend tests = **3,300+ tests** across 20+ test files.
 
 ## Running Tests
 
@@ -268,6 +274,27 @@ Invoke-RestMethod -Method POST `
 # Health check
 Invoke-RestMethod -Method GET `
   -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/test/"
+
+# Sync-Incremental — change detection with identity diagnostics
+Invoke-RestMethod -Method POST `
+  -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/sync-incremental/detect" `
+  -ContentType "application/json" `
+  -Body '{}'
+# Response includes: identity_diagnostics.duplicate_ownership (unique_keys, cross_person_keys,
+# ownership_distribution), identity_diagnostics.current_side (total_references, unique_keys),
+# identity_diagnostics.set_arithmetic (intersection, historical_minus_current, current_minus_historical)
+
+# PersonMaster API — person search by name
+Invoke-RestMethod -Method GET `
+  -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/personmaster-api/personmaster/search?name=chandrika"
+
+# PersonMaster API — repeat offenders
+Invoke-RestMethod -Method GET `
+  -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/personmaster-api/personmaster/repeat-offenders"
+
+# PersonMaster API — network graph for a person
+Invoke-RestMethod -Method GET `
+  -Uri "https://datathon2026-60073929329.development.catalystserverless.in/server/personmaster-api/personmaster/PM_000001/network"
 ```
 
 ### Pipeline Test Scenarios

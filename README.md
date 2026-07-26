@@ -82,22 +82,22 @@ trained model.
            Catalyst Data Store / NoSQL / Cache
 ```
 
-The platform deploys as **16 Catalyst Functions** across 6 layers:
+The platform deploys as **21 Catalyst Functions** across 6 layers:
 
 | Layer | Functions |
 |-------|-----------|
 | **Edge** | entity-matching-engine, graph-service, graph-traversal |
-| **Frontend/REST** | network-analysis (5 endpoints), graph-visualization (2 endpoints), graph-service-api |
-| **Orchestration** | pipeline (full orchestrator, inline handlers) |
+| **Frontend/REST** | network-analysis (5 endpoints), graph-visualization (2 endpoints), graph-service-api, personmaster-api (4 endpoints) |
+| **Orchestration** | pipeline (full orchestrator, inline handlers), pm-migration |
 | **AI/ML** | classifier, nl_sql, rag |
-| **Data** | query_exec, session, dashboard |
-| **Supporting** | personmaster-builder, personmaster-writer, personmaster-api, sync-full, sync-incremental |
+| **Data** | query_exec, session, dashboard, sync-incremental, sync-full, sync-full-job |
+| **Supporting** | personmaster-builder, personmaster-writer, validation |
 
 ## Repository Structure
 
 ```
 ksp-crime-analytics-platform/
-|-- catalyst.json                # 16-function deployment manifest
+|-- catalyst.json                # 21-function deployment manifest
 |-- AGENTS.md                    # AI agent onboarding
 |-- ONBOARDING.md                # Human team guide
 |-- README.md                    # This file
@@ -115,10 +115,10 @@ ksp-crime-analytics-platform/
 |   |   |-- hooks/               # Custom React hooks
 |   |   |-- services/            # API client functions
 |   |   |-- utils/               # Constants and helpers
-|   |   |-- __tests__/           # Vitest test suites (178 tests)
+|   |   |-- __tests__/           # Vitest test suites (28 files)
 |   |-- package.json
 |
-|-- functions/                   # 16 Catalyst Function directories
+|-- functions/                   # 21 Catalyst Function directories
 |   |-- classifier/              # Intent classification
 |   |-- nl_sql/                  # NL-to-ZCQL generation + execution
 |   |-- rag/                     # BriefFacts search + narrative
@@ -134,9 +134,12 @@ ksp-crime-analytics-platform/
 |   |-- graph-service-api/       # Graph REST API (Cytoscape format)
 |   |-- network-analysis/        # Network analysis REST API
 |   |-- personmaster-writer/     # PersonMaster NoSQL batch writer
-|   |-- personmaster-api/        # PersonMaster HTTP endpoint
+|   |-- personmaster-api/        # PersonMaster HTTP endpoint (search, repeat-offenders, profile, network)
+|   |-- pm-migration/            # Data migration tooling for PersonMaster
+|   |-- validation/              # Ground truth identity validation
 |   |-- sync-full/               # Full graph rebuild pipeline
-|   |-- sync-incremental/        # Incremental entity signal processing
+|   |-- sync-full-job/           # Scheduled cron trigger for full sync
+|   |-- sync-incremental/        # Incremental entity signal processing (detect + reconcile)
 |
 |-- data_pipeline/               # Synthetic data generation (9 phases, 24+ tables)
 ```
@@ -204,9 +207,9 @@ After `catalyst deploy`, re-add `QUICKML_TOKEN` in Catalyst Console for these
 
 | Metric | Value |
 |--------|-------|
-| Total tests | 178+ |
-| Catalyst Functions | 16 deployed |
-| REST Endpoints | 7+ |
+| Total tests | 3,300+ |
+| Catalyst Functions | 21 deployed |
+| REST Endpoints | 15+ |
 | ZCQL Tables | 24+ |
 | Frontend Views | 5 (Chat, Dashboard, Graph, Person Search, Hotspot Map) |
 | PersonMaster clusters | 481 |
