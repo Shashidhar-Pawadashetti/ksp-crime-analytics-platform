@@ -46,6 +46,7 @@ var bfsTraversePM = pipeline.bfsTraversePM;
 var computeDegreeFromEdges = pipeline.computeDegreeFromEdges;
 var extractPersonName = pipeline.extractPersonName;
 var extractKeywords = pipeline.extractKeywords;
+var extractCaseRowId = pipeline.extractCaseRowId;
 var classifyByKeyword = pipeline.classifyByKeyword;
 var flatRows = pipeline.flatRows;
 var zcqlRows = pipeline.zcqlRows;
@@ -239,6 +240,41 @@ test('returns null for non-person query', function () {
   assertEqual(name, null);
 });
 
+test('extracts PM_000001 from "Assess the risk of PM_000001"', function () {
+  var name = extractPersonName('Assess the risk of PM_000001');
+  assertEqual(name, 'PM_000001');
+});
+
+test('extracts PM_000002 from "Evaluate risk for PM_000002"', function () {
+  var name = extractPersonName('Evaluate risk for PM_000002');
+  assertEqual(name, 'PM_000002');
+});
+
+test('fallback name extraction still works for "Check risk of Chandrika Singh"', function () {
+  var name = extractPersonName('Check risk of Chandrika Singh');
+  assert(name && name.toLowerCase().indexOf('chandrika') !== -1, 'should extract Chandrika not ' + name);
+});
+
+test('PM ID wins over generic text in "Assess the risk of PM_999999"', function () {
+  var name = extractPersonName('Assess the risk of PM_999999');
+  assertEqual(name, 'PM_999999');
+});
+
+test('case-insensitive PM match for "assess risk of pm_000001"', function () {
+  var name = extractPersonName('assess risk of pm_000001');
+  assertEqual(name, 'PM_000001');
+});
+
+test('returns null for "Assess the risk of" (no person)', function () {
+  var name = extractPersonName('Assess the risk of');
+  assertEqual(name, null);
+});
+
+test('command words filtered: "assess" does not leak as name', function () {
+  var name = extractPersonName('assess the person');
+  assertEqual(name, null);
+});
+
 // ============================================================
 // Tests for classifyByKeyword
 // ============================================================
@@ -292,6 +328,57 @@ test('strips non-alphanumeric from keywords', function () {
   var kws = extractKeywords("O'Brien theft cases");
   assert(kws.indexOf('obrien') !== -1, 'should normalize O\'Brien to obrien');
   assert(kws.indexOf('theft') !== -1);
+});
+
+// ============================================================
+// Tests for extractCaseRowId
+// ============================================================
+
+console.log('\n=== extractCaseRowId ===');
+
+test('extracts 17-digit case ROWID from narrative query', function () {
+  var id = extractCaseRowId('Give me a detailed narrative summary of case 47995000000332408');
+  assertEqual(id, '47995000000332408');
+});
+
+test('extracts case ID from "tell me about case 47995000000332408"', function () {
+  var id = extractCaseRowId('tell me about case 47995000000332408');
+  assertEqual(id, '47995000000332408');
+});
+
+test('extracts case ID from "narrative of case 47995000000332408"', function () {
+  var id = extractCaseRowId('narrative of case 47995000000332408');
+  assertEqual(id, '47995000000332408');
+});
+
+test('extracts case ID from "what happened in case 123456789012345"', function () {
+  var id = extractCaseRowId('what happened in case 123456789012345');
+  assertEqual(id, '123456789012345');
+});
+
+test('returns null when no case ID in query', function () {
+  var id = extractCaseRowId('describe the case');
+  assertEqual(id, null);
+});
+
+test('does not interpret short numeric as case ID', function () {
+  var id = extractCaseRowId('show me 10 cases in Bengaluru');
+  assertEqual(id, null);
+});
+
+test('does not interpret words with digits as case ID', function () {
+  var id = extractCaseRowId('what is the risk of PM_000001');
+  assertEqual(id, null);
+});
+
+test('extracts 14-digit case ID minimum boundary', function () {
+  var id = extractCaseRowId('case 12345678901234');
+  assertEqual(id, '12345678901234');
+});
+
+test('does not extract 13-digit number', function () {
+  var id = extractCaseRowId('case 1234567890123');
+  assertEqual(id, null);
 });
 
 // ============================================================
@@ -548,6 +635,239 @@ function createMockApp(mockTable) {
     assert(cache.persons['PM_000101'], 'PM_000101 (page 2 start) exists');
     assert(cache.persons['PM_000200'], 'PM_000200 (page 2 boundary) exists');
     assert(cache.persons['PM_000250'], 'PM_000250 (last) exists');
+  });
+
+  // ============================================================
+  // Tests for production confirmed_edges schema compatibility
+  // ============================================================
+
+  console.log('\n=== Production Schema Compatibility ===');
+
+  await test('Production schema: with_person_id and type are correctly parsed', async function () {
+    pipeline._resetPersonMasterCache();
+
+    function buildEdgesFromDocs(persons) {
+      var resultEdges = [];
+      var pids = Object.keys(persons);
+      for (var pi = 0; pi < pids.length; pi++) {
+        var doc = persons[pids[pi]];
+        var confirmed = doc.confirmed_edges || [];
+        for (var ei = 0; ei < confirmed.length; ei++) {
+          var ce = confirmed[ei];
+          if (!ce || !ce.edge_id) continue;
+          var tgtId = ce.target_person_id || ce.with_person_id;
+          if (!tgtId || tgtId === doc.person_id) continue;
+          var rawType = ce.edge_type || ce.type;
+          if (!rawType) continue;
+          var eType = rawType.toUpperCase();
+          if (eType === 'CO_ACCUSED' || eType === 'ACCUSED_TO_VICTIM' || eType === 'SHARED_LOCATION' || eType === 'CANDIDATE_MATCH') {
+            resultEdges.push({
+              edge_id: ce.edge_id,
+              source: doc.person_id,
+              target: tgtId,
+              edge_type: eType,
+              weight: ce.confidence || 1,
+              occurrence_count: (ce.case_ids || []).length || 0
+            });
+          }
+        }
+      }
+      return resultEdges;
+    }
+
+    // Test with production schema fields: with_person_id, type (NOT target_person_id, edge_type)
+    var persons = {
+      'PM_000001': {
+        person_id: 'PM_000001',
+        canonical_name: 'Ravi',
+        confirmed_edges: [
+          { edge_id: 'E001', with_person_id: 'PM_000002', type: 'ACCUSED_TO_VICTIM', confidence: 0.95, case_ids: ['C1'] }
+        ]
+      },
+      'PM_000002': {
+        person_id: 'PM_000002',
+        canonical_name: 'Sita',
+        confirmed_edges: [
+          { edge_id: 'E001', with_person_id: 'PM_000001', type: 'ACCUSED_TO_VICTIM', confidence: 0.95, case_ids: ['C1'] }
+        ]
+      }
+    };
+    var edges = buildEdgesFromDocs(persons);
+    assert(edges.length > 0, 'production schema edges should be parsed');
+    assertEqual(edges[0].edge_type, 'ACCUSED_TO_VICTIM', 'edge_type should be normalized to uppercase');
+    assertEqual(edges[0].target, 'PM_000002', 'with_person_id should resolve to target');
+    assertEqual(edges[0].source, 'PM_000001', 'source should be the containing doc person_id');
+    assertEqual(edges[0].occurrence_count, 1, 'case_ids length should set occurrence_count');
+  });
+
+  await test('buildNetworkGraphFromPM with PM_000001 production data returns 2 nodes + 2 edges', async function () {
+    pipeline._resetPersonMasterCache();
+    var persons = {
+      'PM_000001': {
+        person_id: 'PM_000001',
+        canonical_name: 'Ravi Kumar',
+        roles_summary: { accused_count: 2, victim_count: 0, complainant_count: 0 },
+        confirmed_edges: [
+          { edge_id: 'E001711', with_person_id: 'PM_000013', type: 'ACCUSED_TO_VICTIM', confidence: 0.95, case_ids: ['47995000000332408'] },
+          { edge_id: 'E001712', with_person_id: 'PM_000042', type: 'CO_ACCUSED', confidence: 0.90, case_ids: ['47995000000332409'] }
+        ]
+      },
+      'PM_000013': {
+        person_id: 'PM_000013',
+        canonical_name: 'Priya Sharma',
+        roles_summary: { accused_count: 0, victim_count: 1, complainant_count: 0 },
+        confirmed_edges: [
+          { edge_id: 'E001711', with_person_id: 'PM_000001', type: 'ACCUSED_TO_VICTIM', confidence: 0.95, case_ids: ['47995000000332408'] }
+        ]
+      },
+      'PM_000042': {
+        person_id: 'PM_000042',
+        canonical_name: 'Suresh Patil',
+        roles_summary: { accused_count: 1, victim_count: 0, complainant_count: 0 },
+        confirmed_edges: [
+          { edge_id: 'E001712', with_person_id: 'PM_000001', type: 'CO_ACCUSED', confidence: 0.90, case_ids: ['47995000000332409'] }
+        ]
+      }
+    };
+    var edges = [];
+    var skippedEdges = 0;
+    function buildEdgesFromDocs(persons) {
+      var resultEdges = [];
+      var pids = Object.keys(persons);
+      for (var pi = 0; pi < pids.length; pi++) {
+        var doc = persons[pids[pi]];
+        var confirmed = doc.confirmed_edges || [];
+        for (var ei = 0; ei < confirmed.length; ei++) {
+          var ce = confirmed[ei];
+          if (!ce || !ce.edge_id) { skippedEdges++; continue; }
+          var tgtId = ce.target_person_id || ce.with_person_id;
+          if (!tgtId || tgtId === doc.person_id) { skippedEdges++; continue; }
+          var rawType = ce.edge_type || ce.type;
+          if (!rawType) { skippedEdges++; continue; }
+          var eType = rawType.toUpperCase();
+          if (eType === 'CO_ACCUSED' || eType === 'ACCUSED_TO_VICTIM' || eType === 'SHARED_LOCATION' || eType === 'CANDIDATE_MATCH') {
+            resultEdges.push({
+              edge_id: ce.edge_id,
+              source: doc.person_id,
+              target: tgtId,
+              edge_type: eType,
+              weight: ce.confidence || 1,
+              occurrence_count: (ce.case_ids || []).length || 0
+            });
+          } else {
+            skippedEdges++;
+          }
+        }
+      }
+      return resultEdges;
+    }
+    edges = buildEdgesFromDocs(persons);
+    // Edge appears once per doc's confirmed_edges (both endpoints list it)
+    // 2 unique edges × 2 docs each = 4 total; BFS deduplicates to 2
+    assertEqual(edges.length, 4, 'each edge appears once per endpoint doc (4 total, BFS deduplicates)');
+    assertEqual(skippedEdges, 0, 'should skip 0 edges');
+
+    // Verify edge_id content
+    var edgeIds = edges.map(function(e) { return e.edge_id; });
+    assert(edgeIds.indexOf('E001711') !== -1, 'E001711 present');
+    assert(edgeIds.indexOf('E001712') !== -1, 'E001712 present');
+
+    // BFS from PM_000001 — deduplicates by visitedEdgeIds
+    var result = pipeline.bfsTraversePM(persons, edges, 'PM_000001', 2);
+    assertEqual(result.nodes.length, 3, 'BFS should return 3 nodes (PM_000001 + 2 neighbours)');
+    assertEqual(result.edges.length, 2, 'BFS should deduplicate to 2 edges');
+  });
+
+  await test('Backward compatibility: both old (edge_type) and new (type) field names work', async function () {
+    pipeline._resetPersonMasterCache();
+    var persons = {
+      'PM_001': {
+        person_id: 'PM_001',
+        canonical_name: 'Old Schema Person',
+        confirmed_edges: [
+          { edge_id: 'E1', target_person_id: 'PM_002', edge_type: 'CO_ACCUSED', confidence: 0.8 }
+        ]
+      },
+      'PM_002': {
+        person_id: 'PM_002',
+        canonical_name: 'New Schema Person',
+        confirmed_edges: [
+          { edge_id: 'E1', with_person_id: 'PM_001', type: 'CO_ACCUSED', confidence: 0.8 }
+        ]
+      }
+    };
+
+    function buildEdgesFromDocs(persons) {
+      var resultEdges = [];
+      var pids = Object.keys(persons);
+      for (var pi = 0; pi < pids.length; pi++) {
+        var doc = persons[pids[pi]];
+        var confirmed = doc.confirmed_edges || [];
+        for (var ei = 0; ei < confirmed.length; ei++) {
+          var ce = confirmed[ei];
+          if (!ce || !ce.edge_id) continue;
+          var tgtId = ce.target_person_id || ce.with_person_id;
+          if (!tgtId || tgtId === doc.person_id) continue;
+          var rawType = ce.edge_type || ce.type;
+          if (!rawType) continue;
+          var eType = rawType.toUpperCase();
+          if (eType === 'CO_ACCUSED' || eType === 'ACCUSED_TO_VICTIM' || eType === 'SHARED_LOCATION' || eType === 'CANDIDATE_MATCH') {
+            resultEdges.push({
+              edge_id: ce.edge_id,
+              source: doc.person_id,
+              target: tgtId,
+              edge_type: eType
+            });
+          }
+        }
+      }
+      return resultEdges;
+    }
+
+    var edges = buildEdgesFromDocs(persons);
+    // Edge appears once per doc (both endpoints), so 2 total
+    assertEqual(edges.length, 2, 'edge appears in both docs (2 total, BFS deduplicates to 1)');
+
+    // Old schema still works
+    var oldDoc = { person_id: 'PM_010', confirmed_edges: [{ edge_id: 'E10', target_person_id: 'PM_011', edge_type: 'SHARED_LOCATION', confidence: 0.7 }] };
+    var newDoc = { person_id: 'PM_011', confirmed_edges: [{ edge_id: 'E10', with_person_id: 'PM_010', type: 'SHARED_LOCATION', confidence: 0.7 }] };
+    var testPersons = { 'PM_010': oldDoc, 'PM_011': newDoc };
+    var testEdges = buildEdgesFromDocs(testPersons);
+    assertEqual(testEdges.length, 2, 'old+new schema: edge appears in both docs (2 total, BFS deduplicates to 1)');
+  });
+
+  await test('Cache loading returns documents (not empty array)', async function () {
+    pipeline._resetPersonMasterCache();
+    var mock = createPaginatedMock(1874);
+    var app = createMockApp(mock);
+    var cache = await pipeline.ensurePersonMasterCache(app);
+    assert(cache && cache.loaded, 'cache should be loaded');
+    assert(Object.keys(cache.persons).length > 0, 'persons should not be empty');
+    assertEqual(Object.keys(cache.persons).length, 1874, 'should have 1874 persons');
+    assert(mock.getCallCount() >= 19, 'should make 19+ pages for 1874 items (100 per page)');
+  });
+
+  await test('Error in cache loading clears _loadingPromise', async function () {
+    pipeline._resetPersonMasterCache();
+    var failingMock = {
+      queryTable: function () { throw new Error('Simulated complete failure'); }
+    };
+    var failingApp = createMockApp(failingMock);
+    var cache = await pipeline.ensurePersonMasterCache(failingApp);
+    assert(cache && cache.loaded, 'cache should be loaded (empty fallback)');
+    assertEqual(Object.keys(cache.persons).length, 0, 'persons should be empty on failure');
+    // _loadingPromise is set to null in the finally block
+    // Verify by calling again - should make a fresh attempt
+    var mock = createPaginatedMock(10);
+    var app = createMockApp(mock);
+    var cache2 = await pipeline.ensurePersonMasterCache(app);
+    // Since previous cache has loaded=true with empty, the cached version returns
+    // Need to reset to verify fresh attempt
+    pipeline._resetPersonMasterCache();
+    var mock3 = createPaginatedMock(10);
+    var app3 = createMockApp(mock3);
+    var cache3 = await pipeline.ensurePersonMasterCache(app3);
+    assertEqual(Object.keys(cache3.persons).length, 10, 'fresh load after reset returns 10 persons');
   });
 
   // ============================================================

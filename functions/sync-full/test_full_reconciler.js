@@ -1322,6 +1322,242 @@ await testAsync('job invocation defaults to full mode without max_records', asyn
   assert.strictEqual(result.stale_deletion_enabled, true);
 });
 
+/* ================================================================ */
+/*  Scenario: Merge victim deletion                                 */
+/* ================================================================ */
+
+console.log('\n=== Scenario: Merge victim deletion ===');
+
+await testAsync('survivor persisted before victim deleted', async function () {
+  var detPid = reconciler.deterministicPersonId;
+
+  /* Two accused records that cluster together (same name, same case) */
+  var accusedRows = [
+    makeSourceRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Merge Victim', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1'),
+    makeSourceRawRow('Accused', 'AccusedMasterID', '2', 'CASE-001', 'Merge Victim', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  /* Two existing PM docs each claiming one source record from the same cluster */
+  var victimPid = 'PM_VICTIM_' + Date.now().toString(36);
+  var survivorPid = 'PM_SURVIVOR_' + Date.now().toString(36);
+
+  var pmRows = [
+    makePMRawRow(survivorPid, [
+      { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'Merge Victim', age_as_recorded: 30 }
+    ]),
+    makePMRawRow(victimPid, [
+      { table: 'Accused', row_id: 'A-2', case_id: 'CASE-001', name_as_recorded: 'Merge Victim', age_as_recorded: 30 }
+    ])
+  ];
+
+  var mockCat = createMockCatalyst(pmRows, accusedRows, [], []);
+  mockCat._table._store[survivorPid] = { person_id: survivorPid, type: 'PM', source_records: [{ table: 'Accused', row_id: 'A-1' }] };
+  mockCat._table._store[victimPid] = { person_id: victimPid, type: 'PM', source_records: [{ table: 'Accused', row_id: 'A-2' }] };
+
+  var appInst = mockCat.initializeApp();
+  var result = await fullReconcile(appInst, { runId: 'TEST-MERGE' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.clusters_formed, 1, 'both records should cluster together');
+  assert.strictEqual(result.merge_victim_deletion_enabled, true, 'merge victim deletion should be enabled');
+  assert.strictEqual(result.merge_victims.identified, 1, 'one merge victim identified');
+  assert.strictEqual(result.merge_victims.deleted, 1, 'merge victim deleted');
+
+  /* Survivor must exist in store */
+  assert.ok(mockCat._table._store[survivorPid] !== undefined, 'survivor must exist after reconciliation');
+
+  /* Survivor should NOT be in merge victims */
+  var storeKeys = Object.keys(mockCat._table._store);
+  assert.ok(storeKeys.indexOf(victimPid) === -1, 'merge victim must be removed from store');
+  console.log('  [info] Merge victim result: ' + JSON.stringify(result));
+});
+
+await testAsync('merge victim deletion disabled on source load failure', async function () {
+  var failingMock = {
+    initializeApp: function () {
+      return {
+        zcql: function () {
+          return {
+            executeZCQLQuery: async function () {
+              throw new Error('Simulated ZCQL failure');
+            }
+          };
+        },
+        nosql: function () {
+          return {
+            getTable: async function () {
+              return {
+                queryTable: async function () { return { getResponseData: function () { return []; } }; },
+                insertItems: async function () {},
+                updateItems: async function () {},
+                deleteItems: async function () {},
+                getItems: async function () { return { data: [] }; }
+              };
+            }
+          };
+        },
+        datastore: function () {
+          return {
+            table: function () {
+              return { insertRow: async function () { return { ROWID: 'mock-audit-id' }; } };
+            }
+          };
+        }
+      };
+    }
+  };
+
+  var appInst = failingMock.initializeApp();
+  var result = await fullReconcile(appInst, { runId: 'TEST-MERGE-FAIL-LOAD' });
+
+  assert.strictEqual(result.status, 'FAILED');
+  assert.strictEqual(result.merge_victim_deletion_enabled, false, 'merge victim deletion disabled on load failure');
+  assert.strictEqual(result.merge_victims.identified, 0, 'no merge victims identified');
+});
+
+await testAsync('FULL mode enables stale orphan cleanup', async function () {
+  var accusedRows = [
+    makeSourceRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Active Person', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  var stalePid = 'PM_STALE_FULL_' + Date.now().toString(36);
+  var pmRows = [
+    makePMRawRow(stalePid, [
+      { table: 'Accused', row_id: 'A-999', case_id: 'CASE-999', name_as_recorded: 'Stale Person', age_as_recorded: 40 }
+    ])
+  ];
+
+  var mockCat = createMockCatalyst(pmRows, accusedRows, [], []);
+  mockCat._table._store[stalePid] = { person_id: stalePid, type: 'PM', source_records: [{ table: 'Accused', row_id: 'A-999' }] };
+  var appInst = mockCat.initializeApp();
+
+  var result = await fullReconcile(appInst, {});
+
+  assert.strictEqual(result.stale_deletion_enabled, true, 'stale deletion enabled in FULL mode');
+  assert.strictEqual(result.stale_documents.identified, 1, 'one stale identified');
+  assert.strictEqual(result.stale_documents.deleted, 1, 'stale deleted');
+  assert.strictEqual(result.documents_deleted, 1, 'documents_deleted reflects stale orphan count');
+});
+
+await testAsync('LIMITED mode disables stale orphan cleanup but keeps merge victim deletion', async function () {
+  var detPid = reconciler.deterministicPersonId;
+
+  var accusedRows = [
+    makeSourceRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Merge Victim', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1'),
+    makeSourceRawRow('Accused', 'AccusedMasterID', '2', 'CASE-001', 'Merge Victim', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  var victimPid = 'PM_VICTIM_LIMITED_' + Date.now().toString(36);
+  var survivorPid = 'PM_SURVIVOR_LIMITED_' + Date.now().toString(36);
+
+  var pmRows = [
+    makePMRawRow(survivorPid, [
+      { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'Merge Victim', age_as_recorded: 30 }
+    ]),
+    makePMRawRow(victimPid, [
+      { table: 'Accused', row_id: 'A-2', case_id: 'CASE-001', name_as_recorded: 'Merge Victim', age_as_recorded: 30 }
+    ])
+  ];
+
+  var mockCat = createMockCatalyst(pmRows, accusedRows, [], []);
+  mockCat._table._store[survivorPid] = { person_id: survivorPid, type: 'PM', source_records: [{ table: 'Accused', row_id: 'A-1' }] };
+  mockCat._table._store[victimPid] = { person_id: victimPid, type: 'PM', source_records: [{ table: 'Accused', row_id: 'A-2' }] };
+
+  var appInst = mockCat.initializeApp();
+  var result = await fullReconcile(appInst, { max_records: 10 });
+
+  assert.strictEqual(result.mode, 'LIMITED');
+  assert.strictEqual(result.stale_deletion_enabled, false, 'stale deletion disabled in LIMITED mode');
+  assert.strictEqual(result.merge_victim_deletion_enabled, true, 'merge victim deletion still enabled in LIMITED mode');
+  assert.strictEqual(result.merge_victims.identified, 1, 'merge victim identified');
+  assert.strictEqual(result.merge_victims.deleted, 1, 'merge victim deleted in LIMITED mode');
+});
+
+await testAsync('already deleted victim returns not_found not error', async function () {
+  var detPid = reconciler.deterministicPersonId;
+
+  var accusedRows = [
+    makeSourceRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Already Gone', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1'),
+    makeSourceRawRow('Accused', 'AccusedMasterID', '2', 'CASE-001', 'Already Gone', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  var victimPid = 'PM_GONE_VICTIM_' + Date.now().toString(36);
+  var survivorPid = 'PM_GONE_SURVIVOR_' + Date.now().toString(36);
+
+  /* Custom mock table that throws 404 for the victim PID on deleteItems */
+  var baseTable = createMockNoSqlTable();
+  var origDeleteItems = baseTable.deleteItems;
+  baseTable.deleteItems = async function (opts) {
+    var keys = opts.keys || {};
+    var pid = extractProp(keys, 'person_id');
+    if (pid === victimPid) {
+      var err = new Error('Requested resource not found');
+      err.statusCode = 404;
+      throw err;
+    }
+    return origDeleteItems.call(this, opts);
+  };
+
+  var mockCat = createMockCatalyst([], accusedRows, [], []);
+  mockCat._table = baseTable;
+  /* Both docs must be in store so loadPersonMasterDocuments finds both */
+  mockCat._table._store[survivorPid] = { person_id: survivorPid, type: 'PM', source_records: [{ table: 'Accused', row_id: 'A-1' }] };
+  mockCat._table._store[victimPid] = { person_id: victimPid, type: 'PM', source_records: [{ table: 'Accused', row_id: 'A-2' }] };
+
+  var appInst = mockCat.initializeApp();
+  var result = await fullReconcile(appInst, { runId: 'TEST-GONE-MERGE' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.merge_victims.identified, 1, 'victim identified');
+  assert.strictEqual(result.merge_victims.already_absent, 1, 'victim already absent (not found)');
+  assert.strictEqual(result.merge_victims.deleted, 0, 'no new deletions');
+  assert.strictEqual(result.merge_victims.errors, 0, 'no errors');
+  console.log('  [info] Already-deleted victim result: ' + JSON.stringify(result));
+});
+
+await testAsync('survivor never included in deletion set', async function () {
+  var detPid = reconciler.deterministicPersonId;
+
+  var accusedRows = [
+    makeSourceRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Survivor Only', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')
+  ];
+
+  var existingPid = 'PM_EXISTING_' + Date.now().toString(36);
+  var pmRows = [
+    makePMRawRow(existingPid, [
+      { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'Survivor Only', age_as_recorded: 30 }
+    ])
+  ];
+
+  var mockCat = createMockCatalyst(pmRows, accusedRows, [], []);
+  mockCat._table._store[existingPid] = { person_id: existingPid, type: 'PM', source_records: [{ table: 'Accused', row_id: 'A-1' }] };
+
+  var appInst = mockCat.initializeApp();
+  var result = await fullReconcile(appInst, { runId: 'TEST-SURVIVOR-NO-DELETE' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.merge_victims.identified, 0, 'no merge victims');
+  assert.strictEqual(result.stale_documents.identified, 0, 'no stale docs');
+  assert.strictEqual(result.documents_deleted, 0, 'nothing deleted');
+  assert.ok(mockCat._table._store[existingPid] !== undefined, 'survivor still exists');
+});
+
+await testAsync('no-merge scenario unchanged (merge_victims empty)', async function () {
+  var accusedRows = [
+    makeSourceRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'Person One', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1'),
+    makeSourceRawRow('Accused', 'AccusedMasterID', '2', 'CASE-002', 'Person Two', 25, 2, '2024-02-20', 'UNIT-2', 'DIST-2')
+  ];
+
+  var mockCat = createMockCatalyst([], accusedRows, [], []);
+  var appInst = mockCat.initializeApp();
+  var result = await fullReconcile(appInst, { runId: 'TEST-NO-MERGE' });
+
+  assert.strictEqual(result.status, 'SUCCESS');
+  assert.strictEqual(result.merge_victims.identified, 0, 'no merge victims');
+  assert.strictEqual(result.merge_victims.deleted, 0, 'no merge victim deletions');
+  assert.strictEqual(result.stale_documents.identified, 0, 'no stale docs');
+});
+
 console.log('\n=== Summary ===');
 console.log('  Passed: ' + passed);
 console.log('  Failed: ' + failed);

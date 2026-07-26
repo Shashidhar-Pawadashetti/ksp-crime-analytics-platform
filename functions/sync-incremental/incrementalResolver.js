@@ -13,14 +13,14 @@
 /*  Entity Matching Engine + Document Builder (pure modules, no SDK)   */
 /* ------------------------------------------------------------------ */
 
-var { normaliseName } = require('../entity-matching-engine/normaliser');
-var { generatePhoneticKey } = require('../entity-matching-engine/phonetic');
-var { generateUniquePairs } = require('../entity-matching-engine/blocking');
-var { computeScore } = require('../entity-matching-engine/scorer');
-var { classify, CONFIRMED, UNCONFIRMED, THRESHOLD } = require('../entity-matching-engine/threshold');
-var { buildPersonMaster } = require('../personmaster-writer/documentBuilder');
-var { generateConfirmedEdges, generateCandidateMatchEdges } = require('../personmaster-writer/edgeGenerator');
-var { mergeEdgesIntoDocument } = require('../personmaster-writer/edgePersistence');
+var { normaliseName } = require('./__vendored/normaliser');
+var { generatePhoneticKey } = require('./__vendored/phonetic');
+var { generateUniquePairs } = require('./__vendored/blocking');
+var { computeScore } = require('./__vendored/scorer');
+var { classify, CONFIRMED, UNCONFIRMED, THRESHOLD } = require('./__vendored/threshold');
+var { buildPersonMaster } = require('./__vendored/documentBuilder');
+var { generateConfirmedEdges, generateCandidateMatchEdges } = require('./__vendored/edgeGenerator');
+var { mergeEdgesIntoDocument } = require('./__vendored/edgePersistence');
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                         */
@@ -129,15 +129,76 @@ function recordChecksum(rec) {
 function parseSourceRecords(row) {
   var sr = row.source_records;
   if (!sr) return [];
-  if (Array.isArray(sr)) return sr;
+  
+  /* Case B: Entire field is a stringified JSON array */
   if (typeof sr === 'string') {
     try {
-      return JSON.parse(sr);
+      var parsed = JSON.parse(sr);
+      if (Array.isArray(parsed)) sr = parsed;
+      else return [];
     } catch (e) {
       return [];
     }
   }
-  return [];
+  
+  if (!Array.isArray(sr)) return [];
+  
+  /* Cases A, C, D: iterate elements, handle objects, strings, and other primitives */
+  var records = [];
+  
+  for (var i = 0; i < sr.length; i++) {
+    var item = sr[i];
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      records.push(item);
+    } else if (typeof item === 'string') {
+      try {
+        var obj = JSON.parse(item);
+        if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+          records.push(obj);
+        }
+      } catch (e) {
+        /* skip malformed */
+      }
+    }
+    /* primitive / null / undefined items are silently skipped */
+  }
+  
+  return records;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Source Record Identity Helpers                                     */
+/* ------------------------------------------------------------------ */
+
+var ROLE_TO_TABLE = {
+  'Accused': 'Accused',
+  'Victim': 'Victim',
+  'Complainant': 'ComplainantDetails',
+  'complainant': 'ComplainantDetails',
+  'accused': 'Accused',
+  'victim': 'Victim'
+};
+
+function getSourceRecordId(sr) {
+  if (sr.source_id) return sr.source_id;
+  if (sr.row_id) return sr.row_id;
+  return null;
+}
+
+function getSourceRecordTable(sr) {
+  if (sr.table) return sr.table;
+  if (sr.source_table) return sr.source_table;
+  if (sr.role) {
+    return ROLE_TO_TABLE[sr.role] || null;
+  }
+  return null;
+}
+
+function buildSourceRecordKey(sr) {
+  var table = getSourceRecordTable(sr);
+  var id = getSourceRecordId(sr);
+  if (!table || !id) return null;
+  return table + ':' + id;
 }
 
 /* ------------------------------------------------------------------ */
@@ -224,18 +285,44 @@ function normaliseAndPhoneticize(records) {
 
 function buildSourceToPersonIndex(docs) {
   var index = {};
+  var diag = { total_failed: 0, missing_table: 0, missing_source_id: 0,
+    missing_both: 0, has_role_no_table: 0, unknown_role: 0, samples: [],
+    unique_keys: 0, duplicate_keys: 0, valid_records: 0 };
+  var seenKeys = {};
+
   for (var di = 0; di < docs.length; di++) {
     var doc = docs[di];
     var sourceRecords = parseSourceRecords(doc);
     for (var si = 0; si < sourceRecords.length; si++) {
       var sr = sourceRecords[si];
-      var key = (sr.table || '') + ':' + (sr.row_id || '');
-      if (key !== ':') {
+      var key = buildSourceRecordKey(sr);
+      if (key) {
+        diag.valid_records++;
+        if (seenKeys[key]) { diag.duplicate_keys++; }
+        else { diag.unique_keys++; seenKeys[key] = true; }
         index[key] = doc.person_id;
+      } else {
+        diag.total_failed++;
+        var tid = getSourceRecordId(sr);
+        var tbl = sr.table || sr.source_table || '';
+        var roleTbl = sr.role ? (ROLE_TO_TABLE[sr.role] || null) : null;
+        if (!tbl && !tid) diag.missing_both++;
+        if (!tbl) diag.missing_table++;
+        if (!tid) diag.missing_source_id++;
+        if (!tbl && sr.role && !roleTbl) diag.unknown_role++;
+        if (!tbl && sr.role && roleTbl) diag.has_role_no_table++;
+        if (diag.samples.length < 10) {
+          diag.samples.push({
+            role: sr.role || null,
+            table: sr.table || null,
+            source_table: sr.source_table || null,
+            source_id: sr.source_id || null
+          });
+        }
       }
     }
   }
-  return index;
+  return { index: index, diagnostics: diag };
 }
 
 /* ------------------------------------------------------------------ */
@@ -299,16 +386,7 @@ async function loadAffectedSourceRecords(appInstance, caseIds) {
   if (!whereClause) return [];
 
   var allRecords = [];
-
-  var baseSQL = [
-    'SELECT a.ROWID, a.AccusedMasterID, a.CaseMasterID, a.AccusedName, a.AgeYear, a.GenderID,',
-    'cm.IncidentFromDate, cm.PoliceStationID, cm.Latitude, cm.Longitude,',
-    'u.DistrictID',
-    'FROM #TABLE# a',
-    'INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID',
-    'INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID',
-    'WHERE (' + whereClause + ')'
-  ].join(' ');
+  var failedTables = [];
 
   var tables = [
     { name: 'Accused', idCol: 'AccusedMasterID', nameCol: 'AccusedName', prefix: 'A-' },
@@ -319,13 +397,26 @@ async function loadAffectedSourceRecords(appInstance, caseIds) {
   for (var ti = 0; ti < tables.length; ti++) {
     var t = tables[ti];
     try {
-      var sql = baseSQL.replace('#TABLE#', t.name);
-      var rows = await queryAllZCQL(appInstance, sql, 1000);
+      var baseSQL = [
+        'SELECT a.ROWID, a.' + t.idCol + ', a.CaseMasterID, a.' + t.nameCol + ', a.AgeYear, a.GenderID,',
+        'cm.IncidentFromDate, cm.PoliceStationID, cm.Latitude, cm.Longitude,',
+        'u.DistrictID',
+        'FROM ' + t.name + ' a',
+        'INNER JOIN CaseMaster cm ON a.CaseMasterID = cm.ROWID',
+        'INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID',
+        'WHERE (' + whereClause + ')'
+      ].join(' ');
+      var rows = await queryAllZCQL(appInstance, baseSQL, 1000);
       mapSourceRows(rows, t.name, t.idCol, t.nameCol, t.prefix, allRecords);
       console.log('[incResolve] ' + t.name + ': ' + rows.length + ' records');
     } catch (err) {
-      console.error('[incResolve] ' + t.name + ' query failed: ' + err.message);
+      console.error('[incResolve] FAILED: ' + t.name + ': ' + err.message);
+      failedTables.push(t.name);
     }
+  }
+
+  if (failedTables.length > 0) {
+    throw new Error('SOURCE_LOAD_FAILED: Failed to load source table(s): ' + failedTables.join(', '));
   }
 
   console.log('[incResolve] Total affected source records: ' + allRecords.length);
@@ -428,7 +519,7 @@ function handleOrphanedRecords(orphanedRecords, existingDocMap) {
 
     var orphanKey = (orphan.source_table || '') + ':' + (orphan.source_id || '');
     var remaining = sr.filter(function (r) {
-      var rKey = (r.table || '') + ':' + (r.row_id || '');
+      var rKey = buildSourceRecordKey(r);
       return rKey !== orphanKey;
     });
 
@@ -479,8 +570,8 @@ function handleOrphanedRecords(orphanedRecords, existingDocMap) {
 function existingSRToRecord(sr) {
   return {
     source_table: sr.table || '',
-    source_id: sr.row_id || '',
-    row_id: sr.row_id || '',
+    source_id: sr.source_id || sr.row_id || '',
+    row_id: sr.row_id || sr.source_id || '',
     case_id: sr.case_id || '',
     name: sr.name_as_recorded || '',
     age: sr.age_as_recorded != null ? sr.age_as_recorded : null,
@@ -710,8 +801,8 @@ function mapClustersToDocs(clusters, existingDocMap, existingRecordsIndex, orpha
       var orphanSet = buildOrphanKeySet(orphanHandledDocIds);
 
       existingSR.forEach(function (sr) {
-        var key = (sr.table || '') + ':' + (sr.row_id || '');
-        /* Skip if already in cluster (re-resolved) or orphaned */
+        var key = buildSourceRecordKey(sr);
+        if (!key) return;
         if (clusterKeySet[key]) return;
         if (orphanSet[key]) return;
         mergedRecords.push(existingSRToRecord(sr));
@@ -724,7 +815,8 @@ function mapClustersToDocs(clusters, existingDocMap, existingRecordsIndex, orpha
       var mergedKeySet = buildSourceKeySet(mergedRecords);
       var existingKeySet = {};
       existingSR.forEach(function (r) {
-        existingKeySet[(r.table || '') + ':' + (r.row_id || '')] = true;
+        var k = buildSourceRecordKey(r);
+        if (k) existingKeySet[k] = true;
       });
 
       var sameKeys = Object.keys(mergedKeySet).length === Object.keys(existingKeySet).length &&
@@ -734,7 +826,7 @@ function mapClustersToDocs(clusters, existingDocMap, existingRecordsIndex, orpha
         var allChecksumsMatch = mergedRecords.every(function (r) {
           var key = (r.source_table || '') + ':' + (r.source_id || '');
           var matchedExisting = existingSR.filter(function (ex) {
-            return (ex.table || '') + ':' + (ex.row_id || '') === key;
+            return buildSourceRecordKey(ex) === key;
           });
           if (matchedExisting.length === 0) return false;
 
@@ -910,7 +1002,7 @@ async function incrementalResolve(appInstance, changeResult, options) {
   var existingDocs = await loadExistingPMDocs(appInstance);
   var existingDocMap = {};
   existingDocs.forEach(function (d) { existingDocMap[d.person_id] = d; });
-  var existingRecordsIndex = buildSourceToPersonIndex(existingDocs);
+  var existingRecordsIndex = buildSourceToPersonIndex(existingDocs).index;
   console.log('[incResolve] Existing documents: ' + existingDocs.length + ', indexed records: ' + Object.keys(existingRecordsIndex).length);
 
   /* ---- Step 2: Build affected-case scope ---- */

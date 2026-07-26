@@ -43,7 +43,8 @@ function createMockTable() {
   };
 }
 
-function createMockCatalyst(personMasterRows, accusedRows, victimRows, compRows) {
+function createMockCatalyst(personMasterRows, accusedRows, victimRows, compRows, failTables) {
+  failTables = failTables || [];
   var table = createMockTable();
   return {
     _table: table,
@@ -54,9 +55,18 @@ function createMockCatalyst(personMasterRows, accusedRows, victimRows, compRows)
           return {
             executeZCQLQuery: async function (sql) {
               if (sql.indexOf('FROM PersonMaster') !== -1) return personMasterRows;
-              if (sql.indexOf('FROM Accused') !== -1) return accusedRows;
-              if (sql.indexOf('FROM Victim') !== -1) return victimRows;
-              if (sql.indexOf('FROM ComplainantDetails') !== -1) return compRows;
+              if (sql.indexOf('FROM Accused') !== -1) {
+                if (failTables.indexOf('Accused') !== -1) throw new Error('Simulated failure: Accused');
+                return accusedRows;
+              }
+              if (sql.indexOf('FROM Victim') !== -1) {
+                if (failTables.indexOf('Victim') !== -1) throw new Error('Simulated failure: Victim');
+                return victimRows;
+              }
+              if (sql.indexOf('FROM ComplainantDetails') !== -1) {
+                if (failTables.indexOf('ComplainantDetails') !== -1) throw new Error('Simulated failure: ComplainantDetails');
+                return compRows;
+              }
               return [];
             }
           };
@@ -71,7 +81,8 @@ function createMockCatalyst(personMasterRows, accusedRows, victimRows, compRows)
   };
 }
 
-function createMockCatalystNoPersist(personMasterRows, accusedRows, victimRows, compRows) {
+function createMockCatalystNoPersist(personMasterRows, accusedRows, victimRows, compRows, failTables) {
+  failTables = failTables || [];
   return {
     initializeApp: function () {
       return {
@@ -79,9 +90,18 @@ function createMockCatalystNoPersist(personMasterRows, accusedRows, victimRows, 
           return {
             executeZCQLQuery: async function (sql) {
               if (sql.indexOf('FROM PersonMaster') !== -1) return personMasterRows;
-              if (sql.indexOf('FROM Accused') !== -1) return accusedRows;
-              if (sql.indexOf('FROM Victim') !== -1) return victimRows;
-              if (sql.indexOf('FROM ComplainantDetails') !== -1) return compRows;
+              if (sql.indexOf('FROM Accused') !== -1) {
+                if (failTables.indexOf('Accused') !== -1) throw new Error('Simulated failure: Accused');
+                return accusedRows;
+              }
+              if (sql.indexOf('FROM Victim') !== -1) {
+                if (failTables.indexOf('Victim') !== -1) throw new Error('Simulated failure: Victim');
+                return victimRows;
+              }
+              if (sql.indexOf('FROM ComplainantDetails') !== -1) {
+                if (failTables.indexOf('ComplainantDetails') !== -1) throw new Error('Simulated failure: ComplainantDetails');
+                return compRows;
+              }
               return [];
             }
           };
@@ -713,6 +733,86 @@ await testAsync('generates new deterministic ID for genuinely new identity', asy
   assert.strictEqual(result.new_documents, 1, 'one new doc should be created');
   assert.strictEqual(result.documents_deleted, 0, 'no deletions');
   console.log('  [info] New identity result: ' + JSON.stringify(result));
+});
+
+/* ================================================================ */
+/*  Test 12: Source load failure guards — zero mutations            */
+/* ================================================================ */
+
+console.log('\n=== Scenario 12: Source load failure guards ===');
+
+await testAsync('Accused source failure aborts incrementalResolve — zero mutations', async function () {
+  var pid1 = pidFor([{ source_table: 'Accused', source_id: 'A-1' }]);
+  var pmDocs = [makePMRawRow(pid1, [
+    { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'John Doe', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' }
+  ])];
+  var accusedRows = [makeSourcerRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'John Doe', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')];
+
+  var mockCat = createMockCatalyst(pmDocs, accusedRows, [], [], ['Accused']);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-FAIL1', timestamp: new Date().toISOString(),
+    stats: { existing_documents: 1, current_source_records: 1, changed_documents: 1, unchanged_documents: 0, new_records: 0, orphaned_records: 0 },
+    changed_person_ids: [pid1], unchanged_person_ids: [], new_records: [], orphaned_records: [], load_errors: []
+  };
+
+  try {
+    await incrementalResolve(appInst, changeResult, { runId: 'REC-FAIL1' });
+    assert.fail('should have thrown');
+  } catch (e) {
+    assert.ok(e.message.indexOf('SOURCE_LOAD_FAILED') !== -1, 'must contain SOURCE_LOAD_FAILED');
+    assert.ok(e.message.indexOf('Accused') !== -1, 'must mention Accused');
+    /* No PersonMaster mutations happened because the function aborted */
+  }
+});
+
+await testAsync('Victim source failure aborts incrementalResolve — zero mutations', async function () {
+  var pid1 = pidFor([{ source_table: 'Accused', source_id: 'A-1' }]);
+  var pmDocs = [makePMRawRow(pid1, [
+    { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'John Doe', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' }
+  ])];
+  var accusedRows = [makeSourcerRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'John Doe', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')];
+
+  var mockCat = createMockCatalyst(pmDocs, accusedRows, [], [], ['Victim']);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-FAIL2', timestamp: new Date().toISOString(),
+    stats: { existing_documents: 1, current_source_records: 1, changed_documents: 1, unchanged_documents: 0, new_records: 0, orphaned_records: 0 },
+    changed_person_ids: [pid1], unchanged_person_ids: [], new_records: [], orphaned_records: [], load_errors: []
+  };
+
+  try {
+    await incrementalResolve(appInst, changeResult, { runId: 'REC-FAIL2' });
+    assert.fail('should have thrown');
+  } catch (e) {
+    assert.ok(e.message.indexOf('SOURCE_LOAD_FAILED') !== -1, 'must contain SOURCE_LOAD_FAILED');
+  }
+});
+
+await testAsync('ComplainantDetails source failure aborts incrementalResolve — zero mutations', async function () {
+  var pid1 = pidFor([{ source_table: 'Accused', source_id: 'A-1' }]);
+  var pmDocs = [makePMRawRow(pid1, [
+    { table: 'Accused', row_id: 'A-1', case_id: 'CASE-001', name_as_recorded: 'John Doe', age_as_recorded: 30, date_of_offence: '2024-01-15', unit_id: 'UNIT-1', district_id: 'DIST-1' }
+  ])];
+  var accusedRows = [makeSourcerRawRow('Accused', 'AccusedMasterID', '1', 'CASE-001', 'John Doe', 30, 1, '2024-01-15', 'UNIT-1', 'DIST-1')];
+
+  var mockCat = createMockCatalyst(pmDocs, accusedRows, [], [], ['ComplainantDetails']);
+  var appInst = mockCat.initializeApp();
+
+  var changeResult = {
+    run_id: 'CHG-FAIL3', timestamp: new Date().toISOString(),
+    stats: { existing_documents: 1, current_source_records: 1, changed_documents: 1, unchanged_documents: 0, new_records: 0, orphaned_records: 0 },
+    changed_person_ids: [pid1], unchanged_person_ids: [], new_records: [], orphaned_records: [], load_errors: []
+  };
+
+  try {
+    await incrementalResolve(appInst, changeResult, { runId: 'REC-FAIL3' });
+    assert.fail('should have thrown');
+  } catch (e) {
+    assert.ok(e.message.indexOf('SOURCE_LOAD_FAILED') !== -1, 'must contain SOURCE_LOAD_FAILED');
+  }
 });
 
 /* ================================================================ */

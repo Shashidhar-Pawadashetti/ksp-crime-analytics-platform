@@ -625,20 +625,20 @@ async function persistDocuments(appInstance, documents) {
   return { created: created, updated: updated };
 }
 
-async function deletePersonMaster(appInstance, personId) {
+async function deleteOneDoc(appInstance, personId) {
+  var { NoSQLItem } = require('zcatalyst-sdk-node/lib/no-sql');
+  var noSql = appInstance.nosql();
+  var table = await noSql.getTable(PM_TABLE_NAME);
   try {
-    var noSql = appInstance.nosql();
-    var table = await noSql.getTable(PM_TABLE_NAME);
-    var { NoSQLItem } = require('zcatalyst-sdk-node/lib/no-sql');
-
     await table.deleteItems({
       keys: NoSQLItem.from({ type: 'PM', person_id: personId })
     });
-    console.log('[fullReconcile] Deleted stale document: ' + personId);
-    return true;
+    return 'deleted';
   } catch (err) {
-    console.error('[fullReconcile] Delete failed for ' + personId + ': ' + err.message);
-    return false;
+    if (err && (err.message || '').indexOf('not found') !== -1 || (err.statusCode === 404)) {
+      return 'not_found';
+    }
+    throw err;
   }
 }
 
@@ -699,7 +699,8 @@ async function fullReconcile(appInstance, options, jobContext) {
   var records = loadResult.records;
   var loadErrors = loadResult.errors;
   var mode = isLimited ? 'LIMITED' : 'FULL';
-  var staleDeletionEnabled = !isLimited && loadErrors.length === 0 && records.length > 0;
+  var mergeVictimDeletionEnabled = loadErrors.length === 0 && records.length > 0;
+  var staleDeletionEnabled = mergeVictimDeletionEnabled && !isLimited;
 
   stageLog('MATCHING', t0);
   logRemaining(jobContext, 'MATCHING');
@@ -723,11 +724,14 @@ async function fullReconcile(appInstance, options, jobContext) {
       return {
         run_id: runId, mode: mode, authoritative: !isLimited,
         stale_deletion_enabled: false,
+        merge_victim_deletion_enabled: false,
+        merge_victims: { identified: 0, deleted: 0, already_absent: 0, errors: 0 },
+        stale_documents: { identified: 0, deleted: 0, already_absent: 0, errors: 0 },
         documents_created: 0, documents_updated: 0,
         documents_deleted: 0, persons_processed: 0, clusters_formed: 0, singles: 0,
         confirmed_edges_written: 0, unconfirmed_edges_written: 0,
         source_errors: loadErrors, stale_deleted: 0, elapsed_seconds: 0,
-        error_count: loadErrors.length, status: 'FAILED'
+        error_count: loadErrors.length, source_load_complete: false, status: 'FAILED'
       };
     }
 
@@ -742,6 +746,9 @@ async function fullReconcile(appInstance, options, jobContext) {
       return {
         run_id: runId, mode: mode, authoritative: !isLimited,
         stale_deletion_enabled: false,
+        merge_victim_deletion_enabled: false,
+        merge_victims: { identified: 0, deleted: 0, already_absent: 0, errors: 0 },
+        stale_documents: { identified: 0, deleted: 0, already_absent: 0, errors: 0 },
         status: 'FAILED',
         error_count: 1,
         source_errors: ['PersonMaster load failed: ' + err.message],
@@ -749,13 +756,13 @@ async function fullReconcile(appInstance, options, jobContext) {
         documents_deleted: 0, persons_processed: 0,
         clusters_formed: 0, singles: 0,
         confirmed_edges_written: 0, unconfirmed_edges_written: 0,
-        stale_deleted: 0, elapsed_seconds: 0
+        stale_deleted: 0, elapsed_seconds: 0, source_load_complete: true
       };
     }
     var staleDeleted = 0;
     for (var si = 0; si < existingDocs.length; si++) {
-      var deleted = await deletePersonMaster(appInstance, existingDocs[si].person_id);
-      if (deleted) staleDeleted++;
+      var result = await deleteOneDoc(appInstance, existingDocs[si].person_id);
+      if (result === 'deleted') staleDeleted++;
     }
 
     console.log('[fullReconcile] No records — deleted ' + staleDeleted + ' stale documents');
@@ -786,6 +793,9 @@ async function fullReconcile(appInstance, options, jobContext) {
     return {
       run_id: runId, mode: mode, authoritative: !isLimited,
       stale_deletion_enabled: staleDeletionEnabled,
+      merge_victim_deletion_enabled: mergeVictimDeletionEnabled,
+      merge_victims: { identified: 0, deleted: 0, already_absent: 0, errors: 0 },
+      stale_documents: { identified: 0, deleted: 0, already_absent: 0, errors: 0 },
       documents_created: 0,
       documents_updated: 0,
       documents_deleted: staleDeleted,
@@ -799,6 +809,7 @@ async function fullReconcile(appInstance, options, jobContext) {
       elapsed_seconds: 0,
       error_count: 0,
       audit_error: auditErrMsg,
+      source_load_complete: true,
       status: 'SUCCESS'
     };
   }
@@ -833,6 +844,9 @@ async function fullReconcile(appInstance, options, jobContext) {
     return {
       run_id: runId, mode: mode, authoritative: !isLimited,
       stale_deletion_enabled: false,
+      merge_victim_deletion_enabled: false,
+      merge_victims: { identified: 0, deleted: 0, already_absent: 0, errors: 0 },
+      stale_documents: { identified: 0, deleted: 0, already_absent: 0, errors: 0 },
       status: 'FAILED',
       error_count: 1,
       source_errors: ['PersonMaster load failed: ' + err.message],
@@ -840,7 +854,7 @@ async function fullReconcile(appInstance, options, jobContext) {
       documents_deleted: 0, persons_processed: 0,
       clusters_formed: 0, singles: 0,
       confirmed_edges_written: 0, unconfirmed_edges_written: 0,
-      stale_deleted: 0, elapsed_seconds: 0
+      stale_deleted: 0, elapsed_seconds: 0, source_load_complete: true
     };
   }
   stageLog('PM_LOAD', t0);
@@ -957,25 +971,47 @@ async function fullReconcile(appInstance, options, jobContext) {
   logRemaining(jobContext, 'PERSIST');
 
   /* ---------------------------------------------------------------- */
-  /*  Step 8: Delete stale + merge-victim documents                  */
+  /*  Step 8: Delete merge victims (safe, survivor already persisted) */
   /* ---------------------------------------------------------------- */
-  var staleDeleted = 0;
-
-  if (staleDeletionEnabled) {
-    var allStalePids = {};
-    mapped.stalePids.forEach(function (pid) { allStalePids[pid] = true; });
-    mapped.mergeVictimPids.forEach(function (pid) { allStalePids[pid] = true; });
-
-    var stalePidList = Object.keys(allStalePids);
-    console.log('[fullReconcile] Documents to delete: ' + stalePidList.length + ' (stale=' + mapped.stalePids.length + ', merge_victims=' + mapped.mergeVictimPids.length + ')');
-
-    for (var sdi = 0; sdi < stalePidList.length; sdi++) {
-      var deleted = await deletePersonMaster(appInstance, stalePidList[sdi]);
-      if (deleted) staleDeleted++;
+  var mergeStats = { identified: 0, deleted: 0, already_absent: 0, errors: 0 };
+  if (mergeVictimDeletionEnabled && mapped.mergeVictimPids.length > 0) {
+    mergeStats.identified = mapped.mergeVictimPids.length;
+    console.log('[fullReconcile] Merge victims to delete: ' + mapped.mergeVictimPids.length);
+    for (var mvi = 0; mvi < mapped.mergeVictimPids.length; mvi++) {
+      try {
+        var result = await deleteOneDoc(appInstance, mapped.mergeVictimPids[mvi]);
+        if (result === 'deleted') mergeStats.deleted++;
+        else if (result === 'not_found') mergeStats.already_absent++;
+      } catch (err) {
+        mergeStats.errors++;
+        console.error('[fullReconcile] Merge victim delete error: ' + mapped.mergeVictimPids[mvi] + ': ' + err.message);
+      }
     }
-  } else {
-    console.log('[fullReconcile] Stale deletion disabled (mode=' + mode + ', errors=' + loadErrors.length + ')');
+  } else if (mapped.mergeVictimPids.length > 0) {
+    console.log('[fullReconcile] Merge victim deletion disabled (errors=' + loadErrors.length + ', mode=' + mode + ')');
   }
+
+  /* ---------------------------------------------------------------- */
+  /*  Step 9: Delete stale orphans (general cleanup)                  */
+  /* ---------------------------------------------------------------- */
+  var staleStats = { identified: 0, deleted: 0, already_absent: 0, errors: 0 };
+  if (staleDeletionEnabled && mapped.stalePids.length > 0) {
+    staleStats.identified = mapped.stalePids.length;
+    console.log('[fullReconcile] Stale orphans to delete: ' + mapped.stalePids.length);
+    for (var sdi = 0; sdi < mapped.stalePids.length; sdi++) {
+      try {
+        var result = await deleteOneDoc(appInstance, mapped.stalePids[sdi]);
+        if (result === 'deleted') staleStats.deleted++;
+        else if (result === 'not_found') staleStats.already_absent++;
+      } catch (err) {
+        staleStats.errors++;
+        console.error('[fullReconcile] Stale orphan delete error: ' + mapped.stalePids[sdi] + ': ' + err.message);
+      }
+    }
+  } else if (mapped.stalePids.length > 0) {
+    console.log('[fullReconcile] Stale orphan deletion disabled (mode=' + mode + ', errors=' + loadErrors.length + ')');
+  }
+  var staleDeleted = staleStats.deleted;
   stageLog('STALE_CLEANUP', t0);
   logRemaining(jobContext, 'STALE_CLEANUP');
 
@@ -1026,6 +1062,19 @@ async function fullReconcile(appInstance, options, jobContext) {
   return {
     run_id: runId, mode: mode, authoritative: !isLimited,
     stale_deletion_enabled: staleDeletionEnabled,
+    merge_victim_deletion_enabled: mergeVictimDeletionEnabled,
+    merge_victims: {
+      identified: mergeStats.identified,
+      deleted: mergeStats.deleted,
+      already_absent: mergeStats.already_absent,
+      errors: mergeStats.errors
+    },
+    stale_documents: {
+      identified: staleStats.identified,
+      deleted: staleStats.deleted,
+      already_absent: staleStats.already_absent,
+      errors: staleStats.errors
+    },
     documents_created: persistResult.created,
     documents_updated: persistResult.updated,
     documents_deleted: staleDeleted,
@@ -1038,6 +1087,7 @@ async function fullReconcile(appInstance, options, jobContext) {
     stale_deleted: staleDeleted,
     elapsed_seconds: Number(elapsed),
     error_count: totalErrors,
+    source_load_complete: loadErrors.length === 0,
     status: runStatus
   };
 }
