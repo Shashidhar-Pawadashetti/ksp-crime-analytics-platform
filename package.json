@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run build:classifier && npm run build:nl_sql && npm run build:rag && npm run build:pipeline && npm run build:session && npm run build:query_exec && npm run build:test && npm run build:entity-matching-engine && npm run build:graph-traversal && npm run build:personmaster-api && npm run build:personmaster-writer && npm run build:sync-full && npm run build:sync-incremental",
+    "build": "npm run build:classifier && npm run build:nl_sql && npm run build:rag && npm run build:pipeline && npm run build:session && npm run build:query_exec && npm run build:test && npm run build:entity-matching-engine && npm run build:graph-traversal && npm run build:personmaster-api && npm run build:personmaster-writer && npm run build:sync-full && npm run build:sync-incremental && npm run build:feature-derivation-engine && npm run build:risk-scoring && npm run build:forecasting",
     "build:classifier": "cd functions/classifier && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
     "build:nl_sql": "cd functions/nl_sql && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
     "build:rag": "cd functions/rag && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
@@ -16,7 +16,10 @@
     "build:personmaster-api": "cd functions/personmaster-api && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
     "build:personmaster-writer": "cd functions/personmaster-writer && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
     "build:sync-full": "cd functions/sync-full && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
-    "build:sync-incremental": "cd functions/sync-incremental && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node"
+    "build:sync-incremental": "cd functions/sync-incremental && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
+    "build:feature-derivation-engine": "cd functions/feature-derivation-engine && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
+    "build:risk-scoring": "cd functions/risk-scoring && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node",
+    "build:forecasting": "cd functions/forecasting && npx esbuild index.js --bundle --outfile=dist/index.js --platform=node --external:zcatalyst-sdk-node"
   },
   "devDependencies": {
     "esbuild": "^0.24.2"

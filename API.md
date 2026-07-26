@@ -12,121 +12,116 @@ functions).
 
 ---
 
-## Endpoints Summary
+## Function Index (20 functions)
 
-### Conversational AI (original 7 functions)
+| # | Function Name | Description | Base Path |
+|---|---------------|-------------|-----------|
+| 1 | test | Health check | `/test/` |
+| 2 | classifier | Intent classification | `/classifier/` |
+| 3 | nl_sql | NL → ZCQL generation + execution | `/nl_sql/` |
+| 4 | rag | Narrative query via BriefFacts search | `/rag/` |
+| 5 | pipeline | Full orchestrator (main entry point) | `/pipeline/` |
+| 6 | session | Conversation memory (Cache CRUD) | `/session/` |
+| 7 | query_exec | Raw ZCQL executor with safety validation | `/query_exec/` |
+| 8 | personmaster-api | Public-facing PersonMaster API | `/personmaster/` |
+| 9 | personmaster-writer | PersonMaster document generation & persistence | `/personmaster-writer/` or `/` |
+| 10 | pm-migration | Schema migration tool | `/pm-migration/` or `/` |
+| 11 | sync-incremental | Incremental change detection & resolution | `/sync-incremental/` or `/` |
+| 12 | sync-full | Full reconciliation pipeline | `/sync-full/` or `/` |
+| 13 | sync-full-job | Async full reconciliation (Job Pool) | — (not HTTP) |
+| 14 | graph-service | Internal graph data layer | `/graph-service/` or `/` |
+| 15 | graph-traversal | BFS graph traversal | `/graph-traversal/` or `/` |
+| 16 | entity-matching-engine | Standalone entity matching | `/entity-matching-engine/` or `/` |
+| 17 | network-analysis | Person network analysis | `/network-analysis/` or `/` |
+| 18 | graph-visualization | Graph visualization (Cytoscape export) | `/graph-visualization/` or `/` |
+| 19 | validation | Ground truth validation | `/validation/` or `/` |
+| 20 | dashboard | Chart data endpoints | `/dashboard/` or `/` |
+| 21 | graph-service-api | GET-only graph visualization wrapper | `/graph-service-api/` or `/` |
+
+---
+
+## Endpoints Summary Table
 
 | Method | URL | Function | Description |
 |--------|-----|----------|-------------|
 | GET | `/test/` | test | Health check |
+| GET | `/classifier/` | classifier | Health check |
 | POST | `/classifier/classify` | classifier | Classify query intent |
+| GET | `/nl_sql/` | nl_sql | Health check |
 | POST | `/nl_sql/translate` | nl_sql | NL → ZCQL generation + execution |
+| GET | `/rag/` | rag | Health check |
 | POST | `/rag/query` | rag | Narrative query via BriefFacts search |
+| GET | `/pipeline/` | pipeline | Health check |
 | POST | `/pipeline/query` | pipeline | Full orchestrator (main entry point) |
 | POST | `/session/create` | session | Create conversation session |
 | POST | `/session/append` | session | Append a turn to a session |
-| GET | `/session/` | session | Get session info |
+| GET | `/session/` | session | Get session info (health if no params) |
 | DELETE | `/session/{session_id}` | session | Delete a session |
 | POST | `/query_exec/execute` | query_exec | Raw ZCQL execution with safety |
-
-### PersonMaster API
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
-| GET | `/personmaster/` | personmaster-api | API info |
+| GET | `/personmaster/` | personmaster-api | API info / health |
 | GET | `/personmaster/search` | personmaster-api | Search PersonMaster by name, gender, age |
-| GET | `/personmaster/repeat-offenders` | personmaster-api | List repeat offenders (accused_count >= 2) |
+| GET | `/personmaster/repeat-offenders` | personmaster-api | List repeat offenders |
 | GET | `/personmaster/:person_id` | personmaster-api | Get single PersonMaster document |
 | GET | `/personmaster/:person_id/network` | personmaster-api | BFS graph traversal from a person |
-
-### Network Analysis
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
+| POST | `/resolve` | personmaster-writer | Run full resolution pipeline (legacy) |
+| POST | `/groups` | personmaster-writer | Accept pre-matched groups, persist as PersonMaster docs |
+| GET | `/` | personmaster-writer | Health check |
+| GET | `/diagnose` | personmaster-writer | Run ZCQL connectivity diagnostics (12 tests) |
+| POST | `/migrate` | pm-migration | Migrate PersonMaster docs between schema versions |
+| POST | `/migrate-candidates` | pm-migration | Migrate candidate edges to canonical format |
+| GET | `/migrate-candidates` | pm-migration | Dry-run candidate edge migration |
+| GET | `/` | pm-migration | Health check |
+| POST | `/detect` | sync-incremental | Run change detection (checksum comparison) |
+| POST | `/reconcile` | sync-incremental | Detect changes + run incremental resolution |
+| GET | `/` | sync-incremental | Health check |
+| POST | `/run` | sync-full | Trigger full reconciliation pipeline |
+| GET | `/` | sync-full | Health check |
+| GET | `/` | graph-service | Health check + API info |
+| GET | `/health` | graph-service | Health check |
+| GET | `/person/:personId` | graph-service | Get person details |
+| GET | `/person/:personId/neighbours` | graph-service | Get neighbours of a person |
+| GET | `/person/:personId/edges` | graph-service | Get edges for a person |
+| GET | `/person/:personId/degree` | graph-service | Get degree (connection count) |
+| GET | `/person/:personId/exists` | graph-service | Check if person exists in graph |
+| GET | `/persons/by-role/:role` | graph-service | Get persons by role |
+| GET | `/edge/:edgeId` | graph-service | Get a specific edge by ID |
+| GET | `/statistics` | graph-service | Get graph-wide statistics |
+| GET | `/stats` | graph-service | Get graph-wide statistics (alias) |
+| GET | `/cache/info` | graph-service | Cache hit/miss/size info |
+| POST | `/reload` | graph-service | Reload entire graph from source |
+| POST | `/cache/reload` | graph-service | Reload entire cache from source |
+| POST | `/cache/clear` | graph-service | Clear entire cache |
+| POST | `/traverse` | graph-traversal | BFS traversal of crime graph from a root person |
+| GET | `/` | graph-traversal | Health check |
+| POST | `/match` | entity-matching-engine | Compute match score between two person records |
+| GET | `/` | entity-matching-engine | Health check |
+| GET | `/` | network-analysis | Health check |
 | GET | `/person/:personId` | network-analysis | Person profile |
 | GET | `/person/:personId/associates` | network-analysis | Known associates (BFS) |
 | GET | `/person/:personId/co-accused` | network-analysis | Co-accused network |
 | GET | `/person/:personId/victims` | network-analysis | Victim relationships |
 | GET | `/person/:personId/network-summary` | network-analysis | Aggregated network summary |
 | POST | `/analyze` | network-analysis | Full network analysis (person + associates + co-accused + victims + summary) |
-| GET | `/` | network-analysis | API home/info |
-
-### Graph Visualization
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
+| GET | `/` | graph-visualization | Health check |
 | GET | `/person/:personId/graph` | graph-visualization | Graph visualization export (Cytoscape.js) |
 | POST | `/visualize` | graph-visualization | Accept graph structure, return Cytoscape-formatted JSON |
-| GET | `/` | graph-visualization | API home/info |
-
-### Graph Service (internal data layer)
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
-| GET | `/` | graph-service | Health check |
-| GET | `/person/:personId` | graph-service | Get person details |
-| GET | `/person/:personId/neighbours` | graph-service | Get neighbours of a person |
-| GET | `/person/:personId/edges` | graph-service | Get edges for a person |
-| GET | `/person/:personId/degree` | graph-service | Get degree (connection count) |
-| GET | `/person/:personId/exists` | graph-service | Check if person exists in graph |
-| GET | `/persons/by-role/:role` | graph-service | Get persons by role (accused/victim/complainant) |
-| GET | `/edge/:edgeId` | graph-service | Get a specific edge by ID |
-| GET | `/statistics` | graph-service | Get graph-wide statistics |
-| GET | `/cache/info` | graph-service | Cache hit/miss/size info |
-| POST | `/cache/reload` | graph-service | Reload entire cache from source |
-| POST | `/cache/clear` | graph-service | Clear entire cache |
-
-### Graph Traversal
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
-| POST | `/traverse` | graph-traversal | BFS traversal of crime graph from a root person |
-| GET | `/` | graph-traversal | Health check |
-
-### Full Reconciliation (sync-full)
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
-| POST | `/run` | sync-full | Trigger full reconciliation pipeline |
-| GET | `/` | sync-full | Health check |
-
-### Incremental Sync
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
-| POST | `/detect` | sync-incremental | Run change detection (checksum comparison) |
-| POST | `/reconcile` | sync-incremental | Detect changes + run incremental resolution |
-| GET | `/` | sync-incremental | Health check |
-
-### PersonMaster Writer
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
-| POST | `/resolve` | personmaster-writer | Run full resolution pipeline (legacy) |
-| POST | `/groups` | personmaster-writer | Accept pre-matched groups, persist as PersonMaster docs |
-| GET | `/` | personmaster-writer | Health check |
-| GET | `/diagnose` | personmaster-writer | Run ZCQL connectivity diagnostics (12 tests) |
-
-### Entity Matching Engine (standalone)
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
-| POST | `/match` | entity-matching-engine | Compute match score between two person records |
-| GET | `/` | entity-matching-engine | Health check |
-
-### PersonMaster Migration
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
-| POST | `/migrate` | pm-migration | Migrate PersonMaster docs between schema versions |
-| GET | `/` | pm-migration | Health check |
-
-### Validation / Ground Truth
-
-| Method | URL | Function | Description |
-|--------|-----|----------|-------------|
 | POST | `/validate` | validation | Validate ground truth data against PersonMaster resolution output |
 | GET | `/` | validation | Health check |
+| POST | `/` | dashboard | Chart data endpoint (routed by body.endpoint) |
+| GET | `/` | graph-service-api | GET-only graph visualization (CORS-enabled) |
+
+### Dashboard sub-endpoints (routed via body.endpoint)
+
+| Body `endpoint` | Description |
+|-----------------|-------------|
+| `/dashboard/trend` | Crime trend chart |
+| `/dashboard/breakdown` | Crime type breakdown |
+| `/dashboard/location` | Location breakdown |
+| `/dashboard/hotspots` | Crime hotspot analysis |
+| `/dashboard/risk-ranked` | Risk-ranked accused list |
+| `/dashboard/riskRanked` | Risk-ranked accused list (alias) |
+| `/dashboard/seasonal` | Seasonal crime pattern |
+| `/dashboard/person-search` | Person name search across all tables |
 
 ### Job Function (not HTTP — Catalyst Job Pool)
 
@@ -151,6 +146,12 @@ Response:
 
 ## 2. Classifier — Intent Classification
 
+### 2.1 Health Check
+```
+GET /classifier/
+```
+
+### 2.2 Classify
 ```
 POST /classifier/classify
 Content-Type: application/json
@@ -160,20 +161,32 @@ Content-Type: application/json
 
 Response:
 ```json
-{ "intent": "network", "confidence": 0.95 }
+{
+  "status": "ok",
+  "data": { "intent": "network", "confidence": 0.95 }
+}
 ```
 
 **Intents:** `structured`, `narrative`, `network`, `risk`, `analytical`
 
 On GLM failure or low confidence (< 0.6):
 ```json
-{ "intent": "structured", "confidence": 0.5, "fallback": true }
+{
+  "status": "ok",
+  "data": { "intent": "structured", "confidence": 0.5, "fallback": true }
+}
 ```
 
 ---
 
 ## 3. NL-to-SQL — Natural Language to ZCQL
 
+### 3.1 Health Check
+```
+GET /nl_sql/
+```
+
+### 3.2 Translate
 ```
 POST /nl_sql/translate
 Content-Type: application/json
@@ -186,7 +199,7 @@ Response:
 {
   "status": "ok",
   "data": {
-    "sql": "SELECT COUNT(cm.CaseMasterID) AS case_count FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE d.DistrictName = 'Bengaluru Urban'",
+    "sql": "SELECT COUNT(cm.CaseMasterID) FROM CaseMaster cm INNER JOIN Unit u ON cm.PoliceStationID = u.ROWID INNER JOIN District d ON u.DistrictID = d.ROWID WHERE d.DistrictName LIKE '*Bengaluru*'",
     "explanation": "Counts total cases in Bengaluru Urban district",
     "rows": [{ "cm": { "COUNT(CaseMasterID)": "929" } }],
     "column_meta": [],
@@ -195,10 +208,18 @@ Response:
 }
 ```
 
+Auto-retries once on ZCQL execution error by sending the error back to GLM with a fix prompt.
+
 ---
 
 ## 4. RAG — Narrative Query via BriefFacts
 
+### 4.1 Health Check
+```
+GET /rag/
+```
+
+### 4.2 Query
 ```
 POST /rag/query
 Content-Type: application/json
@@ -222,7 +243,7 @@ On no match:
 {
   "status": "ok",
   "data": {
-    "answer": "I could not find any case records matching your query in the BriefFacts database.",
+    "answer": "I could not find any case records matching your query.",
     "source_refs": []
   }
 }
@@ -232,6 +253,12 @@ On no match:
 
 ## 5. Pipeline — Full Orchestrator (Main Entry Point)
 
+### 5.1 Health Check
+```
+GET /pipeline/
+```
+
+### 5.2 Query
 ```
 POST /pipeline/query
 Content-Type: application/json
@@ -337,13 +364,13 @@ Optional field: `"session_id": "uuid"` to continue an existing conversation.
 }
 ```
 
-**Error codes:** `MISSING_EMPLOYEE_ID`, `MISSING_QUERY`, `CLASSIFICATION_FAILED`
+**Error codes:** `MISSING_EMPLOYEE_ID`, `MISSING_QUERY`, `CLASSIFICATION_FAILED`, `PIPELINE_ERROR`
 
 ---
 
 ## 6. Session — Conversation Memory
 
-### Create Session
+### 6.1 Create Session
 ```
 POST /session/create
 Content-Type: application/json
@@ -367,25 +394,31 @@ Response:
 }
 ```
 
-### Append Turn
+### 6.2 Append Turn
 ```
 POST /session/append
 Content-Type: application/json
 
 {
   "session_id": "7f5ef990-5a44-4c36-a389-90161f1da96a",
+  "employee_id": 1,
   "turn": { "role": "user", "content": "..." }
 }
 ```
 
-### Get Session
+### 6.3 Get Session
 ```
 GET /session/?employee_id=1&session_id=7f5ef990-5a44-4c36-a389-90161f1da96a
 ```
 
-### Delete Session
+Without query params, returns health info:
+```json
+{ "status": "ok", "service": "session", "version": "1.0.0" }
 ```
-DELETE /session/{session_id}
+
+### 6.4 Delete Session
+```
+DELETE /session/{session_id}?employee_id=1
 ```
 
 ---
@@ -399,6 +432,8 @@ Content-Type: application/json
 { "sql": "SELECT DistrictID, DistrictName FROM District WHERE StateID = '1' LIMIT 10" }
 ```
 
+Optional field: `"scope": { "district_filter": 7, "unit_filter": 42 }` for RBAC scoping.
+
 ### Error (unsafe SQL)
 ```json
 {
@@ -409,13 +444,14 @@ Content-Type: application/json
 ```
 
 **Blocked keywords:** `DROP`, `DELETE`, `INSERT`, `UPDATE`, `TRUNCATE`, `ALTER`,
-`CREATE`, `EXEC`, `EXECUTE`. Only `SELECT` queries are allowed.
+`CREATE`, `EXEC`, `EXECUTE`, `MERGE`, `REPLACE`, `GRANT`, `REVOKE`, `CALL`,
+`LOAD`, `RENAME`. Only `SELECT` queries are allowed.
 
 ---
 
 ## 8. PersonMaster API
 
-### 8.1 API Info
+### 8.1 API Info / Health
 ```
 GET /personmaster/
 ```
@@ -504,7 +540,12 @@ Response: Graph with nodes and edges, filtered by caller RBAC scope.
 
 ## 9. Network Analysis — Person Endpoints
 
-### 9.1 Get Person Profile
+### 9.1 API Home / Health
+```
+GET /
+```
+
+### 9.2 Get Person Profile
 ```
 GET /person/:personId
 ```
@@ -535,7 +576,7 @@ Response:
 }
 ```
 
-### 9.2 Get Known Associates
+### 9.3 Get Known Associates
 ```
 GET /person/:personId/associates?max_hops=2&edge_type_filter=CO_ACCUSED,SHARED_LOCATION
 ```
@@ -574,21 +615,21 @@ Response:
 }
 ```
 
-### 9.3 Get Co-Accused Network
+### 9.4 Get Co-Accused Network
 ```
 GET /person/:personId/co-accused
 ```
 
 Returns `CO_ACCUSED` edges only, traversed up to depth 3.
 
-### 9.4 Get Victim Relationships
+### 9.5 Get Victim Relationships
 ```
 GET /person/:personId/victims
 ```
 
 Returns `ACCUSED_TO_VICTIM` edges only, traversed up to depth 3.
 
-### 9.5 Get Network Summary
+### 9.6 Get Network Summary
 ```
 GET /person/:personId/network-summary
 ```
@@ -606,7 +647,7 @@ Response:
 }
 ```
 
-### 9.6 Full Network Analysis
+### 9.7 Full Network Analysis
 ```
 POST /analyze
 Content-Type: application/json
@@ -620,9 +661,14 @@ Returns all person + associates + co-accused + victims + network summary in one 
 
 ## 10. Graph Visualization — Cytoscape.js Export
 
-### 10.1 Get Graph
+### 10.1 API Home / Health
 ```
-GET /person/:personId/graph?format=cytoscape&max_hops=2
+GET /
+```
+
+### 10.2 Get Graph
+```
+GET /person/:personId/graph?format=cytoscape&max_hops=2&max_nodes=100
 ```
 
 | Parameter | Type | Required | Default | Description |
@@ -630,6 +676,7 @@ GET /person/:personId/graph?format=cytoscape&max_hops=2
 | `personId` | string | yes | — | PersonMaster ID |
 | `format` | string | no | `cytoscape` | Output format: `cytoscape`, `compact`, `debug` |
 | `max_hops` | integer | no | `2` | Max BFS depth (1-3) |
+| `max_nodes` | integer | no | `100` | Max nodes to return |
 | `include_unconfirmed` | boolean | no | `false` | Include UNCONFIRMED_MATCH edges |
 | `edge_type_filter` | string | no | — | Comma-separated edge types |
 
@@ -638,7 +685,7 @@ GET /person/:personId/graph?format=cytoscape&max_hops=2
 - `compact` — Simplified nested structure with counts
 - `debug` — Full metadata including internal indices
 
-### 10.2 Visualize (graph → Cytoscape)
+### 10.3 Visualize (graph → Cytoscape)
 ```
 POST /visualize
 Content-Type: application/json
@@ -650,16 +697,16 @@ Content-Type: application/json
 }
 ```
 
-### 10.3 API Home
-```
-GET /
-```
-
 ---
 
 ## 11. Graph Traversal
 
-### BFS Traversal
+### 11.1 Health Check
+```
+GET /
+```
+
+### 11.2 BFS Traversal
 ```
 POST /traverse
 Content-Type: application/json
@@ -670,35 +717,45 @@ Content-Type: application/json
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `person_id` | string | yes | — | Root person ID |
-| `hops` | integer | no | 2 | BFS depth (1-3) |
+| `start_person_id` | string | no | — | Alias for `person_id` |
+| `hops` / `max_depth` | integer | no | 2 | BFS depth (1-3) |
 | `max_nodes` | integer | no | 50 | Max nodes to return |
+| `include_unconfirmed` | boolean | no | false | Include unconfirmed edges |
+| `edge_type_filter` / `edge_types` | string | no | — | Comma-separated edge types |
+| `min_confidence` | number | no | 0 | Min edge confidence threshold |
 | `caller_scope` | object | no | — | RBAC filter scope |
 
 ---
 
 ## 12. Graph Service (Internal Data Layer)
 
-### 12.1 Person Details
+### 12.1 Health Check
+```
+GET /
+GET /health
+```
+
+### 12.2 Person Details
 ```
 GET /person/:personId
 ```
 
-### 12.2 Neighbours
+### 12.3 Neighbours
 ```
 GET /person/:personId/neighbours
 ```
 
-### 12.3 Edges
+### 12.4 Edges
 ```
 GET /person/:personId/edges
 ```
 
-### 12.4 Degree
+### 12.5 Degree
 ```
 GET /person/:personId/degree
 ```
 
-### 12.5 Exists
+### 12.6 Exists
 ```
 GET /person/:personId/exists
 ```
@@ -708,21 +765,22 @@ Response:
 { "status": "ok", "data": { "person_id": "PM_000001", "exists": true } }
 ```
 
-### 12.6 Persons by Role
+### 12.7 Persons by Role
 ```
 GET /persons/by-role/:role
 ```
 
 `role` values: `accused`, `victim`, `complainant`
 
-### 12.7 Get Edge
+### 12.8 Get Edge
 ```
 GET /edge/:edgeId
 ```
 
-### 12.8 Statistics
+### 12.9 Statistics
 ```
 GET /statistics
+GET /stats
 ```
 
 Response:
@@ -740,18 +798,24 @@ Response:
 }
 ```
 
-### 12.9 Cache Management
+### 12.10 Cache Management
 ```
 GET  /cache/info       → cache statistics (hits, misses, size)
+POST /reload           → reload graph from source
 POST /cache/reload     → reload cache from source
 POST /cache/clear      → clear entire cache
 ```
 
 ---
 
-## 13. Full Reconciliation
+## 13. Full Reconciliation (sync-full)
 
-### 13.1 Run Full Reconciliation
+### 13.1 Health Check
+```
+GET /
+```
+
+### 13.2 Run Full Reconciliation
 ```
 POST /run
 Content-Type: application/json
@@ -783,6 +847,8 @@ Response:
     "unconfirmed_edges_written": 218686,
     "source_errors": 0,
     "stale_deleted": 0,
+    "merge_victims": { "identified": 0, "deleted": 0, "already_absent": 0, "errors": 0 },
+    "stale_documents": { "identified": 0, "deleted": 0, "already_absent": 0, "errors": 0 },
     "elapsed_seconds": 482.15,
     "error_count": 0,
     "status": "SUCCESS"
@@ -790,16 +856,25 @@ Response:
 }
 ```
 
-### 13.2 Job Function (Catalyst Job Pool)
+**Merge victims** (`merge_victims`): PersonMaster documents whose source records were merged into another document (e.g., A-1 + A-2 → single cluster). The duplicate is deleted.
+
+**Stale documents** (`stale_documents`): PersonMaster documents whose source records no longer exist in the Data Store (e.g., deleted from Accused/Victim/ComplainantDetails). These are tracked and deleted.
+
+### 13.3 Job Function (Catalyst Job Pool)
 The `sync-full-job` function runs the same pipeline via Catalyst's Job Pool (not HTTP).
 It is triggered asynchronously with a 900,000ms (15-min) timeout and uses
 `context.closeWithSuccess()`/`context.closeWithFailure()` for completion signaling.
 
 ---
 
-## 14. Incremental Sync
+## 14. Incremental Sync (sync-incremental)
 
-### 14.1 Change Detection
+### 14.1 Health Check
+```
+GET /
+```
+
+### 14.2 Change Detection
 ```
 POST /detect
 Content-Type: application/json
@@ -812,19 +887,50 @@ Response:
 {
   "status": "ok",
   "data": {
-    "run_id": "INC-001",
+    "run_id": "CHG-...",
     "timestamp": "2026-07-24T12:00:00.000Z",
-    "stats": { "total_personmaster_docs": 6896, "changed": 12, "unchanged": 6884 },
+    "stats": {
+      "existing_documents": 6896,
+      "current_source_records": 11364,
+      "changed_documents": 12,
+      "unchanged_documents": 6884,
+      "new_records": 0,
+      "orphaned_records": 0
+    },
     "changed_person_ids": ["PM_000001", "PM_000002"],
     "unchanged_person_ids": ["PM_000003", ...],
     "new_records": [],
     "orphaned_records": [],
-    "load_errors": []
+    "load_errors": [],
+    "identity_diagnostics": { ... }
   }
 }
 ```
 
-### 14.2 Detect + Resolve
+**`identity_diagnostics`** provides detailed diagnostics on source record identity tracking:
+
+| Field | Description |
+|-------|-------------|
+| `current_total` | Total current source records from Data Store |
+| `current_with_source_id` | Records with a valid source_id |
+| `current_missing_source_id` | Records missing source_id |
+| `existing_indexed_keys` | Keys indexed from existing PersonMaster docs |
+| `existing_with_source_id` | Existing records with valid source_id |
+| `existing_missing_source_id` | Existing records missing source_id |
+| `source_record_elements_total` | Total elements in source_records arrays across all docs |
+| `source_record_elements_objects` | Elements that are already objects |
+| `source_record_elements_stringified` | Elements that are stringified JSON |
+| `source_record_elements_parsed` | Elements successfully parsed from string |
+| `source_record_elements_malformed` | Elements that could not be parsed |
+| `missing_identity` | Breakdown of records missing table/source_id |
+| `existing_valid_identity_records` | Records with a valid (table:source_id) key |
+| `existing_unique_identity_keys` | Unique (table:source_id) keys |
+| `existing_duplicate_identity_keys` | Duplicate keys (same key in multiple docs) |
+| `duplicate_ownership` | Cross-person duplicate key analysis |
+| `current_side` | Current-source-side uniqueness stats |
+| `set_arithmetic` | Historical vs current key set comparison |
+
+### 14.3 Detect + Resolve
 ```
 POST /reconcile
 Content-Type: application/json
@@ -832,13 +938,36 @@ Content-Type: application/json
 {}
 ```
 
-Detects changes AND runs incremental resolution in one call.
+Detects changes AND runs incremental resolution in one call. Returns both `detection` and `resolution` results:
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "detection": { ... },
+    "resolution": {
+      "run_id": "REC-...",
+      "new_documents": 0,
+      "documents_rebuilt": 3,
+      "persons_processed": 5,
+      "confirmed_edges_written": 2,
+      "unconfirmed_edges_written": 0,
+      "status": "SUCCESS"
+    }
+  }
+}
+```
 
 ---
 
 ## 15. PersonMaster Writer
 
-### 15.1 Resolve
+### 15.1 Health Check
+```
+GET /
+```
+
+### 15.2 Resolve
 ```
 POST /resolve
 Content-Type: application/json
@@ -848,7 +977,7 @@ Content-Type: application/json
 
 Runs full resolution pipeline: load source records → entity matching → cluster formation → PersonMaster persist.
 
-### 15.2 Groups (Bypass Matching)
+### 15.3 Groups (Bypass Matching)
 ```
 POST /groups
 Content-Type: application/json
@@ -864,7 +993,7 @@ Content-Type: application/json
 
 Bypasses entity matching. Each inner array is a pre-matched group consolidated into one PersonMaster document.
 
-### 15.3 Diagnose
+### 15.4 Diagnose
 ```
 GET /diagnose
 ```
@@ -875,7 +1004,12 @@ Runs 12 ZCQL connectivity diagnostic tests (SELECT, COUNT, JOIN, LIMIT, INSERT, 
 
 ## 16. Entity Matching Engine
 
-### 16.1 Match
+### 16.1 Health Check
+```
+GET /
+```
+
+### 16.2 Match
 ```
 POST /match
 Content-Type: application/json
@@ -911,7 +1045,12 @@ Response:
 
 ## 17. PersonMaster Migration
 
-### 17.1 Migrate
+### 17.1 Health Check
+```
+GET /
+```
+
+### 17.2 Migrate Schema Version
 ```
 POST /migrate
 Content-Type: application/json
@@ -923,6 +1062,8 @@ Content-Type: application/json
 |-----------|------|----------|---------|-------------|
 | `from_version` | string | no | `"1"` | Source schema version |
 | `to_version` | string | no | `"2"` | Target schema version |
+
+Supports migrations: v1→v2 (adds `roles_summary`, `flags`), v2→v3 (adds `last_synced_at`, `name_variants`, `meta`), v1→v3 (combined).
 
 Response:
 ```json
@@ -938,11 +1079,67 @@ Response:
 }
 ```
 
+### 17.3 Migrate Candidate Edges
+```
+POST /migrate-candidates
+Content-Type: application/json
+
+{ "dryRun": true }
+```
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `dryRun` | boolean | no | `true` | When true, only scans; when false, applies |
+
+Converts legacy `unconfirmed_edges` format (old `with_person_id` + `score_breakdown`) to canonical format (`edge_id`, `edge_type`, `target_person_id`, `evidence[]`). Also available via `GET /migrate-candidates` (always dry-run).
+
+Dry-run response:
+```json
+{
+  "status": "ok",
+  "data": {
+    "mode": "dry-run",
+    "documents_scanned": 6896,
+    "documents_needing_migration": 42,
+    "legacy_edges_found": 156,
+    "edges_convertible": 156,
+    "already_canonical_edges": 218530,
+    "invalid_edges": 0,
+    "semi_canonical_edges_found": 0,
+    "duplicate_edges_removed": 0,
+    "documents_that_would_update": 42,
+    "samples": []
+  }
+}
+```
+
+Apply response:
+```json
+{
+  "status": "ok",
+  "data": {
+    "mode": "apply",
+    "documents_scanned": 6896,
+    "documents_updated": 42,
+    "legacy_edges_migrated": 156,
+    "semi_canonical_edges_migrated": 0,
+    "already_canonical_edges_preserved": 218530,
+    "invalid_edges_skipped": 0,
+    "errors": []
+  }
+}
+```
+
 ---
 
 ## 18. Validation — Ground Truth
 
-### 18.1 Validate
+### 18.1 Health Check
+```
+GET /
+```
+
+### 18.2 Validate
 ```
 POST /validate
 Content-Type: application/json
@@ -954,6 +1151,63 @@ Content-Type: application/json
 ```
 
 Runs the ground truth validator against PersonMaster resolution output.
+
+---
+
+## 19. Dashboard — Chart Data Endpoints
+
+### POST / (endpoint routing)
+
+All dashboard queries use single `POST /` endpoint. The actual sub-endpoint is specified in the request body.
+
+```
+POST /
+Content-Type: application/json
+
+{
+  "endpoint": "/dashboard/trend",
+  "filters": { "location": "Bengaluru" }
+}
+```
+
+| Body Field | Type | Required | Description |
+|------------|------|----------|-------------|
+| `endpoint` | string | yes | One of the sub-endpoints below |
+| `filters` | object | no | Filter criteria (varies by endpoint) |
+
+| Endpoint | Description |
+|----------|-------------|
+| `/dashboard/trend` | Crime trend over time (GROUP BY CrimeRegisteredDate) |
+| `/dashboard/breakdown` | Crime type breakdown (GROUP BY CrimeGroupName) |
+| `/dashboard/location` | Location breakdown (GROUP BY DistrictName) |
+| `/dashboard/hotspots` | Crime hotspot analysis |
+| `/dashboard/risk-ranked` | Risk ranking of accused by case count |
+| `/dashboard/riskRanked` | Alias for `/dashboard/risk-ranked` |
+| `/dashboard/seasonal` | Seasonal crime patterns |
+| `/dashboard/person-search` | Person name search (filters.searchTerm required) |
+
+Response format:
+```json
+{
+  "status": "ok",
+  "data": [
+    { "label": "Theft", "value": 42 },
+    { "label": "Assault", "value": 17 }
+  ]
+}
+```
+
+---
+
+## 20. Graph Service API (CORS-enabled wrapper)
+
+GET-only wrapper around graph-visualization routes, with CORS headers.
+
+```
+GET /
+```
+
+Supports same `GET /person/:personId/graph` routing as graph-visualization (see §10).
 
 ---
 
@@ -970,13 +1224,14 @@ All endpoints return errors in this format:
 }
 ```
 
-### HTTP Status Codes
+### Common HTTP Status Codes
 
 | Code | Description |
 |------|-------------|
 | 200 | Success |
 | 400 | Validation error (invalid parameters) |
 | 404 | Person or route not found |
+| 405 | Method not allowed |
 | 500 | Internal server error |
 
 ---
@@ -1005,13 +1260,19 @@ Catalyst Data Store uses ZCQL V2 (not standard SQL):
 | `type` | String | Partition key (HASH) | Always `"PM"` |
 | `person_id` | String | Sort key (RANGE) | e.g., `"PM_000001"` |
 | `name_normalised` | String | — | Canonical name |
-| `aliases` | Array | — | Name variants |
+| `name_variants` | Array | — | Name variants (schema v3+) |
+| `aliases` | Array | — | Name variants (legacy) |
+| `gender` | String | — | `"M"`, `"F"`, or `"O"` |
+| `age_estimate` | Number | — | Estimated age |
 | `demographics` | Map | — | Gender, age estimate, district, unit |
 | `roles_summary` | Map | — | Accused/victim/complainant counts |
 | `source_records` | Array | — | Linked source records |
 | `confirmed_edges` | Array | — | Co-accused, victim edges |
-| `unconfirmed_edges` | Array | — | Candidate match edges |
+| `unconfirmed_edges` | Array | — | Candidate match edges (canonical format) |
 | `confidence` | Map | — | Match confidence scores |
+| `flags` | Map | — | Repeat offender, review flags |
+| `last_synced_at` | String | — | Last sync timestamp (schema v3+) |
+| `schema_version` | Number | — | Schema version number |
 | `meta` | Map | — | Resolution metadata |
 
 ---
@@ -1022,8 +1283,8 @@ Catalyst Data Store uses ZCQL V2 (not standard SQL):
 openapi: 3.0.0
 info:
   title: KSP Crime Analytics Platform API
-  version: 1.0.0
-  description: REST APIs for person network analysis and graph visualization
+  version: 2.0.0
+  description: REST APIs for person network analysis, crime analytics, and graph visualization
 servers:
   - url: https://datathon2026-60073929329.development.catalystserverless.in/server
     description: Development server
@@ -1110,6 +1371,7 @@ paths:
               type: object
               properties:
                 session_id: { type: string }
+                employee_id: { type: integer }
                 turn: { type: object }
       responses: { '200': { description: Turn appended } }
 
@@ -1119,11 +1381,9 @@ paths:
       parameters:
         - name: employee_id
           in: query
-          required: true
           schema: { type: integer }
         - name: session_id
           in: query
-          required: true
           schema: { type: string }
       responses: { '200': { description: Session data } }
 
@@ -1135,6 +1395,9 @@ paths:
           in: path
           required: true
           schema: { type: string }
+        - name: employee_id
+          in: query
+          schema: { type: integer }
       responses: { '200': { description: Session deleted } }
 
   /query_exec/execute:
@@ -1146,7 +1409,9 @@ paths:
           application/json:
             schema:
               type: object
-              properties: { sql: { type: string } }
+              properties:
+                sql: { type: string }
+                scope: { type: object }
       responses:
         '200': { description: ZCQL result rows }
         '400': { description: Validation error }
@@ -1302,6 +1567,9 @@ paths:
         - name: max_hops
           in: query
           schema: { type: integer, minimum: 1, maximum: 3, default: 2 }
+        - name: max_nodes
+          in: query
+          schema: { type: integer, default: 100 }
         - name: include_unconfirmed
           in: query
           schema: { type: boolean, default: false }
@@ -1337,8 +1605,14 @@ paths:
               required: [person_id]
               properties:
                 person_id: { type: string }
+                start_person_id: { type: string }
                 hops: { type: integer, default: 2 }
+                max_depth: { type: integer }
                 max_nodes: { type: integer, default: 50 }
+                include_unconfirmed: { type: boolean, default: false }
+                edge_type_filter: { type: string }
+                edge_types: { type: string }
+                min_confidence: { type: number, default: 0 }
                 caller_scope: { type: object }
       responses: { '200': { description: Traversal result } }
 
@@ -1353,12 +1627,12 @@ paths:
               properties:
                 run_id: { type: string }
                 max_records: { type: integer }
-      responses: { '200': { description: Reconciliation result } }
+      responses: { '200': { description: Reconciliation result with merge_victims and stale_documents } }
 
   /detect:
     post:
       summary: Incremental change detection
-      responses: { '200': { description: Detection result } }
+      responses: { '200': { description: Detection result with identity_diagnostics } }
 
   /reconcile:
     post:
@@ -1416,6 +1690,21 @@ paths:
                 to_version: { type: string }
       responses: { '200': { description: Migration result } }
 
+  /migrate-candidates:
+    get:
+      summary: Dry-run candidate edge migration
+      responses: { '200': { description: Dry-run scan results } }
+    post:
+      summary: Migrate candidate edges to canonical format
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dryRun: { type: boolean, default: true }
+      responses: { '200': { description: Migration result } }
+
   /validate:
     post:
       summary: Validate ground truth against resolution output
@@ -1429,8 +1718,192 @@ paths:
                 ground_truth_csv: { type: string }
       responses: { '200': { description: Validation result } }
 
-  /:
+  /dashboard/trend:
+    post:
+      summary: Crime trend chart data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint: { type: string }
+                filters: { type: object }
+      responses: { '200': { description: Chart data } }
+
+  /dashboard/breakdown:
+    post:
+      summary: Crime type breakdown chart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint: { type: string }
+                filters: { type: object }
+      responses: { '200': { description: Chart data } }
+
+  /dashboard/location:
+    post:
+      summary: Location breakdown chart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint: { type: string }
+                filters: { type: object }
+      responses: { '200': { description: Chart data } }
+
+  /dashboard/hotspots:
+    post:
+      summary: Crime hotspot data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint: { type: string }
+                filters: { type: object }
+      responses: { '200': { description: Hotspot data } }
+
+  /dashboard/risk-ranked:
+    post:
+      summary: Risk-ranked accused list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint: { type: string }
+                filters: { type: object }
+      responses: { '200': { description: Risk ranking data } }
+
+  /dashboard/seasonal:
+    post:
+      summary: Seasonal crime pattern data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint: { type: string }
+                filters: { type: object }
+      responses: { '200': { description: Seasonal pattern data } }
+
+  /dashboard/person-search:
+    post:
+      summary: Person name search across tables
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint: { type: string }
+                filters: { type: object, properties: { searchTerm: { type: string } } }
+                searchTerm: { type: string }
+      responses: { '200': { description: Person search results } }
+
+  /health:
     get:
-      summary: API home/info (varies by function)
-      responses: { '200': { description: Service info } }
+      summary: Graph service health check
+      responses: { '200': { description: OK } }
+
+  /person/{personId}/neighbours:
+    get:
+      summary: Get neighbours of a person in graph
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema: { type: string }
+      responses: { '200': { description: Neighbours list } }
+
+  /person/{personId}/edges:
+    get:
+      summary: Get edges for a person
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema: { type: string }
+      responses: { '200': { description: Edge list } }
+
+  /person/{personId}/degree:
+    get:
+      summary: Get degree (connection count)
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema: { type: string }
+      responses: { '200': { description: Degree count } }
+
+  /person/{personId}/exists:
+    get:
+      summary: Check if person exists in graph
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema: { type: string }
+      responses: { '200': { description: Existence check } }
+
+  /persons/by-role/{role}:
+    get:
+      summary: Get persons by role
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema: { type: string, enum: [accused, victim, complainant] }
+      responses: { '200': { description: Persons list } }
+
+  /edge/{edgeId}:
+    get:
+      summary: Get a specific edge by ID
+      parameters:
+        - name: edgeId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Edge data }
+        '404': { description: Edge not found }
+
+  /statistics:
+    get:
+      summary: Get graph-wide statistics
+      responses: { '200': { description: Graph statistics } }
+
+  /stats:
+    get:
+      summary: Get graph-wide statistics (alias)
+      responses: { '200': { description: Graph statistics } }
+
+  /cache/info:
+    get:
+      summary: Cache hit/miss/size info
+      responses: { '200': { description: Cache statistics } }
+
+  /cache/reload:
+    post:
+      summary: Reload entire cache from source
+      responses: { '200': { description: Cache reloaded } }
+
+  /cache/clear:
+    post:
+      summary: Clear entire cache
+      responses: { '200': { description: Cache cleared } }
+
+  /reload:
+    post:
+      summary: Reload entire graph from source
+      responses: { '200': { description: Graph reloaded } }
 ```

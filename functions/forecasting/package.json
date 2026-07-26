@@ -1,0 +1,16 @@
+{
+  "name": "forecasting",
+  "version": "1.0.0",
+  "description": "WBS 5.3 - Spatiotemporal Crime Forecasting",
+  "main": "index.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "helmet": "^8.3.0",
+    "zcatalyst-sdk-node": "^3.4.0"
+  }
+}
